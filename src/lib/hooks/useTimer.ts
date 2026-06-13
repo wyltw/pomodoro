@@ -1,29 +1,29 @@
 import { useState, useEffect } from "react";
 
-type TimerStatus = "play" | "pause" | "stop";
+type TimerStatus = "idle" | "running" | "paused";
 
 export const useTimer = (initialSeconds: number) => {
   const [seconds, setSeconds] = useState(initialSeconds);
-  const [status, setStatus] = useState<TimerStatus>("stop");
+  const [status, setStatus] = useState<TimerStatus>("idle");
 
   const stopTimer = () => {
-    setStatus("stop");
+    setStatus("idle");
     setSeconds(0);
   };
 
   const pauseTimer = () => {
-    setStatus("pause");
+    setStatus("paused");
   };
 
   const startTimer = () => {
-    setStatus("play");
+    setStatus("running");
   };
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (status === "play") setSeconds((prev) => prev + 1);
+      if (status === "running") setSeconds((prev) => prev + 1);
     }, 1000);
-    if (status === "pause" || status === "stop") clearInterval(intervalId);
+    if (status === "paused" || status === "idle") clearInterval(intervalId);
     return () => {
       clearInterval(intervalId);
     };
