@@ -8,15 +8,30 @@ import {
   CircularProgressRange,
   CircularProgressValueText,
 } from "./ui/circular-progress";
-import { useTimer } from "@/lib/hooks/useTimer";
-import TimerToggleButton from "./timer-toggle-button";
-import { Button } from "./ui/button";
-import { Square } from "lucide-react";
+import {
+  TimerContextProvider,
+  useTimerData,
+} from "@/lib/contexts/timer-context";
+import TimerButtonList from "./timer-button-list";
 
 export default function Pomodoro() {
   const sessionMax = 1500;
   const sessionMin = 0;
-  const { seconds, status, pauseTimer, startTimer } = useTimer(sessionMin);
+
+  return (
+    <TimerContextProvider initialSeconds={sessionMin}>
+      <PomodoroTimer sessionMax={sessionMax} sessionMin={sessionMin} />
+    </TimerContextProvider>
+  );
+}
+
+type PomodoroTimerProps = {
+  sessionMax: number;
+  sessionMin: number;
+};
+
+function PomodoroTimer({ sessionMax, sessionMin }: PomodoroTimerProps) {
+  const { seconds } = useTimerData();
 
   return (
     <div className="grid min-h-screen place-items-center bg-background p-6">
@@ -36,23 +51,7 @@ export default function Pomodoro() {
         </CircularProgressIndicator>
         <CircularProgressValueText className="text-2xl" />
       </CircularProgress>
-      <ul>
-        <li>
-          <TimerToggleButton
-            isRunning={status === "running"}
-            onToggle={(isRunning) => {
-              if (isRunning) {
-                pauseTimer();
-              } else {
-                startTimer();
-              }
-            }}
-          />
-          <Button>
-            <Square />
-          </Button>
-        </li>
-      </ul>
+      <TimerButtonList />
     </div>
   );
 }

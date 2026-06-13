@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 type TimerStatus = "idle" | "running" | "paused";
 
@@ -6,18 +6,18 @@ export const useTimer = (initialSeconds: number) => {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [status, setStatus] = useState<TimerStatus>("idle");
 
-  const stopTimer = () => {
+  const stopTimer = useCallback(() => {
     setStatus("idle");
     setSeconds(0);
-  };
+  }, []);
 
-  const pauseTimer = () => {
+  const pauseTimer = useCallback(() => {
     setStatus("paused");
-  };
+  }, []);
 
-  const startTimer = () => {
+  const startTimer = useCallback(() => {
     setStatus("running");
-  };
+  }, []);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
