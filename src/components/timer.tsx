@@ -14,23 +14,20 @@ import {
 } from "@/lib/contexts/timer-context";
 import TimerButtonList from "./timer-button-list";
 
-export default function Pomodoro() {
-  const sessionMax = 1500;
-  const sessionMin = 0;
-
-  return (
-    <TimerContextProvider initialSeconds={sessionMin}>
-      <PomodoroTimer sessionMax={sessionMax} sessionMin={sessionMin} />
-    </TimerContextProvider>
-  );
-}
-
-type PomodoroTimerProps = {
+type TimerProps = {
   sessionMax: number;
   sessionMin: number;
 };
 
-function PomodoroTimer({ sessionMax, sessionMin }: PomodoroTimerProps) {
+export default function Timer({ sessionMax, sessionMin }: TimerProps) {
+  return (
+    <TimerContextProvider initialSeconds={sessionMin}>
+      <CountdownTimer sessionMax={sessionMax} sessionMin={sessionMin} />
+    </TimerContextProvider>
+  );
+}
+
+function CountdownTimer({ sessionMax, sessionMin }: TimerProps) {
   const { seconds } = useTimerData();
 
   return (
