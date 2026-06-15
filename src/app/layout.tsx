@@ -37,7 +37,11 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="h-full">
+        <main className="h-full grid items-center justify-items-center">
+          {children}
+        </main>
+      </body>
     </html>
   );
 }

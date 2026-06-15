@@ -31,12 +31,13 @@ function CountdownTimer({ sessionMax, sessionMin }: TimerProps) {
   const { seconds } = useTimerData();
 
   return (
-    <div className="grid min-h-screen place-items-center bg-background p-6">
+    <div className="flex flex-col items-center gap-2">
       <CircularProgress
         value={seconds}
         max={sessionMax}
         min={sessionMin}
-        size={144}
+        size={208}
+        thickness={8}
         getValueText={(value) => {
           const secondsLeft = sessionMax - value;
           return formatTime(secondsLeft);
@@ -46,7 +47,7 @@ function CountdownTimer({ sessionMax, sessionMin }: TimerProps) {
           <CircularProgressTrack />
           <CircularProgressRange />
         </CircularProgressIndicator>
-        <CircularProgressValueText className="text-2xl" />
+        <CircularProgressValueText className="text-4xl" />
       </CircularProgress>
       <TimerButtonList />
     </div>
