@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 
 type TimerStatus = "idle" | "running" | "paused";
 
-export const useTimer = (initialSeconds: number) => {
+export const useTimer = (initialSeconds: number, endSeconds: number) => {
   const [seconds, setSeconds] = useState(initialSeconds);
   const [status, setStatus] = useState<TimerStatus>("idle");
 
   const stopTimer = useCallback(() => {
     setStatus("idle");
-    setSeconds(0);
-  }, []);
+    setSeconds(initialSeconds);
+  }, [initialSeconds]);
 
   const pauseTimer = useCallback(() => {
     setStatus("paused");
@@ -20,13 +20,23 @@ export const useTimer = (initialSeconds: number) => {
   }, []);
 
   useEffect(() => {
+    if (status !== "running") return;
+
     const intervalId = setInterval(() => {
-      if (status === "running") setSeconds((prev) => prev + 1);
+      setSeconds((prev) => {
+        const nextSeconds = Math.min(prev + 1, endSeconds);
+        if (prev >= endSeconds) {
+          setStatus("idle");
+          return initialSeconds;
+        }
+
+        return nextSeconds;
+      });
     }, 1000);
-    if (status === "paused" || status === "idle") clearInterval(intervalId);
+
     return () => {
       clearInterval(intervalId);
     };
-  }, [status, seconds]);
+  }, [status, initialSeconds, endSeconds]);
   return { seconds, status, startTimer, pauseTimer, stopTimer };
 };

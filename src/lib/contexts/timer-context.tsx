@@ -13,14 +13,16 @@ const TimerApiContext = createContext<TimerApi | null>(null);
 type TimerContextProviderProps = {
   children: ReactNode;
   initialSeconds: number;
+  endSeconds: number;
 };
 
 export function TimerContextProvider({
   children,
+  endSeconds,
   initialSeconds,
 }: TimerContextProviderProps) {
   const { seconds, status, startTimer, pauseTimer, stopTimer } =
-    useTimer(initialSeconds);
+    useTimer(initialSeconds, endSeconds);
 
   const data = useMemo(
     () => ({
@@ -41,7 +43,9 @@ export function TimerContextProvider({
 
   return (
     <TimerDataContext.Provider value={data}>
-      <TimerApiContext.Provider value={api}>{children}</TimerApiContext.Provider>
+      <TimerApiContext.Provider value={api}>
+        {children}
+      </TimerApiContext.Provider>
     </TimerDataContext.Provider>
   );
 }

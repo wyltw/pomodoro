@@ -21,7 +21,7 @@ type TimerProps = {
 
 export default function Timer({ sessionMax, sessionMin }: TimerProps) {
   return (
-    <TimerContextProvider initialSeconds={sessionMin}>
+    <TimerContextProvider initialSeconds={sessionMin} endSeconds={sessionMax}>
       <CountdownTimer sessionMax={sessionMax} sessionMin={sessionMin} />
     </TimerContextProvider>
   );
