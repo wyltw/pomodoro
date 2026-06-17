@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-type TimerStatus = "idle" | "running" | "paused";
+type TimerStatus = "idle" | "running" | "paused" | "completed";
 
 export const useTimer = (initialSeconds: number, endSeconds: number) => {
   const [seconds, setSeconds] = useState(initialSeconds);
@@ -26,7 +26,7 @@ export const useTimer = (initialSeconds: number, endSeconds: number) => {
       setSeconds((prev) => {
         const nextSeconds = Math.min(prev + 1, endSeconds);
         if (prev >= endSeconds) {
-          setStatus("idle");
+          setStatus("completed");
           return initialSeconds;
         }
 

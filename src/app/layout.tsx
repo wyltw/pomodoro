@@ -38,7 +38,7 @@ export default function RootLayout({
       )}
     >
       <body className="h-full">
-        <main className="h-full grid items-center justify-items-center">
+        <main className="h-full grid items-center justify-items-center container mx-auto">
           {children}
         </main>
       </body>

@@ -1,30 +1,66 @@
+"use client";
+
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Timer from "./timer";
 import { TIMER_TAB_ITEMS } from "@/lib/constants";
-import { Card } from "./ui/card";
+import type { TimerType } from "@/lib/types/types";
 
 export default function TimerTabs() {
-  return (
-    <Card className="ring-0 shadow-none">
-      <Tabs defaultValue="pomodoro" className="px-4 gap-4">
-        <TabsList className="self-center">
-          {TIMER_TAB_ITEMS.map((item) => (
-            <TabsTrigger key={item.value} value={item.value}>
-              {item.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+  const [selectedTab, setSelectedTab] = useState<TimerType>("pomodoro");
 
-        <TabsContent value="pomodoro">
-          <Timer sessionMax={1500} sessionMin={0} />
-        </TabsContent>
-        <TabsContent value="shortBreak">
-          <Timer sessionMax={300} sessionMin={0} />
-        </TabsContent>
-        <TabsContent value="longBreak">
-          <Timer sessionMax={900} sessionMin={0} />
-        </TabsContent>
-      </Tabs>
-    </Card>
+  const handleContinue = () => {
+    setSelectedTab("pomodoro");
+  };
+
+  const handleBreak = (type: Exclude<TimerType, "pomodoro">) => {
+    setSelectedTab(type);
+  };
+
+  return (
+    <Tabs
+      value={selectedTab}
+      onValueChange={(value) => {
+        setSelectedTab(value as TimerType);
+      }}
+      className="gap-4 px-4"
+    >
+      <TabsList className="self-center">
+        {TIMER_TAB_ITEMS.map((item) => (
+          <TabsTrigger
+            className="text-base"
+            key={item.value}
+            value={item.value}
+          >
+            {item.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+
+      <TabsContent value="pomodoro">
+        <Timer
+          sessionMax={1500}
+          sessionMin={0}
+          onContinue={handleContinue}
+          onBreak={handleBreak}
+        />
+      </TabsContent>
+      <TabsContent value="shortBreak">
+        <Timer
+          sessionMax={300}
+          sessionMin={0}
+          onContinue={handleContinue}
+          onBreak={handleBreak}
+        />
+      </TabsContent>
+      <TabsContent value="longBreak">
+        <Timer
+          sessionMax={3}
+          sessionMin={0}
+          onContinue={handleContinue}
+          onBreak={handleBreak}
+        />
+      </TabsContent>
+    </Tabs>
   );
 }
