@@ -22,6 +22,7 @@ export const useTimer = (initialSeconds: number, endSeconds: number) => {
   useEffect(() => {
     if (status !== "running") return;
 
+    // status changes trigger cleaner function, so countdown will stop automatically
     const intervalId = setInterval(() => {
       setSeconds((prev) => {
         const nextSeconds = Math.min(prev + 1, endSeconds);

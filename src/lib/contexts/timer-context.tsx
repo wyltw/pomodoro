@@ -21,8 +21,10 @@ export function TimerContextProvider({
   endSeconds,
   initialSeconds,
 }: TimerContextProviderProps) {
-  const { seconds, status, startTimer, pauseTimer, stopTimer } =
-    useTimer(initialSeconds, endSeconds);
+  const { seconds, status, startTimer, pauseTimer, stopTimer } = useTimer(
+    initialSeconds,
+    endSeconds,
+  );
 
   const data = useMemo(
     () => ({

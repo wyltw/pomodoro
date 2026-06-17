@@ -17,6 +17,8 @@ export default function TimerTabs() {
     setSelectedTab(type);
   };
 
+  // Timer state should reset after tabs change because of mount
+
   return (
     <Tabs
       value={selectedTab}
