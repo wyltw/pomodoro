@@ -1,6 +1,6 @@
 import { RotateCcw } from "lucide-react";
 import TimerToggleButton from "./timer-toggle-button";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useTimerApi, useTimerData } from "@/lib/contexts/timer-context";
 
 export default function TimerButtonList() {
