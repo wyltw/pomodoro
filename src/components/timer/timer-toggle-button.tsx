@@ -19,6 +19,9 @@ export default function TimerToggleButton({
       }}
     >
       {isRunning ? <Pause /> : <Play />}
+      <span className="hidden">
+        {isRunning ? "pause timer" : "start timer"}
+      </span>
     </Button>
   );
 }

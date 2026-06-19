@@ -24,6 +24,7 @@ export default function TimerButtonList() {
       <li>
         <Button onClick={stopTimer}>
           <RotateCcw />
+          <span className="hidden">reset timer</span>
         </Button>
       </li>
     </ul>

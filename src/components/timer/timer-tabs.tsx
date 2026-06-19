@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Timer from "./timer";
-import { TIMER_TAB_ITEMS } from "@/lib/constants";
 import type { TimerType } from "@/lib/types/types";
+import { Armchair, Clock5, Coffee } from "lucide-react";
 
 export default function TimerTabs() {
   const [selectedTab, setSelectedTab] = useState<TimerType>("pomodoro");
@@ -28,15 +29,18 @@ export default function TimerTabs() {
       className="gap-4 px-4"
     >
       <TabsList className="self-center">
-        {TIMER_TAB_ITEMS.map((item) => (
-          <TabsTrigger
-            className="text-base"
-            key={item.value}
-            value={item.value}
-          >
-            {item.label}
-          </TabsTrigger>
-        ))}
+        <TabsTrigger className="text-base" value="pomodoro">
+          <Clock5 />
+          Pomodoro
+        </TabsTrigger>
+        <TabsTrigger className="text-base" value="shortBreak">
+          <Coffee />
+          Short Break
+        </TabsTrigger>
+        <TabsTrigger className="text-base" value="longBreak">
+          <Armchair />
+          Long Break
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="pomodoro">
