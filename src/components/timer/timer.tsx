@@ -7,13 +7,13 @@ import {
   CircularProgressTrack,
   CircularProgressRange,
   CircularProgressValueText,
-} from "./ui/circular-progress";
+} from "../ui/circular-progress";
 import {
   TimerContextProvider,
   useTimerData,
 } from "@/lib/contexts/timer-context";
 import TimerButtonList from "./timer-button-list";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import type { TimerType } from "@/lib/types/types";
 
 type TimerProps = {
