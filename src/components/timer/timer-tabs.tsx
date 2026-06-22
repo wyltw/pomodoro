@@ -25,19 +25,19 @@ export default function TimerTabs() {
       onValueChange={(value) => {
         setSelectedTab(value as TimerType);
       }}
-      className="gap-4 px-4"
+      className="mt-32 gap-4 self-start"
     >
       <TabsList className="self-center">
-        <TabsTrigger className="text-base" value="pomodoro">
-          <Clock5 />
+        <TabsTrigger value="pomodoro">
+          <Clock5 data-icon="inline-start" />
           Pomodoro
         </TabsTrigger>
-        <TabsTrigger className="text-base" value="shortBreak">
-          <Coffee />
+        <TabsTrigger value="shortBreak">
+          <Coffee data-icon="inline-start" />
           Short Break
         </TabsTrigger>
-        <TabsTrigger className="text-base" value="longBreak">
-          <Armchair />
+        <TabsTrigger value="longBreak">
+          <Armchair data-icon="inline-start" />
           Long Break
         </TabsTrigger>
       </TabsList>

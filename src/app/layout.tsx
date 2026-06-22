@@ -37,11 +37,7 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="h-full">
-        <main className="h-full grid items-center justify-items-center container mx-auto">
-          {children}
-        </main>
-      </body>
+      <body className="flex h-full flex-col bg-[#FCFCFC]">{children}</body>
     </html>
   );
 }
