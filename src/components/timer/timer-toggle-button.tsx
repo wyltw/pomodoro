@@ -18,7 +18,11 @@ export default function TimerToggleButton({
         onToggle(isRunning);
       }}
     >
-      {isRunning ? <Pause /> : <Play />}
+      {isRunning ? (
+        <Pause data-icon="inline-start" />
+      ) : (
+        <Play data-icon="inline-start" />
+      )}
       <span className="hidden">
         {isRunning ? "pause timer" : "start timer"}
       </span>
