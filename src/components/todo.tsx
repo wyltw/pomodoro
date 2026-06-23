@@ -6,18 +6,28 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { FocusTaskDialog } from "@/components/focus-task-dialog";
+import { TaskList } from "@/components/task-list";
+import type { FocusTask } from "@/lib/types/types";
+
+const tasks: FocusTask[] = [
+  {
+    id: "focus-task-1",
+    title: "Plan today's focus",
+    estimatedPomodoros: 3,
+    completedPomodoros: 0,
+  },
+];
 
 export default function Todo() {
   return (
-    <Collapsible className="group/collapsible bg-card text-card-foreground rounded-2xl border p-4 shadow-sm">
+    <Collapsible className="group/collapsible bg-card text-card-foreground w-full max-w-md rounded-2xl border p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h2 className="font-heading text-base font-medium">
             Today&apos;s Tasks
           </h2>
-          <p className="text-muted-foreground text-sm">
-            Finish one small task before starting your next pomodoro.
-          </p>
+          <p className="text-muted-foreground text-sm">Current task:</p>
         </div>
         <CollapsibleTrigger asChild>
           <Button
@@ -30,20 +40,9 @@ export default function Todo() {
           </Button>
         </CollapsibleTrigger>
       </div>
-
+      <FocusTaskDialog />
       <CollapsibleContent className="mt-4 space-y-3 border-t pt-4 text-sm">
-        <label className="flex items-center gap-3">
-          <input type="checkbox" className="accent-primary size-4" />
-          <span>Choose the three most important tasks for today</span>
-        </label>
-        <label className="flex items-center gap-3">
-          <input type="checkbox" className="accent-primary size-4" />
-          <span>Set the focus goal for the next 25 minutes</span>
-        </label>
-        <label className="flex items-center gap-3">
-          <input type="checkbox" className="accent-primary size-4" />
-          <span>Note your progress before taking a break</span>
-        </label>
+        <TaskList tasks={tasks} />
       </CollapsibleContent>
     </Collapsible>
   );
