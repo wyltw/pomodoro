@@ -43,6 +43,10 @@ pomodoro/
 - Use named exports, not default exports
 - Use Shadcn MCP to search existing shadcn-style components before creating new UI primitives
 - Extract large JSX blocks into semantic components with clear names
+- Treat likely typos in requested filenames or symbols as ambiguous; infer from context when obvious, otherwise ask before creating or renaming files
+- Prefer early returns or guard clauses for invalid or fallback branches
+- Avoid type assertions whenever possible; prefer inference, narrowing, schemas, or type guards at trust boundaries
+- Name helpers for the generic operation they perform unless the domain meaning changes the behavior; avoid repeating context already clear at the call site
 
 ## Build, Test, and Development Commands
 
