@@ -1,11 +1,11 @@
 import TimerTabs from "@/components/timer/timer-tabs";
-import Todo from "@/components/todo";
+import FocusTaskPanel from "@/components/focus-task-panel";
 
 export default function Home() {
   return (
     <>
       <TimerTabs />
-      <Todo />
+      <FocusTaskPanel />
     </>
   );
 }

@@ -9,7 +9,7 @@ export function TaskList({ tasks }: TaskListProps) {
     <ul className="space-y-2">
       {tasks.map((task) => (
         <li
-          className="bg-muted/50 flex items-center justify-between gap-3 rounded-2xl px-3 py-2"
+          className="bg-muted/50 flex items-center justify-between gap-3 rounded-md px-3 py-2"
           key={task.id}
         >
           <span className="min-w-0 truncate font-medium">{task.title}</span>
