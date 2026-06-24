@@ -19,3 +19,5 @@ export const TIMER_TAB_ITEMS: TimerTabItems[] = [
     label: "Long Break",
   },
 ];
+
+export const DAILY_FOCUS_TASKS_STORAGE_KEY = "daily-focus-tasks";
