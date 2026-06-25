@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const focusTaskSchema = z.object({
-  id: z.string(),
+  id: z.uuid(),
   title: z.string(),
   estimatedPomodoros: z.number(),
   completedPomodoros: z.number(),

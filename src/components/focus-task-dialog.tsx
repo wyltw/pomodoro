@@ -3,6 +3,7 @@ import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -12,8 +13,13 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
+import { FocusTask } from "@/lib/types/types";
+import { useState } from "react";
 
 export function FocusTaskDialog() {
+  const [isOpen, setIsOpen] = useState(false);
+  const addTask = useDailyFocusTasksStore((state) => state.addTask);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -29,7 +35,16 @@ export function FocusTaskDialog() {
             Set the task and estimated pomodoro count.
           </DialogDescription>
         </DialogHeader>
-        <form className="grid gap-4">
+        <form
+          action={(formData: FormData) => {
+            const data = Object.fromEntries(formData) as Partial<FocusTask>;
+            addTask({
+              title: "123",
+              estimatedPomodoros: 4,
+            });
+          }}
+          className="grid gap-4"
+        >
           <Field>
             <FieldLabel htmlFor="focus-task-title">Title</FieldLabel>
             <Input
@@ -53,6 +68,11 @@ export function FocusTaskDialog() {
             />
           </Field>
           <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant={"secondary"}>
+                Cancel
+              </Button>
+            </DialogClose>
             <Button type="submit">Save task</Button>
           </DialogFooter>
         </form>

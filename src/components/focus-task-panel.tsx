@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronDownIcon } from "lucide-react";
 
 import { FocusTaskDialog } from "@/components/focus-task-dialog";
@@ -8,18 +10,10 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import type { FocusTask } from "@/lib/types/types";
-
-const tasks: FocusTask[] = [
-  {
-    id: "focus-task-1",
-    title: "Plan today's focus",
-    estimatedPomodoros: 3,
-    completedPomodoros: 0,
-  },
-];
+import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export default function FocusTaskPanel() {
+  const tasks = useDailyFocusTasksStore((state) => state.tasks);
   return (
     <Collapsible className="group/collapsible bg-card text-card-foreground w-full max-w-md rounded-2xl border p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -28,7 +22,7 @@ export default function FocusTaskPanel() {
             Today&apos;s Tasks
           </h2>
           <p className="text-muted-foreground text-sm">
-            Current task: {tasks[0].title}
+            Current task: {tasks[0]?.title}
           </p>
         </div>
         <CollapsibleTrigger asChild>
