@@ -6,7 +6,6 @@ import { DAILY_FOCUS_TASKS_STORAGE_KEY } from "@/lib/constants";
 import { dailyFocusTasksSchema } from "@/lib/schemas";
 import type { DailyFocusTasks, FocusTask } from "@/lib/types/types";
 import { getLocalDateKey } from "@/lib/utils/utils";
-import { randomUUID } from "crypto";
 
 export type DailyFocusTasksState = DailyFocusTasks;
 
@@ -35,7 +34,7 @@ export const useDailyFocusTasksStore = create<DailyFocusTasksStore>()(
         set((state) => ({
           tasks: [
             ...state.tasks,
-            { ...newTask, completedPomodoros: 0, id: randomUUID() },
+            { ...newTask, completedPomodoros: 0, id: crypto.randomUUID() },
           ],
         })),
       updateTask: (taskId, payload) =>
