@@ -63,8 +63,8 @@ Focus tests on integration behavior using Vitest with Testing Library. Test file
 
 ## Commit & Pull Request Guidelines
 
-Recent commits use concise prefixes such as `fix:`, `chore:`, `ci:`, and `layout:`. Follow that style with an imperative summary, for example `fix: handle timer reset state`. PRs should include a short description, test results, linked issues when relevant, and screenshots or recordings for visible UI changes.
-
-## Agent-Specific Instructions
-
-This project uses Next.js `16.2.9`, which may differ from older Next.js conventions. Before changing Next.js routing, server/client component behavior, forms, or build APIs, read the relevant guide in `node_modules/next/dist/docs/` and follow any deprecation notices.
+- Format commit messages and PR titles as `<type>[optional scope]: <description>`.
+- Use a concise Conventional Commits type such as `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `build`, `ci`, `perf`, `revert`, or `chore`.
+- Write the description as a concise imperative summary, for example `fix(timer): handle reset state`.
+- Do not add prefixes outside this format, including `[codex]`.
+- Include a short description and test results in the PR body.
