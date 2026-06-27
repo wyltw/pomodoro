@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { RotateCcw, SaveIcon, Undo, Undo2 } from "lucide-react";
+import { SaveIcon, Undo2Icon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -54,7 +54,22 @@ export default function FocusTaskPanel() {
     );
   }
 
-  return <FocusTaskUpdateForm key={focusingTask.id} task={focusingTask} />;
+  return (
+    <Card className="w-full max-w-md self-start rounded-xl">
+      <CardHeader>
+        <CardTitle className="text-lg">
+          <h2>Now Focusing</h2>
+        </CardTitle>
+        <CardDescription>
+          {focusingTask.completedPomodoros}/{focusingTask.estimatedPomodoros}{" "}
+          pomodoros completed
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <FocusTaskUpdateForm key={focusingTask.id} task={focusingTask} />
+      </CardContent>
+    </Card>
+  );
 }
 
 function FocusTaskUpdateForm({ task }: FocusTaskUpdateFormProps) {
@@ -78,123 +93,109 @@ function FocusTaskUpdateForm({ task }: FocusTaskUpdateFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md self-start rounded-xl">
-      <CardHeader>
-        <CardTitle className="text-lg">
-          <h2>Now Focusing</h2>
-        </CardTitle>
-        <CardDescription>
-          {task.completedPomodoros}/{task.estimatedPomodoros} pomodoros
-          completed
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <Controller
-            control={form.control}
-            name="title"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="focus-task-update-title">Title</FieldLabel>
-                <Input
-                  {...field}
-                  aria-describedby={
-                    fieldState.error
-                      ? "focus-task-update-title-error"
-                      : undefined
-                  }
-                  aria-invalid={fieldState.invalid}
-                  id="focus-task-update-title"
-                  type="text"
-                />
-                <FieldError
-                  errors={[fieldState.error]}
-                  id="focus-task-update-title-error"
-                />
-              </Field>
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="description"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="focus-task-update-description">
-                  Description
-                </FieldLabel>
-                <Textarea
-                  {...field}
-                  aria-describedby={
-                    fieldState.error
-                      ? "focus-task-update-description-error"
-                      : undefined
-                  }
-                  aria-invalid={fieldState.invalid}
-                  id="focus-task-update-description"
-                  placeholder="Add a short note"
-                />
-                <FieldError
-                  errors={[fieldState.error]}
-                  id="focus-task-update-description-error"
-                />
-              </Field>
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="estimatedPomodoros"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="focus-task-update-estimated-pomodoros">
-                  Estimated Pomodoros
-                </FieldLabel>
-                <Input
-                  {...field}
-                  aria-describedby={
-                    fieldState.error
-                      ? "focus-task-update-estimated-pomodoros-error"
-                      : undefined
-                  }
-                  aria-invalid={fieldState.invalid}
-                  id="focus-task-update-estimated-pomodoros"
-                  inputMode="numeric"
-                  max={8}
-                  min={1}
-                  onChange={(event) =>
-                    field.onChange(
-                      event.currentTarget.value === ""
-                        ? undefined
-                        : event.currentTarget.valueAsNumber,
-                    )
-                  }
-                  type="number"
-                  value={Number.isNaN(field.value) ? "" : field.value}
-                />
-                <FieldError
-                  errors={[fieldState.error]}
-                  id="focus-task-update-estimated-pomodoros-error"
-                />
-              </Field>
-            )}
-          />
-          <div className="flex flex-col gap-2">
-            <Button type="submit" disabled={!form.formState.isDirty}>
-              <SaveIcon />
-              Update task
-            </Button>
-            <Button
-              variant={"outline"}
-              disabled={!form.formState.isDirty}
-              onClick={() => {
-                form.reset(task);
-              }}
-            >
-              <Undo2 />
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+      <Controller
+        control={form.control}
+        name="title"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="focus-task-update-title">Title</FieldLabel>
+            <Input
+              {...field}
+              aria-describedby={
+                fieldState.error ? "focus-task-update-title-error" : undefined
+              }
+              aria-invalid={fieldState.invalid}
+              id="focus-task-update-title"
+              type="text"
+            />
+            <FieldError
+              errors={[fieldState.error]}
+              id="focus-task-update-title-error"
+            />
+          </Field>
+        )}
+      />
+      <Controller
+        control={form.control}
+        name="description"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="focus-task-update-description">
+              Description
+            </FieldLabel>
+            <Textarea
+              {...field}
+              aria-describedby={
+                fieldState.error
+                  ? "focus-task-update-description-error"
+                  : undefined
+              }
+              aria-invalid={fieldState.invalid}
+              id="focus-task-update-description"
+              placeholder="Add a short note"
+            />
+            <FieldError
+              errors={[fieldState.error]}
+              id="focus-task-update-description-error"
+            />
+          </Field>
+        )}
+      />
+      <Controller
+        control={form.control}
+        name="estimatedPomodoros"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="focus-task-update-estimated-pomodoros">
+              Estimated Pomodoros
+            </FieldLabel>
+            <Input
+              {...field}
+              aria-describedby={
+                fieldState.error
+                  ? "focus-task-update-estimated-pomodoros-error"
+                  : undefined
+              }
+              aria-invalid={fieldState.invalid}
+              id="focus-task-update-estimated-pomodoros"
+              inputMode="numeric"
+              max={8}
+              min={1}
+              onChange={(event) =>
+                field.onChange(
+                  event.currentTarget.value === ""
+                    ? undefined
+                    : event.currentTarget.valueAsNumber,
+                )
+              }
+              type="number"
+              value={Number.isNaN(field.value) ? "" : field.value}
+            />
+            <FieldError
+              errors={[fieldState.error]}
+              id="focus-task-update-estimated-pomodoros-error"
+            />
+          </Field>
+        )}
+      />
+      <div className="flex flex-col gap-2">
+        <Button type="submit" disabled={!form.formState.isDirty}>
+          <SaveIcon />
+          Update task
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={!form.formState.isDirty}
+          onClick={() => {
+            form.reset(task);
+          }}
+        >
+          <Undo2Icon />
+          Cancel
+        </Button>
+      </div>
+    </form>
   );
 }
