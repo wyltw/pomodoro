@@ -25,7 +25,7 @@ export default function TimerTabs() {
       onValueChange={(value) => {
         setSelectedTab(value as TimerType);
       }}
-      className="gap-4 self-end"
+      className="mt-4 gap-4"
     >
       <TabsList className="self-center">
         <TabsTrigger value="pomodoro">

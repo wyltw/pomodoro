@@ -12,8 +12,6 @@ export default function TimerToggleButton({
 }: TimerToggleButtonProps) {
   return (
     <Button
-      className=""
-      variant={"default"}
       onClick={() => {
         onToggle(isRunning);
       }}
