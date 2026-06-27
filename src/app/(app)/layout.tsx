@@ -12,12 +12,12 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
       <SidebarProvider>
         <FocusTaskSidebar />
         <SidebarInset>
-          <main className="container mx-auto grid flex-1 grid-rows-[1fr_1fr] items-start justify-items-center gap-4 px-4">
+          <main className="container mx-auto grid flex-1 grid-rows-[min-content_1fr] items-center justify-items-center gap-4 px-4">
             {children}
           </main>
+          <Footer />
         </SidebarInset>
       </SidebarProvider>
-      <Footer />
     </>
   );
 }
