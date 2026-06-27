@@ -69,7 +69,7 @@ export default function FocusTaskPanel() {
             <Button
               type="button"
               variant="ghost"
-              size="icon"
+              size="icon-lg"
               aria-label="Edit task"
               title="Edit task"
               disabled={isEditing}
@@ -80,7 +80,7 @@ export default function FocusTaskPanel() {
             <Button
               type="button"
               variant="ghost"
-              size="icon"
+              size="icon-lg"
               className="text-destructive hover:text-destructive"
               aria-label="Delete task"
               disabled={isEditing}
@@ -141,19 +141,25 @@ function FocusTaskUpdateForm({
   if (!isEditing) {
     return (
       <dl className="grid gap-4">
-        <div className="grid gap-1">
-          <dt className="text-sm font-medium">Title</dt>
-          <dd className="text-sm">{task.title}</dd>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-6">
+          <div className="grid min-w-0 gap-1">
+            <dt className="text-muted-foreground text-sm font-medium">Title</dt>
+            <dd className="truncate text-base">{task.title}</dd>
+          </div>
+          <div className="grid gap-1">
+            <dt className="text-muted-foreground text-sm font-medium">
+              Estimated Pomodoros
+            </dt>
+            <dd className="text-xl tabular-nums">{task.estimatedPomodoros}</dd>
+          </div>
         </div>
         <div className="grid gap-1">
-          <dt className="text-sm font-medium">Description</dt>
-          <dd className="text-muted-foreground text-sm whitespace-pre-wrap">
+          <dt className="text-muted-foreground text-sm font-medium">
+            Description
+          </dt>
+          <dd className="text-base whitespace-pre-wrap">
             {task.description || "No description"}
           </dd>
-        </div>
-        <div className="grid gap-1">
-          <dt className="text-sm font-medium">Estimated Pomodoros</dt>
-          <dd className="text-sm tabular-nums">{task.estimatedPomodoros}</dd>
         </div>
       </dl>
     );
@@ -179,32 +185,6 @@ function FocusTaskUpdateForm({
             <FieldError
               errors={[fieldState.error]}
               id="focus-task-update-title-error"
-            />
-          </Field>
-        )}
-      />
-      <Controller
-        control={form.control}
-        name="description"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-update-description">
-              Description
-            </FieldLabel>
-            <Textarea
-              {...field}
-              aria-describedby={
-                fieldState.error
-                  ? "focus-task-update-description-error"
-                  : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-update-description"
-              placeholder="Add a short note"
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-update-description-error"
             />
           </Field>
         )}
@@ -242,6 +222,32 @@ function FocusTaskUpdateForm({
             <FieldError
               errors={[fieldState.error]}
               id="focus-task-update-estimated-pomodoros-error"
+            />
+          </Field>
+        )}
+      />
+      <Controller
+        control={form.control}
+        name="description"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="focus-task-update-description">
+              Description
+            </FieldLabel>
+            <Textarea
+              {...field}
+              aria-describedby={
+                fieldState.error
+                  ? "focus-task-update-description-error"
+                  : undefined
+              }
+              aria-invalid={fieldState.invalid}
+              id="focus-task-update-description"
+              placeholder="Add a short note"
+            />
+            <FieldError
+              errors={[fieldState.error]}
+              id="focus-task-update-description-error"
             />
           </Field>
         )}
