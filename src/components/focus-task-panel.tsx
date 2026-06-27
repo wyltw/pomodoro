@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SaveIcon, Undo2Icon } from "lucide-react";
+import { SaveIcon, SquarePenIcon, Trash2Icon, Undo2Icon } from "lucide-react";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -31,15 +32,20 @@ const focusTaskUpdateFormSchema = z.object({
 type FocusTaskUpdateFormInput = z.input<typeof focusTaskUpdateFormSchema>;
 type FocusTaskUpdateFormValues = z.output<typeof focusTaskUpdateFormSchema>;
 
-type FocusTaskUpdateFormProps = {
-  task: FocusTask;
-};
-
 export default function FocusTaskPanel() {
+  const [isEditing, setIsEditing] = useState(false);
   const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
 
   const focusingTask = tasks.find((task) => task.id === activeTaskId);
+
+  function startEditing() {
+    setIsEditing(true);
+  }
+
+  function stopEditing() {
+    setIsEditing(false);
+  }
 
   if (!focusingTask) {
     return (
@@ -57,8 +63,32 @@ export default function FocusTaskPanel() {
   return (
     <Card className="w-full max-w-md self-start rounded-xl">
       <CardHeader>
-        <CardTitle className="text-lg">
+        <CardTitle className="flex items-center justify-between gap-3 text-lg">
           <h2>Now Focusing</h2>
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label="Edit task"
+              title="Edit task"
+              disabled={isEditing}
+              onClick={startEditing}
+            >
+              <SquarePenIcon />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="text-destructive hover:text-destructive"
+              aria-label="Delete task"
+              disabled={isEditing}
+              title="Delete task"
+            >
+              <Trash2Icon />
+            </Button>
+          </div>
         </CardTitle>
         <CardDescription>
           {focusingTask.completedPomodoros}/{focusingTask.estimatedPomodoros}{" "}
@@ -66,13 +96,28 @@ export default function FocusTaskPanel() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <FocusTaskUpdateForm key={focusingTask.id} task={focusingTask} />
+        <FocusTaskUpdateForm
+          key={focusingTask.id}
+          task={focusingTask}
+          isEditing={isEditing}
+          onEditingEnd={stopEditing}
+        />
       </CardContent>
     </Card>
   );
 }
 
-function FocusTaskUpdateForm({ task }: FocusTaskUpdateFormProps) {
+type FocusTaskUpdateFormProps = {
+  task: FocusTask;
+  isEditing: boolean;
+  onEditingEnd: () => void;
+};
+
+function FocusTaskUpdateForm({
+  task,
+  isEditing,
+  onEditingEnd,
+}: FocusTaskUpdateFormProps) {
   const updateTask = useDailyFocusTasksStore((state) => state.updateTask);
   const form = useForm<
     FocusTaskUpdateFormInput,
@@ -90,6 +135,28 @@ function FocusTaskUpdateForm({ task }: FocusTaskUpdateFormProps) {
   function onSubmit(values: FocusTaskUpdateFormValues) {
     updateTask(task.id, values);
     form.reset(values);
+    onEditingEnd();
+  }
+
+  if (!isEditing) {
+    return (
+      <dl className="grid gap-4">
+        <div className="grid gap-1">
+          <dt className="text-sm font-medium">Title</dt>
+          <dd className="text-sm">{task.title}</dd>
+        </div>
+        <div className="grid gap-1">
+          <dt className="text-sm font-medium">Description</dt>
+          <dd className="text-muted-foreground text-sm whitespace-pre-wrap">
+            {task.description || "No description"}
+          </dd>
+        </div>
+        <div className="grid gap-1">
+          <dt className="text-sm font-medium">Estimated Pomodoros</dt>
+          <dd className="text-sm tabular-nums">{task.estimatedPomodoros}</dd>
+        </div>
+      </dl>
+    );
   }
 
   return (
@@ -187,9 +254,9 @@ function FocusTaskUpdateForm({ task }: FocusTaskUpdateFormProps) {
         <Button
           type="button"
           variant="outline"
-          disabled={!form.formState.isDirty}
           onClick={() => {
             form.reset(task);
+            onEditingEnd();
           }}
         >
           <Undo2Icon />
