@@ -10,7 +10,9 @@ import { getLocalDateKey } from "@/lib/utils/utils";
 export type DailyFocusTasksState = DailyFocusTasks;
 
 export type DailyFocusTasksActions = {
-  addTask: (newTask: Pick<FocusTask, "title" | "estimatedPomodoros">) => void;
+  addTask: (
+    newTask: Pick<FocusTask, "title" | "description" | "estimatedPomodoros">,
+  ) => void;
   updateTask: (taskId: string, payload: Partial<FocusTask>) => void;
   removeTask: (taskId: string) => void;
   setActiveTask: (taskId: string) => void;
