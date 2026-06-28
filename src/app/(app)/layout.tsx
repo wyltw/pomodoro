@@ -1,5 +1,5 @@
+import { FocusTaskSidebar } from "@/components/focus-task/focus-task-sidebar";
 import Footer from "@/components/footer";
-import { FocusTaskSidebar } from "@/components/focus-task-sidebar";
 import Header from "@/components/header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import React, { ReactNode } from "react";

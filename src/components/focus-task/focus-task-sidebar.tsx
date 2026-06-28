@@ -18,6 +18,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
+import NumberInput from "./number-input";
 
 const focusTaskFormSchema = z.object({
   title: z.string().trim().min(1, "Title is required."),
@@ -25,7 +26,7 @@ const focusTaskFormSchema = z.object({
   estimatedPomodoros: z
     .number({ error: "Estimated Pomodoros is required." })
     .min(1, "Estimated Pomodoros must be at least 1.")
-    .max(8, "Estimated Pomodoros must be 8 or less."),
+    .max(8, "Consider splitting this into smaller tasks."),
 });
 
 type FocusTaskFormInput = z.input<typeof focusTaskFormSchema>;
@@ -142,7 +143,7 @@ function FocusTaskForm() {
             <FieldLabel htmlFor="focus-task-estimated-pomodoros">
               Estimated Pomodoros
             </FieldLabel>
-            <Input
+            <NumberInput
               {...field}
               aria-describedby={
                 fieldState.error
@@ -152,15 +153,26 @@ function FocusTaskForm() {
               aria-invalid={fieldState.invalid}
               id="focus-task-estimated-pomodoros"
               inputMode="numeric"
-              max={8}
-              min={1}
-              onChange={(event) =>
-                field.onChange(
-                  event.currentTarget.value === ""
-                    ? undefined
-                    : event.currentTarget.valueAsNumber,
-                )
-              }
+              onChange={async (event) => {
+                const value = Math.max(0, Number(event.currentTarget.value));
+                event.currentTarget.value = String(value);
+                field.onChange(value);
+                await form.trigger("estimatedPomodoros");
+              }}
+              onIncrease={() => {
+                const value = field.value;
+                form.setValue("estimatedPomodoros", Math.min(9, value + 1), {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                });
+              }}
+              onDecrease={() => {
+                const value = field.value;
+                form.setValue("estimatedPomodoros", Math.max(0, value - 1), {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                });
+              }}
               placeholder="1"
               type="number"
               value={Number.isNaN(field.value) ? "" : field.value}

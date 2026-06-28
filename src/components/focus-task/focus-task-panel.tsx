@@ -3,8 +3,6 @@
 import { SquarePenIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
-import { FocusTaskDetails } from "@/components/focus-task-details";
-import { FocusTaskUpdateForm } from "@/components/focus-task-update-form";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,6 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
+import { FocusTaskDetails } from "./focus-task-details";
+import { FocusTaskUpdateForm } from "./focus-task-update-form";
 
 export default function FocusTaskPanel() {
   const [isEditing, setIsEditing] = useState(false);
