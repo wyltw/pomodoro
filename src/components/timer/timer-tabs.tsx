@@ -5,9 +5,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Timer from "./timer";
 import type { TimerType } from "@/lib/types/types";
 import { Armchair, Clock5, Coffee } from "lucide-react";
+import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export default function TimerTabs() {
   const [selectedTab, setSelectedTab] = useState<TimerType>("pomodoro");
+  const completeActivePomodoro = useDailyFocusTasksStore(
+    (state) => state.completeActivePomodoro,
+  );
 
   const handleContinue = () => {
     setSelectedTab("pomodoro");
@@ -46,6 +50,7 @@ export default function TimerTabs() {
         <Timer
           sessionMax={1500}
           sessionMin={0}
+          onComplete={completeActivePomodoro}
           onContinue={handleContinue}
           onBreak={handleBreak}
         />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { formatTime } from "@/lib/utils/utils";
 import {
   CircularProgress,
@@ -19,6 +20,7 @@ import type { TimerType } from "@/lib/types/types";
 type TimerProps = {
   sessionMax: number;
   sessionMin: number;
+  onComplete?: () => void;
   onContinue: () => void;
   onBreak: (type: Exclude<TimerType, "pomodoro">) => void;
 };
@@ -26,6 +28,7 @@ type TimerProps = {
 export default function Timer({
   sessionMax,
   sessionMin,
+  onComplete,
   onContinue,
   onBreak,
 }: TimerProps) {
@@ -35,6 +38,7 @@ export default function Timer({
         <CountdownTimer
           sessionMax={sessionMax}
           sessionMin={sessionMin}
+          onComplete={onComplete}
           onContinue={onContinue}
           onBreak={onBreak}
         />
@@ -46,10 +50,17 @@ export default function Timer({
 function CountdownTimer({
   sessionMax,
   sessionMin,
+  onComplete,
   onContinue,
   onBreak,
 }: TimerProps) {
   const { seconds, status } = useTimerData();
+
+  useEffect(() => {
+    if (status !== "completed") return;
+
+    onComplete?.();
+  }, [onComplete, status]);
 
   if (status === "completed") {
     return <TimerCompletedView onContinue={onContinue} onBreak={onBreak} />;

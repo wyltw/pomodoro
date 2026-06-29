@@ -14,6 +14,7 @@ export type DailyFocusTasksActions = {
     newTask: Pick<FocusTask, "title" | "description" | "estimatedPomodoros">,
   ) => void;
   updateTask: (taskId: string, payload: Partial<FocusTask>) => void;
+  completeActivePomodoro: () => void;
   removeTask: (taskId: string) => void;
   setActiveTask: (taskId: string) => void;
   clearActiveTask: () => void;
@@ -45,6 +46,21 @@ export const useDailyFocusTasksStore = create<DailyFocusTasksStore>()(
             task.id === taskId ? { ...task, ...payload } : task,
           ),
         })),
+      completeActivePomodoro: () =>
+        set((state) => {
+          if (!state.activeTaskId) return state;
+
+          return {
+            tasks: state.tasks.map((task) =>
+              task.id === state.activeTaskId
+                ? {
+                    ...task,
+                    completedPomodoros: task.completedPomodoros + 1,
+                  }
+                : task,
+            ),
+          };
+        }),
       removeTask: (taskId) =>
         set((state) => ({
           tasks: state.tasks.filter((task) => task.id !== taskId),
