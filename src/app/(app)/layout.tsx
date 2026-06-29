@@ -3,6 +3,7 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import React, { ReactNode } from "react";
+import { Toaster } from "sonner";
 
 type HomeLayoutProps = { children: ReactNode };
 export default function HomeLayout({ children }: HomeLayoutProps) {
@@ -18,6 +19,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
           <Footer />
         </SidebarInset>
       </SidebarProvider>
+      <Toaster />
     </>
   );
 }

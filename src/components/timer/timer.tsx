@@ -58,7 +58,9 @@ function CountdownTimer({
 
   useEffect(() => {
     if (status !== "completed") return;
-
+    const notification = new Notification("To do list", {
+      body: "session Finished",
+    });
     onComplete?.();
   }, [onComplete, status]);
 
