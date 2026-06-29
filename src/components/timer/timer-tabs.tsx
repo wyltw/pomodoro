@@ -7,10 +7,13 @@ import type { TimerType } from "@/lib/types/types";
 import { Armchair, Clock5, Coffee } from "lucide-react";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { useRequestNotification } from "@/lib/hooks/useRequestNotification";
+import { TimerCompletedView } from "./timer-completed-view";
 
 export default function TimerTabs() {
   useRequestNotification();
-  const [selectedTab, setSelectedTab] = useState<TimerType>("pomodoro");
+  const [selectedTab, setSelectedTab] = useState<TimerType | "completed">(
+    "pomodoro",
+  );
   const completeActivePomodoro = useDailyFocusTasksStore(
     (state) => state.completeActivePomodoro,
   );
@@ -21,6 +24,14 @@ export default function TimerTabs() {
 
   const handleBreak = (type: Exclude<TimerType, "pomodoro">) => {
     setSelectedTab(type);
+  };
+
+  const handleComplete = (type: TimerType) => {
+    if (type === "pomodoro") {
+      completeActivePomodoro();
+    }
+
+    setSelectedTab("completed");
   };
 
   // Timer state should reset after tabs change because of mount
@@ -52,26 +63,25 @@ export default function TimerTabs() {
         <Timer
           sessionMax={3}
           sessionMin={0}
-          onComplete={completeActivePomodoro}
-          onContinue={handleContinue}
-          onBreak={handleBreak}
+          onComplete={() => handleComplete("pomodoro")}
         />
       </TabsContent>
       <TabsContent value="shortBreak">
         <Timer
           sessionMax={300}
           sessionMin={0}
-          onContinue={handleContinue}
-          onBreak={handleBreak}
+          onComplete={() => handleComplete("shortBreak")}
         />
       </TabsContent>
       <TabsContent value="longBreak">
         <Timer
           sessionMax={900}
           sessionMin={0}
-          onContinue={handleContinue}
-          onBreak={handleBreak}
+          onComplete={() => handleComplete("longBreak")}
         />
+      </TabsContent>
+      <TabsContent value="completed">
+        <TimerCompletedView onContinue={handleContinue} onBreak={handleBreak} />
       </TabsContent>
     </Tabs>
   );

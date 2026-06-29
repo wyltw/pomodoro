@@ -8,15 +8,7 @@ describe("Timer", () => {
     vi.useFakeTimers();
     const onComplete = vi.fn();
 
-    render(
-      <Timer
-        sessionMax={1}
-        sessionMin={0}
-        onComplete={onComplete}
-        onContinue={vi.fn()}
-        onBreak={vi.fn()}
-      />,
-    );
+    render(<Timer sessionMax={1} sessionMin={0} onComplete={onComplete} />);
 
     fireEvent.click(screen.getByRole("button", { name: "start timer" }));
 
