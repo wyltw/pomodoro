@@ -7,7 +7,7 @@ import type { TimerType } from "@/lib/types/types";
 import { Armchair, Clock5, Coffee } from "lucide-react";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { TimerCompletedView } from "./timer-completed-view";
-import { createNotification } from "@/lib/utils/utils";
+import { notifyUser } from "@/lib/utils/utils";
 
 export default function TimerTabs() {
   const [selectedTab, setSelectedTab] = useState<TimerType | "completed">(
@@ -67,7 +67,7 @@ export default function TimerTabs() {
           sessionMin={0}
           onComplete={() => {
             handleComplete("pomodoro");
-            createNotification("Pomodoro complete", {
+            void notifyUser("Pomodoro complete", "/sounds/decide2.wav", {
               body: activeTask
                 ? `Finished focusing on "${activeTask.title}".`
                 : "Your focus session has finished.",
@@ -79,14 +79,24 @@ export default function TimerTabs() {
         <Timer
           sessionMax={300}
           sessionMin={0}
-          onComplete={() => handleComplete("shortBreak")}
+          onComplete={() => {
+            handleComplete("shortBreak");
+            void notifyUser("Short break over", "/sounds/decide24.mp3", {
+              body: "Time to focus again.",
+            });
+          }}
         />
       </TabsContent>
       <TabsContent value="longBreak">
         <Timer
           sessionMax={900}
           sessionMin={0}
-          onComplete={() => handleComplete("longBreak")}
+          onComplete={() => {
+            handleComplete("longBreak");
+            void notifyUser("Long break over", "/sounds/decide24.mp3", {
+              body: "Ready for another focus session?",
+            });
+          }}
         />
       </TabsContent>
       <TabsContent value="completed">

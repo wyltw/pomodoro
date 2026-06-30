@@ -40,3 +40,30 @@ export const createNotification = (
 
   return notification;
 };
+
+export const playNotifySound = async (soundPath: string) => {
+  const sound = new Audio(soundPath);
+  sound.volume = 0.35;
+
+  try {
+    await sound.play();
+  } catch {
+    // Audio feedback is optional; ignore playback failures.
+  }
+};
+
+export const notifyUser = async (
+  title: string,
+  soundPath: string,
+  options?: NotificationOptions,
+) => {
+  const isAppActive =
+    document.visibilityState === "visible" && document.hasFocus();
+
+  if (isAppActive) {
+    await playNotifySound(soundPath);
+    return;
+  }
+
+  createNotification(title, options);
+};
