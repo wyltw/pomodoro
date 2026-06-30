@@ -6,16 +6,18 @@ import Timer from "./timer";
 import type { TimerType } from "@/lib/types/types";
 import { Armchair, Clock5, Coffee } from "lucide-react";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
-import { useRequestNotification } from "@/lib/hooks/useRequestNotification";
 import { TimerCompletedView } from "./timer-completed-view";
+import { createNotification } from "@/lib/utils/utils";
 
 export default function TimerTabs() {
-  useRequestNotification();
   const [selectedTab, setSelectedTab] = useState<TimerType | "completed">(
     "pomodoro",
   );
   const completeActivePomodoro = useDailyFocusTasksStore(
     (state) => state.completeActivePomodoro,
+  );
+  const activeTask = useDailyFocusTasksStore((state) =>
+    state.tasks.find((task) => task.id === state.activeTaskId),
   );
 
   const handleContinue = () => {
@@ -63,7 +65,14 @@ export default function TimerTabs() {
         <Timer
           sessionMax={3}
           sessionMin={0}
-          onComplete={() => handleComplete("pomodoro")}
+          onComplete={() => {
+            handleComplete("pomodoro");
+            createNotification("Pomodoro complete", {
+              body: activeTask
+                ? `Finished focusing on "${activeTask.title}".`
+                : "Your focus session has finished.",
+            });
+          }}
         />
       </TabsContent>
       <TabsContent value="shortBreak">

@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 
 type TimerToggleButtonProps = {
   isRunning: boolean;
-  onToggle: (isRunning: boolean) => void;
+  onToggle: (isRunning: boolean) => Promise<void>;
 };
 
 export default function TimerToggleButton({

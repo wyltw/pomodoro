@@ -15,3 +15,28 @@ export function getLocalDateKey(date = new Date()) {
 
   return `${year}-${month}-${day}`;
 }
+
+export const requestNotification: () => Promise<
+  NotificationPermission | undefined
+> = async () => {
+  if (!("Notification" in window)) return;
+  if (Notification.permission === "default") {
+    return await Notification.requestPermission();
+  }
+};
+
+export const createNotification = (
+  title: string,
+  options?: NotificationOptions,
+) => {
+  if (!("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+
+  const notification = new Notification(title, options);
+  notification.addEventListener("click", () => {
+    window.focus();
+    notification.close();
+  });
+
+  return notification;
+};
