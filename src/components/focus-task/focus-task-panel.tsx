@@ -32,7 +32,7 @@ export default function FocusTaskPanel() {
 
   if (!focusingTask) {
     return (
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md self-start">
         <CardHeader>
           <CardTitle className="text-lg">
             <h2>Now Focusing</h2>

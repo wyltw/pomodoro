@@ -13,7 +13,7 @@ export function TimerCompletedView({
   const pomodoros = 3;
 
   return (
-    <>
+    <div className="flex h-40 flex-col justify-center gap-2">
       <p className="text-xl">You have finished {pomodoros} pomodoros today.</p>
       <div className="flex justify-center gap-2">
         <Button onClick={() => onBreak("shortBreak")}>Take a break</Button>
@@ -21,6 +21,6 @@ export function TimerCompletedView({
           Keep focusing
         </Button>
       </div>
-    </>
+    </div>
   );
 }
