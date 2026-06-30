@@ -5,9 +5,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Timer from "./timer";
 import type { TimerType } from "@/lib/types/types";
 import { Armchair, Clock5, Coffee } from "lucide-react";
+import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
+import { TimerCompletedView } from "./timer-completed-view";
+import { notifyUser } from "@/lib/utils/utils";
 
 export default function TimerTabs() {
-  const [selectedTab, setSelectedTab] = useState<TimerType>("pomodoro");
+  const [selectedTab, setSelectedTab] = useState<TimerType | "completed">(
+    "pomodoro",
+  );
+  const completeActivePomodoro = useDailyFocusTasksStore(
+    (state) => state.completeActivePomodoro,
+  );
+  const activeTask = useDailyFocusTasksStore((state) =>
+    state.tasks.find((task) => task.id === state.activeTaskId),
+  );
 
   const handleContinue = () => {
     setSelectedTab("pomodoro");
@@ -15,6 +26,14 @@ export default function TimerTabs() {
 
   const handleBreak = (type: Exclude<TimerType, "pomodoro">) => {
     setSelectedTab(type);
+  };
+
+  const handleComplete = (type: TimerType) => {
+    if (type === "pomodoro") {
+      completeActivePomodoro();
+    }
+
+    setSelectedTab("completed");
   };
 
   // Timer state should reset after tabs change because of mount
@@ -44,27 +63,44 @@ export default function TimerTabs() {
 
       <TabsContent value="pomodoro">
         <Timer
-          sessionMax={1500}
+          sessionMax={3}
           sessionMin={0}
-          onContinue={handleContinue}
-          onBreak={handleBreak}
+          onComplete={() => {
+            handleComplete("pomodoro");
+            void notifyUser("Pomodoro complete", "/sounds/decide2.wav", {
+              body: activeTask
+                ? `Finished focusing on "${activeTask.title}".`
+                : "Your focus session has finished.",
+            });
+          }}
         />
       </TabsContent>
       <TabsContent value="shortBreak">
         <Timer
           sessionMax={300}
           sessionMin={0}
-          onContinue={handleContinue}
-          onBreak={handleBreak}
+          onComplete={() => {
+            handleComplete("shortBreak");
+            void notifyUser("Short break over", "/sounds/decide24.mp3", {
+              body: "Time to focus again.",
+            });
+          }}
         />
       </TabsContent>
       <TabsContent value="longBreak">
         <Timer
-          sessionMax={3}
+          sessionMax={900}
           sessionMin={0}
-          onContinue={handleContinue}
-          onBreak={handleBreak}
+          onComplete={() => {
+            handleComplete("longBreak");
+            void notifyUser("Long break over", "/sounds/decide24.mp3", {
+              body: "Ready for another focus session?",
+            });
+          }}
         />
+      </TabsContent>
+      <TabsContent value="completed">
+        <TimerCompletedView onContinue={handleContinue} onBreak={handleBreak} />
       </TabsContent>
     </Tabs>
   );

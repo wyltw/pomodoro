@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { formatTime } from "@/lib/utils/utils";
 import {
   CircularProgress,
@@ -13,21 +14,17 @@ import {
   useTimerData,
 } from "@/lib/contexts/timer-context";
 import TimerButtonList from "./timer-button-list";
-import { Button } from "../ui/button";
-import type { TimerType } from "@/lib/types/types";
 
 type TimerProps = {
   sessionMax: number;
   sessionMin: number;
-  onContinue: () => void;
-  onBreak: (type: Exclude<TimerType, "pomodoro">) => void;
+  onComplete?: () => void;
 };
 
 export default function Timer({
   sessionMax,
   sessionMin,
-  onContinue,
-  onBreak,
+  onComplete,
 }: TimerProps) {
   return (
     <TimerContextProvider initialSeconds={sessionMin} endSeconds={sessionMax}>
@@ -35,25 +32,20 @@ export default function Timer({
         <CountdownTimer
           sessionMax={sessionMax}
           sessionMin={sessionMin}
-          onContinue={onContinue}
-          onBreak={onBreak}
+          onComplete={onComplete}
         />
       </div>
     </TimerContextProvider>
   );
 }
 
-function CountdownTimer({
-  sessionMax,
-  sessionMin,
-  onContinue,
-  onBreak,
-}: TimerProps) {
+function CountdownTimer({ sessionMax, sessionMin, onComplete }: TimerProps) {
   const { seconds, status } = useTimerData();
 
-  if (status === "completed") {
-    return <TimerCompletedView onContinue={onContinue} onBreak={onBreak} />;
-  }
+  useEffect(() => {
+    if (status !== "completed") return;
+    onComplete?.();
+  }, [onComplete, status]);
 
   return (
     <>
@@ -75,29 +67,6 @@ function CountdownTimer({
         <CircularProgressValueText className="text-4xl" />
       </CircularProgress>
       <TimerButtonList />
-    </>
-  );
-}
-
-type TimerCompletedViewProps = Pick<TimerProps, "onContinue" | "onBreak">;
-
-function TimerCompletedView({ onContinue, onBreak }: TimerCompletedViewProps) {
-  const pomodoros = 3;
-
-  return (
-    <>
-      <p className="text-xl">You have finished {pomodoros} pomodoros today.</p>
-      <div className="flex gap-2">
-        <Button onClick={() => onBreak("shortBreak")}>Take a break</Button>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            onContinue();
-          }}
-        >
-          Keep focusing
-        </Button>
-      </div>
     </>
   );
 }

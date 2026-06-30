@@ -15,3 +15,55 @@ export function getLocalDateKey(date = new Date()) {
 
   return `${year}-${month}-${day}`;
 }
+
+export const requestNotification: () => Promise<
+  NotificationPermission | undefined
+> = async () => {
+  if (!("Notification" in window)) return;
+  if (Notification.permission === "default") {
+    return await Notification.requestPermission();
+  }
+};
+
+export const createNotification = (
+  title: string,
+  options?: NotificationOptions,
+) => {
+  if (!("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+
+  const notification = new Notification(title, options);
+  notification.addEventListener("click", () => {
+    window.focus();
+    notification.close();
+  });
+
+  return notification;
+};
+
+export const playNotifySound = async (soundPath: string) => {
+  const sound = new Audio(soundPath);
+  sound.volume = 0.35;
+
+  try {
+    await sound.play();
+  } catch {
+    // Audio feedback is optional; ignore playback failures.
+  }
+};
+
+export const notifyUser = async (
+  title: string,
+  soundPath: string,
+  options?: NotificationOptions,
+) => {
+  const isAppActive =
+    document.visibilityState === "visible" && document.hasFocus();
+
+  if (isAppActive) {
+    await playNotifySound(soundPath);
+    return;
+  }
+
+  createNotification(title, options);
+};
