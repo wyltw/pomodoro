@@ -5,7 +5,7 @@ import { ListChecksIcon, PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { TaskList } from "@/components/task-list";
+import { TaskList } from "@/components/focus-task/task-list";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";

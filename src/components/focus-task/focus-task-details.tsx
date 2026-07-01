@@ -14,9 +14,11 @@ export function FocusTaskDetails({ task }: FocusTaskDetailsProps) {
         </div>
         <div className="grid gap-1">
           <dt className="text-muted-foreground text-sm font-medium">
-            Estimated Pomodoros
+            Pomodoro Progress
           </dt>
-          <dd className="text-xl tabular-nums">{task.estimatedPomodoros}</dd>
+          <dd className="text-xl tabular-nums">
+            {task.completedPomodoros}/{task.estimatedPomodoros}
+          </dd>
         </div>
       </div>
       <div className="grid gap-1">

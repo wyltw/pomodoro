@@ -80,6 +80,32 @@ export function FocusTaskUpdateForm({
       />
       <Controller
         control={form.control}
+        name="description"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="focus-task-update-description">
+              Description
+            </FieldLabel>
+            <Textarea
+              {...field}
+              aria-describedby={
+                fieldState.error
+                  ? "focus-task-update-description-error"
+                  : undefined
+              }
+              aria-invalid={fieldState.invalid}
+              id="focus-task-update-description"
+              placeholder="Add a short note"
+            />
+            <FieldError
+              errors={[fieldState.error]}
+              id="focus-task-update-description-error"
+            />
+          </Field>
+        )}
+      />
+      <Controller
+        control={form.control}
         name="estimatedPomodoros"
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
@@ -126,32 +152,7 @@ export function FocusTaskUpdateForm({
           </Field>
         )}
       />
-      <Controller
-        control={form.control}
-        name="description"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-update-description">
-              Description
-            </FieldLabel>
-            <Textarea
-              {...field}
-              aria-describedby={
-                fieldState.error
-                  ? "focus-task-update-description-error"
-                  : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-update-description"
-              placeholder="Add a short note"
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-update-description-error"
-            />
-          </Field>
-        )}
-      />
+
       <div className="flex flex-col gap-2">
         <Button type="submit" disabled={!form.formState.isDirty}>
           <SaveIcon />
