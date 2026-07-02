@@ -6,6 +6,7 @@ import {
 } from "@/components/focus-task/task-filter";
 import { TaskList } from "@/components/focus-task/task-list";
 import { SidebarGroupLabel } from "@/components/ui/sidebar";
+import { useTimerStatus } from "@/lib/contexts/timer-status-context";
 import type { FocusTask } from "@/lib/types/types";
 
 type FocusTaskListProps = {
@@ -20,6 +21,7 @@ export function FocusTaskList({
   onItemClick,
 }: FocusTaskListProps) {
   const [filter, setFilter] = useState<TaskFilterValue>("all");
+  const { status } = useTimerStatus();
 
   return (
     <>
@@ -32,6 +34,7 @@ export function FocusTaskList({
         activeTaskId={activeTaskId}
         onItemClick={onItemClick}
         filter={filter}
+        disabled={status === "running"}
       />
     </>
   );

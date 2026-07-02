@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
+import { TimerStatusProvider } from "@/lib/contexts/timer-status-context";
 import Timer from "./timer";
 
 describe("Timer", () => {
@@ -8,7 +9,11 @@ describe("Timer", () => {
     vi.useFakeTimers();
     const onComplete = vi.fn();
 
-    render(<Timer sessionMax={1} sessionMin={0} onComplete={onComplete} />);
+    render(
+      <TimerStatusProvider>
+        <Timer sessionMax={1} sessionMin={0} onComplete={onComplete} />
+      </TimerStatusProvider>,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "start timer" }));
 

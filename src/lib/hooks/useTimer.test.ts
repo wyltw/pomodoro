@@ -1,11 +1,20 @@
 import { act, renderHook } from "@testing-library/react";
+import { createElement, type ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
+import { TimerStatusProvider } from "@/lib/contexts/timer-status-context";
 import { useTimer } from "./useTimer";
+
+function TimerStatusWrapper({ children }: { children: ReactNode }) {
+  return createElement(TimerStatusProvider, null, children);
+}
 
 const setupUseTimer = (initialSeconds = 0, endSeconds = 10) =>
   renderHook(
     ({ initialSeconds, endSeconds }) => useTimer(initialSeconds, endSeconds),
-    { initialProps: { initialSeconds, endSeconds } },
+    {
+      initialProps: { initialSeconds, endSeconds },
+      wrapper: TimerStatusWrapper,
+    },
   );
 
 describe("useTimer", () => {

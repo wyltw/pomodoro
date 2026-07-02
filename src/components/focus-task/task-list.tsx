@@ -1,7 +1,8 @@
 import type { FocusTask } from "@/lib/types/types";
 import { cn } from "@/lib/utils/cn";
 import { CircleCheckBig } from "lucide-react";
-import { TaskFilterValue } from "./task-filter";
+import { Button } from "@/components/ui/button";
+import type { TaskFilterValue } from "./task-filter";
 import { useMemo } from "react";
 
 type TaskListProps = {
@@ -9,6 +10,7 @@ type TaskListProps = {
   activeTaskId: string | undefined;
   onItemClick: (activeId: string) => void;
   filter: TaskFilterValue;
+  disabled: boolean;
 };
 
 export function TaskList({
@@ -16,6 +18,7 @@ export function TaskList({
   activeTaskId,
   onItemClick,
   filter,
+  disabled,
 }: TaskListProps) {
   const filterTask = (value: TaskFilterValue) => {
     const methods = {
@@ -52,24 +55,31 @@ export function TaskList({
   return (
     <ul className="space-y-2">
       {filteredTask.map((task) => (
-        <li
-          className={cn(
-            "flex items-center justify-between gap-3 rounded-md px-3 py-2 hover:cursor-pointer active:cursor-pointer",
-            { "bg-accent shadow-sm outline-1": activeTaskId === task.id },
-          )}
-          key={task.id}
-          onClick={() => onItemClick(task.id)}
-        >
-          <span className="min-w-0 truncate">{task.title}</span>
-          <div className="flex gap-2">
-            {task.completedPomodoros === task.estimatedPomodoros ? (
-              <CircleCheckBig className="text-green-500" />
-            ) : (
-              <span className="text-muted-foreground shrink-0 tabular-nums">
-                {task.completedPomodoros}/{task.estimatedPomodoros}
-              </span>
+        <li key={task.id}>
+          <Button
+            className={cn(
+              "h-auto w-full justify-between gap-3 rounded-md px-3 py-2 font-normal whitespace-normal",
+              {
+                "bg-accent hover:bg-accent ring-border shadow-sm":
+                  activeTaskId === task.id,
+              },
             )}
-          </div>
+            disabled={disabled}
+            onClick={() => onItemClick(task.id)}
+            type="button"
+            variant="outline"
+          >
+            <span className="min-w-0 truncate">{task.title}</span>
+            <span className="flex gap-2">
+              {task.completedPomodoros === task.estimatedPomodoros ? (
+                <CircleCheckBig className="size-5 text-green-500" />
+              ) : (
+                <span className="text-muted-foreground shrink-0 tabular-nums">
+                  {task.completedPomodoros}/{task.estimatedPomodoros}
+                </span>
+              )}
+            </span>
+          </Button>
         </li>
       ))}
     </ul>
