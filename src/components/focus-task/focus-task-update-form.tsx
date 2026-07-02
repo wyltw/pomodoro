@@ -13,17 +13,28 @@ import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import type { FocusTask } from "@/lib/types/types";
 import NumberInput from "./number-input";
 
-const focusTaskUpdateFormSchema = z.object({
-  title: z.string().trim().min(1, "Title is required."),
-  description: z.string().trim(),
-  estimatedPomodoros: z
-    .number({ error: "Estimated Pomodoros is required." })
-    .min(1, "Estimated Pomodoros must be at least 1.")
-    .max(8, "Consider splitting this into smaller tasks."),
-});
+function createFocusTaskUpdateFormSchema(completedPomodoros: number) {
+  const minimumEstimatedPomodoros = Math.max(1, completedPomodoros);
+  const minimumEstimatedPomodorosError =
+    completedPomodoros > 0
+      ? `Estimated Pomodoros cannot be less than the ${completedPomodoros} already completed.`
+      : "Estimated Pomodoros must be at least 1.";
 
-type FocusTaskUpdateFormInput = z.input<typeof focusTaskUpdateFormSchema>;
-type FocusTaskUpdateFormValues = z.output<typeof focusTaskUpdateFormSchema>;
+  return z.object({
+    title: z.string().trim().min(1, "Title is required."),
+    description: z.string().trim(),
+    estimatedPomodoros: z
+      .number({ error: "Estimated Pomodoros is required." })
+      .min(minimumEstimatedPomodoros, minimumEstimatedPomodorosError)
+      .max(8, "Consider splitting this into smaller tasks."),
+  });
+}
+
+type FocusTaskUpdateFormSchema = ReturnType<
+  typeof createFocusTaskUpdateFormSchema
+>;
+type FocusTaskUpdateFormInput = z.input<FocusTaskUpdateFormSchema>;
+type FocusTaskUpdateFormValues = z.output<FocusTaskUpdateFormSchema>;
 
 type FocusTaskUpdateFormProps = {
   task: FocusTask;
@@ -35,6 +46,9 @@ export function FocusTaskUpdateForm({
   onEditingEnd,
 }: FocusTaskUpdateFormProps) {
   const updateTask = useDailyFocusTasksStore((state) => state.updateTask);
+  const focusTaskUpdateFormSchema = createFocusTaskUpdateFormSchema(
+    task.completedPomodoros,
+  );
   const form = useForm<
     FocusTaskUpdateFormInput,
     unknown,
@@ -74,6 +88,32 @@ export function FocusTaskUpdateForm({
             <FieldError
               errors={[fieldState.error]}
               id="focus-task-update-title-error"
+            />
+          </Field>
+        )}
+      />
+      <Controller
+        control={form.control}
+        name="description"
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="focus-task-update-description">
+              Description
+            </FieldLabel>
+            <Textarea
+              {...field}
+              aria-describedby={
+                fieldState.error
+                  ? "focus-task-update-description-error"
+                  : undefined
+              }
+              aria-invalid={fieldState.invalid}
+              id="focus-task-update-description"
+              placeholder="Add a short note"
+            />
+            <FieldError
+              errors={[fieldState.error]}
+              id="focus-task-update-description-error"
             />
           </Field>
         )}
@@ -126,32 +166,7 @@ export function FocusTaskUpdateForm({
           </Field>
         )}
       />
-      <Controller
-        control={form.control}
-        name="description"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-update-description">
-              Description
-            </FieldLabel>
-            <Textarea
-              {...field}
-              aria-describedby={
-                fieldState.error
-                  ? "focus-task-update-description-error"
-                  : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-update-description"
-              placeholder="Add a short note"
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-update-description-error"
-            />
-          </Field>
-        )}
-      />
+
       <div className="flex flex-col gap-2">
         <Button type="submit" disabled={!form.formState.isDirty}>
           <SaveIcon />

@@ -5,7 +5,7 @@ import { ListChecksIcon, PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { TaskList } from "@/components/task-list";
+import { FocusTaskList } from "@/components/focus-task/focus-task-list";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -52,8 +52,7 @@ export function FocusTaskSidebar() {
           <FocusTaskForm />
         </SidebarGroup>
         <SidebarGroup className="border-sidebar-border border-t pt-4">
-          <SidebarGroupLabel>Today&apos;s tasks</SidebarGroupLabel>
-          <TaskList
+          <FocusTaskList
             tasks={tasks}
             activeTaskId={activeTaskId}
             onItemClick={setActiveTask}

@@ -74,8 +74,7 @@ export default function FocusTaskPanel() {
           </div>
         </CardTitle>
         <CardDescription>
-          {focusingTask.completedPomodoros}/{focusingTask.estimatedPomodoros}{" "}
-          pomodoros completed
+          Completed sessions count toward this task while it&apos;s active
         </CardDescription>
       </CardHeader>
       <CardContent>

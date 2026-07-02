@@ -48,10 +48,20 @@ export const useDailyFocusTasksStore = create<DailyFocusTasksStore>()(
         })),
       completeActivePomodoro: () =>
         set((state) => {
-          if (!state.activeTaskId) return state;
+          const { activeTaskId, tasks } = state;
+          const activeTask = tasks.find((task) => task.id === activeTaskId);
+          if (!state.activeTaskId || !activeTask) return state;
+          if (
+            activeTask.completedPomodoros + 1 >
+            activeTask.estimatedPomodoros
+          ) {
+            return {
+              activeTaskId: undefined,
+            };
+          }
 
           return {
-            tasks: state.tasks.map((task) =>
+            tasks: tasks.map((task) =>
               task.id === state.activeTaskId
                 ? {
                     ...task,
