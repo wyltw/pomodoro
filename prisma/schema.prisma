@@ -1,0 +1,42 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id   String          @id @default(uuid())
+  days DailyFocusDay[]
+}
+
+model DailyFocusDay {
+  id                 String @id @default(uuid())
+  userId             String
+  localDate          String
+  completedPomodoros Int    @default(0)
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks FocusTask[]
+
+  @@unique([userId, localDate])
+}
+
+model FocusTask {
+  id                 String    @id @default(uuid())
+  dailyFocusDayId    String
+  title              String
+  description        String    @default("")
+  estimatedPomodoros Int
+  completedPomodoros Int       @default(0)
+  completedAt        DateTime?
+
+  dailyFocusDay DailyFocusDay @relation(fields: [dailyFocusDayId], references: [id], onDelete: Cascade)
+}
