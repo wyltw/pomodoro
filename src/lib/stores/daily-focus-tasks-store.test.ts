@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "vitest";
 
 import type { FocusTask } from "@/lib/types/types";
-import { useDailyFocusTasksStore } from "./daily-focus-tasks-store";
+import { createDailyFocusTasksStore } from "./daily-focus-tasks-store";
 
 const activeTask: FocusTask = {
   id: "123e4567-e89b-12d3-a456-426614174000",
@@ -18,31 +18,33 @@ const inactiveTask: FocusTask = {
 };
 
 describe("completeActivePomodoro", () => {
+  let store: ReturnType<typeof createDailyFocusTasksStore>;
+
   beforeEach(() => {
-    useDailyFocusTasksStore.setState({
-      tasks: [activeTask, inactiveTask],
-      activeTaskId: activeTask.id,
+    store = createDailyFocusTasksStore({
+      shouldPersist: false,
+      initialValues: {
+        localDate: "2026-07-12",
+        tasks: [activeTask, inactiveTask],
+        activeTaskId: activeTask.id,
+      },
     });
   });
 
   test("increments only the active task", () => {
-    useDailyFocusTasksStore.getState().completeActivePomodoro();
+    store.getState().completeActivePomodoro();
 
-    const [updatedActiveTask, updatedInactiveTask] =
-      useDailyFocusTasksStore.getState().tasks;
+    const [updatedActiveTask, updatedInactiveTask] = store.getState().tasks;
 
     expect(updatedActiveTask.completedPomodoros).toBe(1);
     expect(updatedInactiveTask.completedPomodoros).toBe(0);
   });
 
   test("does nothing when there is no active task", () => {
-    useDailyFocusTasksStore.setState({ activeTaskId: undefined });
+    store.setState({ activeTaskId: undefined });
 
-    useDailyFocusTasksStore.getState().completeActivePomodoro();
+    store.getState().completeActivePomodoro();
 
-    expect(useDailyFocusTasksStore.getState().tasks).toEqual([
-      activeTask,
-      inactiveTask,
-    ]);
+    expect(store.getState().tasks).toEqual([activeTask, inactiveTask]);
   });
 });

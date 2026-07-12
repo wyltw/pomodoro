@@ -1,7 +1,9 @@
 "use client";
 
-import { create } from "zustand";
+import { createContext, useContext, useState, type ReactNode } from "react";
+import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { createStore } from "zustand/vanilla";
 import { DAILY_FOCUS_TASKS_STORAGE_KEY } from "@/lib/constants";
 import { dailyFocusTasksSchema } from "@/lib/schemas";
 import type { DailyFocusTasks, FocusTask } from "@/lib/types/types";
@@ -27,58 +29,76 @@ function hasTaskId(tasks: FocusTask[], taskId: string | undefined) {
   return taskId !== undefined && tasks.some((task) => task.id === taskId);
 }
 
-export const useDailyFocusTasksStore = create<DailyFocusTasksStore>()(
-  persist(
-    (set) => ({
-      localDate: getLocalDateKey(),
-      tasks: [],
-      activeTaskId: undefined,
-      addTask: (newTask) =>
-        set((state) => ({
-          tasks: [
-            ...state.tasks,
-            { ...newTask, completedPomodoros: 0, id: crypto.randomUUID() },
-          ],
-        })),
-      updateTask: (taskId, payload) =>
-        set((state) => ({
-          tasks: state.tasks.map((task) =>
-            task.id === taskId ? { ...task, ...payload } : task,
-          ),
-        })),
-      completeActivePomodoro: () =>
-        set((state) => {
-          const { activeTaskId, tasks } = state;
-          const activeTask = tasks.find((task) => task.id === activeTaskId);
-          if (!state.activeTaskId || !activeTask) return state;
-          if (
-            activeTask.completedPomodoros + 1 >
-            activeTask.estimatedPomodoros
-          ) {
-            return {
-              activeTaskId: undefined,
-            };
-          }
+type CreateDailyFocusTasksStoreOptions = {
+  initialValues?: DailyFocusTasksState;
+  shouldPersist?: boolean;
+};
 
+export function createDailyFocusTasksStore({
+  initialValues = {
+    localDate: getLocalDateKey(),
+    tasks: [],
+    activeTaskId: undefined,
+  },
+  shouldPersist = true,
+}: CreateDailyFocusTasksStoreOptions = {}) {
+  const createState = (
+    set: (
+      partial:
+        | Partial<DailyFocusTasksStore>
+        | ((state: DailyFocusTasksStore) => Partial<DailyFocusTasksStore>),
+    ) => void,
+  ): DailyFocusTasksStore => ({
+    ...initialValues,
+    addTask: (newTask) =>
+      set((state) => ({
+        tasks: [
+          ...state.tasks,
+          { ...newTask, completedPomodoros: 0, id: crypto.randomUUID() },
+        ],
+      })),
+    updateTask: (taskId, payload) =>
+      set((state) => ({
+        tasks: state.tasks.map((task) =>
+          task.id === taskId ? { ...task, ...payload } : task,
+        ),
+      })),
+    completeActivePomodoro: () =>
+      set((state) => {
+        const { activeTaskId, tasks } = state;
+        const activeTask = tasks.find((task) => task.id === activeTaskId);
+        if (!state.activeTaskId || !activeTask) return state;
+        if (activeTask.completedPomodoros + 1 > activeTask.estimatedPomodoros) {
           return {
-            tasks: tasks.map((task) =>
-              task.id === state.activeTaskId
-                ? {
-                    ...task,
-                    completedPomodoros: task.completedPomodoros + 1,
-                  }
-                : task,
-            ),
+            activeTaskId: undefined,
           };
-        }),
-      removeTask: (taskId) =>
-        set((state) => ({
-          tasks: state.tasks.filter((task) => task.id !== taskId),
-        })),
-      setActiveTask: (taskId) => set({ activeTaskId: taskId }),
-      clearActiveTask: () => set({ activeTaskId: undefined }),
-    }),
-    {
+        }
+
+        return {
+          tasks: tasks.map((task) =>
+            task.id === state.activeTaskId
+              ? {
+                  ...task,
+                  completedPomodoros: task.completedPomodoros + 1,
+                }
+              : task,
+          ),
+        };
+      }),
+    removeTask: (taskId) =>
+      set((state) => ({
+        tasks: state.tasks.filter((task) => task.id !== taskId),
+      })),
+    setActiveTask: (taskId) => set({ activeTaskId: taskId }),
+    clearActiveTask: () => set({ activeTaskId: undefined }),
+  });
+
+  if (!shouldPersist) {
+    return createStore<DailyFocusTasksStore>()(createState);
+  }
+
+  return createStore<DailyFocusTasksStore>()(
+    persist(createState, {
       name: DAILY_FOCUS_TASKS_STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
       partialize: ({ localDate, tasks, activeTaskId }) => ({
@@ -116,6 +136,45 @@ export const useDailyFocusTasksStore = create<DailyFocusTasksStore>()(
           tasks: remainingTasks,
         };
       },
-    },
-  ),
-);
+    }),
+  );
+}
+
+type DailyFocusTasksStoreApi = ReturnType<typeof createDailyFocusTasksStore>;
+
+const DailyFocusTasksStoreContext =
+  createContext<DailyFocusTasksStoreApi | null>(null);
+
+type DailyFocusTasksStoreProviderProps = CreateDailyFocusTasksStoreOptions & {
+  children: ReactNode;
+};
+
+export function DailyFocusTasksStoreProvider({
+  children,
+  initialValues,
+  shouldPersist,
+}: DailyFocusTasksStoreProviderProps) {
+  const [store] = useState(() =>
+    createDailyFocusTasksStore({ initialValues, shouldPersist }),
+  );
+
+  return (
+    <DailyFocusTasksStoreContext.Provider value={store}>
+      {children}
+    </DailyFocusTasksStoreContext.Provider>
+  );
+}
+
+export function useDailyFocusTasksStore<T>(
+  selector: (state: DailyFocusTasksStore) => T,
+) {
+  const store = useContext(DailyFocusTasksStoreContext);
+
+  if (!store) {
+    throw new Error(
+      "useDailyFocusTasksStore must be used within DailyFocusTasksStoreProvider",
+    );
+  }
+
+  return useStore(store, selector);
+}
