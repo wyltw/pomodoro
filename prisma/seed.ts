@@ -36,8 +36,15 @@ const seedTasks = [
 async function main() {
   await prisma.user.upsert({
     where: { id: seedUserId },
-    update: {},
-    create: { id: seedUserId },
+    update: {
+      name: "Seed User",
+      email: "seed@example.com",
+    },
+    create: {
+      id: seedUserId,
+      name: "Seed User",
+      email: "seed@example.com",
+    },
   });
 
   await prisma.dailyFocusDay.upsert({
