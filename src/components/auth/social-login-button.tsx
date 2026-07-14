@@ -10,9 +10,13 @@ type SocialProvider = "google" | "spotify";
 
 type SocialLoginButtonProps = {
   provider: SocialProvider;
+  callbackURL?: string;
 };
 
-export function SocialLoginButton({ provider }: SocialLoginButtonProps) {
+export function SocialLoginButton({
+  provider,
+  callbackURL,
+}: SocialLoginButtonProps) {
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isSpotify = provider === "spotify";
@@ -24,7 +28,7 @@ export function SocialLoginButton({ provider }: SocialLoginButtonProps) {
     setIsPending(true);
 
     try {
-      const result = await authClient.signIn.social({ provider });
+      const result = await authClient.signIn.social({ provider, callbackURL });
 
       if (result.error) {
         setError(

@@ -3,8 +3,7 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TimerStatusProvider } from "@/lib/contexts/timer-status-context";
-import React, { ReactNode } from "react";
-import { Toaster } from "sonner";
+import { ReactNode } from "react";
 
 type HomeLayoutProps = { children: ReactNode };
 export default function HomeLayout({ children }: HomeLayoutProps) {
@@ -22,7 +21,6 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
           </SidebarInset>
         </SidebarProvider>
       </TimerStatusProvider>
-      <Toaster />
     </>
   );
 }

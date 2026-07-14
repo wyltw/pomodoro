@@ -11,14 +11,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { ReactNode } from "react";
 
-export function LoginDialog() {
+type LoginDialogProps = { children?: ReactNode; from?: "statistics" };
+
+export function LoginDialog({ children, from }: LoginDialogProps) {
+  const callbackURL = from ? `/${from}` : undefined;
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="link" size="lg">
-          Sign in
-        </Button>
+        {children ? (
+          children
+        ) : (
+          <Button variant="link" size="lg">
+            Sign in
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -37,9 +45,9 @@ export function LoginDialog() {
               Sign in with Spotify to enable full-track playback.
             </p>
           </div>
-          <SocialLoginButton provider="spotify" />
+          <SocialLoginButton provider="spotify" callbackURL={callbackURL} />
           <Separator className="my-1" />
-          <SocialLoginButton provider="google" />
+          <SocialLoginButton provider="google" callbackURL={callbackURL} />
         </div>
       </DialogContent>
     </Dialog>
