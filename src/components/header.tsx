@@ -1,6 +1,6 @@
-import React from "react";
 import { Button } from "./ui/button";
 import { ChartColumn, Settings } from "lucide-react";
+import { LoginDialog } from "@/components/auth/login-dialog";
 
 export default function Header() {
   return (
@@ -20,9 +20,7 @@ export default function Header() {
           </Button>
         </li>
         <li>
-          <Button variant={"link"} size={"lg"}>
-            Log In
-          </Button>
+          <LoginDialog />
         </li>
       </ul>
     </div>
