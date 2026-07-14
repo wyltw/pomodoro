@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, LoaderCircle, LogOut } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 
 import { LoginDialog } from "@/components/auth/login-dialog";
@@ -14,18 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
-
-function getInitials(name: string) {
-  const initials = name
-    .trim()
-    .split(/\s+/)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  return initials || "?";
-}
+import { getInitials, getLocalDateKey } from "@/lib/utils/utils";
+import { getOrCreateDailyFocusDay } from "@/lib/actions/daily-focus-day-actions";
 
 export function AuthMenu() {
   const { data: session, isPending } = authClient.useSession();
@@ -46,6 +36,16 @@ export function AuthMenu() {
       setIsSigningOut(false);
     }
   }
+
+  const initializeDailyFocusDay = useEffectEvent(async (userId: string) => {
+    await getOrCreateDailyFocusDay(userId, getLocalDateKey());
+  });
+
+  useEffect(() => {
+    const userId = session?.user.id;
+    if (!userId) return;
+    initializeDailyFocusDay(userId);
+  }, [session?.user.id]);
 
   if (isPending) {
     return (

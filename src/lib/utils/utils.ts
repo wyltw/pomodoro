@@ -67,3 +67,15 @@ export const notifyUser = async (
 
   createNotification(title, options);
 };
+
+export function getInitials(name: string) {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  return initials || "?";
+}
