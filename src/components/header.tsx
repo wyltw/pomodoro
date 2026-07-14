@@ -1,6 +1,8 @@
-import React from "react";
-import { Button } from "./ui/button";
-import { ChartColumn, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
+
+import { AuthMenu } from "@/components/auth/auth-menu";
+import { StatisticsButton } from "@/components/statistics/statistics-button";
+import { Button } from "@/components/ui/button";
 
 export default function Header() {
   return (
@@ -14,15 +16,10 @@ export default function Header() {
           </Button>
         </li>
         <li>
-          <Button variant={"ghost"} size={"lg"}>
-            <ChartColumn data-icon="inline-start" />
-            Statistics
-          </Button>
+          <StatisticsButton />
         </li>
         <li>
-          <Button variant={"link"} size={"lg"}>
-            Log In
-          </Button>
+          <AuthMenu />
         </li>
       </ul>
     </div>
