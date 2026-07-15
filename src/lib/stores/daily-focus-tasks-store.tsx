@@ -1,10 +1,18 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { DAILY_FOCUS_TASKS_STORAGE_KEY } from "@/lib/constants";
+import { authClient } from "@/lib/auth-client";
+import { useFocusTasksQuery } from "@/lib/hooks/use-focus-tasks-query";
 import { dailyFocusTasksSchema } from "@/lib/schemas";
 import type { DailyFocusTasks, FocusTask } from "@/lib/types/types";
 import { getLocalDateKey } from "@/lib/utils/utils";
@@ -157,6 +165,23 @@ export function DailyFocusTasksStoreProvider({
   const [store] = useState(() =>
     createDailyFocusTasksStore({ initialValues, shouldPersist }),
   );
+  const { data: session, isPending } = authClient.useSession();
+  const localDate = useStore(store, (state) => state.localDate);
+  const { tasks } = useFocusTasksQuery({
+    enabled: !isPending && Boolean(session),
+    localDate,
+  });
+
+  useEffect(() => {
+    if (!tasks) return;
+
+    store.setState((state) => ({
+      tasks,
+      activeTaskId: hasTaskId(tasks, state.activeTaskId)
+        ? state.activeTaskId
+        : undefined,
+    }));
+  }, [store, tasks]);
 
   return (
     <DailyFocusTasksStoreContext.Provider value={store}>

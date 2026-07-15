@@ -8,8 +8,10 @@ export const focusTaskSchema = z.object({
   completedPomodoros: z.number(),
 });
 
+export const localDateSchema = z.iso.date();
+
 export const dailyFocusTasksSchema = z.object({
-  localDate: z.string(),
+  localDate: localDateSchema,
   tasks: z.array(focusTaskSchema),
   activeTaskId: z.string().optional(),
 });

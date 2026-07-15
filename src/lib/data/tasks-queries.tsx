@@ -3,7 +3,7 @@ import "server-only";
 import { verifySession } from "@/lib/dal";
 import prisma from "@/lib/prisma";
 
-export const getCurrentUserTasks = async (localDate: string) => {
+export const getFocusTasks = async (localDate: string) => {
   const { userId } = await verifySession();
 
   const dailyFocusDay = await prisma.dailyFocusDay.findUnique({

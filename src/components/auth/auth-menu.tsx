@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, LoaderCircle, LogOut } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "sonner";
 
@@ -14,11 +15,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
+import { focusTasksQueryKey } from "@/lib/api/focus-tasks";
 import { getInitials, getLocalDateKey } from "@/lib/utils/utils";
 import { getOrCreateDailyFocusDay } from "@/lib/actions/daily-focus-day-actions";
 
 export function AuthMenu() {
   const { data: session, isPending } = authClient.useSession();
+  const queryClient = useQueryClient();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function handleSignOut() {
@@ -38,7 +41,11 @@ export function AuthMenu() {
   }
 
   const initializeDailyFocusDay = useEffectEvent(async () => {
-    await getOrCreateDailyFocusDay(getLocalDateKey());
+    const localDate = getLocalDateKey();
+    await getOrCreateDailyFocusDay(localDate);
+    await queryClient.invalidateQueries({
+      queryKey: focusTasksQueryKey(localDate),
+    });
   });
 
   useEffect(() => {
