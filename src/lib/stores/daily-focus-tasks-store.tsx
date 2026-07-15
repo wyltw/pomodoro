@@ -153,22 +153,50 @@ type DailyFocusTasksStoreApi = ReturnType<typeof createDailyFocusTasksStore>;
 const DailyFocusTasksStoreContext =
   createContext<DailyFocusTasksStoreApi | null>(null);
 
-type DailyFocusTasksStoreProviderProps = CreateDailyFocusTasksStoreOptions & {
+type DailyFocusTasksStoreProviderProps = Pick<
+  CreateDailyFocusTasksStoreOptions,
+  "initialValues"
+> & {
   children: ReactNode;
 };
 
 export function DailyFocusTasksStoreProvider({
   children,
   initialValues,
-  shouldPersist,
 }: DailyFocusTasksStoreProviderProps) {
+  const { data: session } = authClient.useSession();
+  const userId = session?.user.id;
+
+  return (
+    <DailyFocusTasksStoreProviderInner
+      key={userId ?? "anonymous"}
+      initialValues={initialValues}
+      isAuthenticated={Boolean(userId)}
+      shouldPersist={!userId}
+    >
+      {children}
+    </DailyFocusTasksStoreProviderInner>
+  );
+}
+
+type DailyFocusTasksStoreProviderInnerProps =
+  DailyFocusTasksStoreProviderProps & {
+    isAuthenticated: boolean;
+    shouldPersist: boolean;
+  };
+
+function DailyFocusTasksStoreProviderInner({
+  children,
+  initialValues,
+  isAuthenticated,
+  shouldPersist,
+}: DailyFocusTasksStoreProviderInnerProps) {
   const [store] = useState(() =>
     createDailyFocusTasksStore({ initialValues, shouldPersist }),
   );
-  const { data: session, isPending } = authClient.useSession();
   const localDate = useStore(store, (state) => state.localDate);
   const { tasks } = useFocusTasksQuery({
-    enabled: !isPending && Boolean(session),
+    enabled: isAuthenticated,
     localDate,
   });
 
