@@ -1,12 +1,15 @@
-import prisma from "../prisma";
+import "server-only";
+
+import { verifySession } from "@/lib/dal";
+import prisma from "@/lib/prisma";
 
 export const getCurrentUserTasks = async (localDate: string) => {
-  const user = "00000000-0000-4000-8000-000000000101";
-  // TODO: use DAL in future to get user.
+  const { userId } = await verifySession();
+
   const dailyFocusDay = await prisma.dailyFocusDay.findUnique({
     where: {
       userId_localDate: {
-        userId: user,
+        userId,
         localDate,
       },
     },

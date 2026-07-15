@@ -37,14 +37,14 @@ export function AuthMenu() {
     }
   }
 
-  const initializeDailyFocusDay = useEffectEvent(async (userId: string) => {
-    await getOrCreateDailyFocusDay(userId, getLocalDateKey());
+  const initializeDailyFocusDay = useEffectEvent(async () => {
+    await getOrCreateDailyFocusDay(getLocalDateKey());
   });
 
   useEffect(() => {
     const userId = session?.user.id;
     if (!userId) return;
-    initializeDailyFocusDay(userId);
+    initializeDailyFocusDay();
   }, [session?.user.id]);
 
   if (isPending) {
