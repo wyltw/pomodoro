@@ -70,4 +70,18 @@ describe("useTimer", () => {
 
     expect(result.current.seconds).toBe(0);
   });
+
+  test("should complete and reset after reaching the end", () => {
+    vi.useFakeTimers();
+    const { result } = setupUseTimer(0, 1);
+
+    act(() => result.current.startTimer());
+
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    expect(result.current.seconds).toBe(0);
+    expect(result.current.status).toBe("completed");
+  });
 });
