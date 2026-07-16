@@ -48,3 +48,21 @@ describe("completeActivePomodoro", () => {
     expect(store.getState().tasks).toEqual([activeTask, inactiveTask]);
   });
 });
+
+describe("replaceTasks", () => {
+  test("replaces tasks and clears an active task that no longer exists", () => {
+    const store = createDailyFocusTasksStore({
+      shouldPersist: false,
+      initialValues: {
+        localDate: "2026-07-12",
+        tasks: [activeTask],
+        activeTaskId: activeTask.id,
+      },
+    });
+
+    store.getState().replaceTasks([inactiveTask]);
+
+    expect(store.getState().tasks).toEqual([inactiveTask]);
+    expect(store.getState().activeTaskId).toBeUndefined();
+  });
+});

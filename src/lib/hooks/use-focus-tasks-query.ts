@@ -13,11 +13,16 @@ export function useFocusTasksQuery({
   enabled,
   localDate,
 }: UseFocusTasksQueryOptions) {
-  const { data: tasks } = useQuery({
+  const {
+    data: tasks,
+    error,
+    isLoading,
+  } = useQuery({
     enabled,
     queryFn: () => getFocusTasks(localDate),
     queryKey: focusTasksQueryKey(localDate),
+    retry: false,
   });
 
-  return { tasks };
+  return { tasks, error, isLoading };
 }

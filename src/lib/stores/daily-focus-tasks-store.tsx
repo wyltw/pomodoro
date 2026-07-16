@@ -1,18 +1,11 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { DAILY_FOCUS_TASKS_STORAGE_KEY } from "@/lib/constants";
 import { authClient } from "@/lib/auth-client";
-import { useFocusTasksQuery } from "@/lib/hooks/use-focus-tasks-query";
 import { dailyFocusTasksSchema } from "@/lib/schemas";
 import type { DailyFocusTasks, FocusTask } from "@/lib/types/types";
 import { getLocalDateKey } from "@/lib/utils/utils";
@@ -28,6 +21,7 @@ export type DailyFocusTasksActions = {
   removeTask: (taskId: string) => void;
   setActiveTask: (taskId: string) => void;
   clearActiveTask: () => void;
+  replaceTasks: (tasks: FocusTask[]) => void;
 };
 
 export type DailyFocusTasksStore = DailyFocusTasksState &
@@ -99,6 +93,13 @@ export function createDailyFocusTasksStore({
       })),
     setActiveTask: (taskId) => set({ activeTaskId: taskId }),
     clearActiveTask: () => set({ activeTaskId: undefined }),
+    replaceTasks: (tasks) =>
+      set((state) => ({
+        tasks,
+        activeTaskId: hasTaskId(tasks, state.activeTaskId)
+          ? state.activeTaskId
+          : undefined,
+      })),
   });
 
   if (!shouldPersist) {
@@ -171,7 +172,6 @@ export function DailyFocusTasksStoreProvider({
     <DailyFocusTasksStoreProviderInner
       key={userId ?? "anonymous"}
       initialValues={initialValues}
-      isAuthenticated={Boolean(userId)}
       shouldPersist={!userId}
     >
       {children}
@@ -181,36 +181,17 @@ export function DailyFocusTasksStoreProvider({
 
 type DailyFocusTasksStoreProviderInnerProps =
   DailyFocusTasksStoreProviderProps & {
-    isAuthenticated: boolean;
     shouldPersist: boolean;
   };
 
 function DailyFocusTasksStoreProviderInner({
   children,
   initialValues,
-  isAuthenticated,
   shouldPersist,
 }: DailyFocusTasksStoreProviderInnerProps) {
   const [store] = useState(() =>
     createDailyFocusTasksStore({ initialValues, shouldPersist }),
   );
-  const localDate = useStore(store, (state) => state.localDate);
-  const { tasks } = useFocusTasksQuery({
-    enabled: isAuthenticated,
-    localDate,
-  });
-
-  useEffect(() => {
-    if (!tasks) return;
-
-    store.setState((state) => ({
-      tasks,
-      activeTaskId: hasTaskId(tasks, state.activeTaskId)
-        ? state.activeTaskId
-        : undefined,
-    }));
-  }, [store, tasks]);
-
   return (
     <DailyFocusTasksStoreContext.Provider value={store}>
       {children}

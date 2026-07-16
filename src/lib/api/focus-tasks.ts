@@ -1,6 +1,6 @@
 import "client-only";
 
-import { focusTaskSchema } from "@/lib/schemas";
+import type { FocusTasksResponse } from "@/lib/types/types";
 
 export const focusTasksQueryKey = (localDate: string) =>
   ["focus-tasks", localDate] as const;
@@ -8,10 +8,11 @@ export const focusTasksQueryKey = (localDate: string) =>
 export async function getFocusTasks(localDate: string) {
   const searchParams = new URLSearchParams({ localDate });
   const response = await fetch(`/api/focus-tasks?${searchParams}`);
+  const result: FocusTasksResponse = await response.json();
 
   if (!response.ok) {
-    throw new Error("Unable to load focus tasks.");
+    throw new Error(result.error ?? "Unable to load focus tasks.");
   }
 
-  return focusTaskSchema.array().parse(await response.json());
+  return result.data;
 }

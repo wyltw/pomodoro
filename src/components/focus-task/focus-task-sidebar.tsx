@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ListChecksIcon, PlusIcon } from "lucide-react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -17,25 +18,35 @@ import {
   SidebarHeader,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { authClient } from "@/lib/auth-client";
+import { useFocusTasksQuery } from "@/lib/hooks/use-focus-tasks-query";
+import { focusTaskFormSchema } from "@/lib/schemas";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import NumberInput from "./number-input";
-
-const focusTaskFormSchema = z.object({
-  title: z.string().trim().min(1, "Title is required."),
-  description: z.string().trim(),
-  estimatedPomodoros: z
-    .number({ error: "Estimated Pomodoros is required." })
-    .min(1, "Estimated Pomodoros must be at least 1.")
-    .max(8, "Consider splitting this into smaller tasks."),
-});
 
 type FocusTaskFormInput = z.input<typeof focusTaskFormSchema>;
 type FocusTaskFormValues = z.output<typeof focusTaskFormSchema>;
 
 export function FocusTaskSidebar() {
+  const { data: session } = authClient.useSession();
+  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
+  const replaceTasks = useDailyFocusTasksStore((state) => state.replaceTasks);
   const setActiveTask = useDailyFocusTasksStore((state) => state.setActiveTask);
+  const {
+    tasks: queriedTasks,
+    error,
+    isLoading,
+  } = useFocusTasksQuery({
+    enabled: Boolean(session),
+    localDate,
+  });
+
+  useEffect(() => {
+    if (!queriedTasks) return;
+    replaceTasks(queriedTasks);
+  }, [queriedTasks, replaceTasks]);
 
   return (
     <Sidebar>
@@ -52,11 +63,19 @@ export function FocusTaskSidebar() {
           <FocusTaskForm />
         </SidebarGroup>
         <SidebarGroup className="border-sidebar-border border-t pt-4">
-          <FocusTaskList
-            tasks={tasks}
-            activeTaskId={activeTaskId}
-            onItemClick={setActiveTask}
-          />
+          {error ? (
+            <p className="text-destructive text-sm" role="alert">
+              {error.message}
+            </p>
+          ) : isLoading ? (
+            <p className="text-muted-foreground text-sm">Loading tasks...</p>
+          ) : (
+            <FocusTaskList
+              tasks={tasks}
+              activeTaskId={activeTaskId}
+              onItemClick={setActiveTask}
+            />
+          )}
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
