@@ -63,19 +63,21 @@ export function FocusTaskSidebar() {
           <FocusTaskForm />
         </SidebarGroup>
         <SidebarGroup className="border-sidebar-border border-t pt-4">
-          {error ? (
+          {error && (
             <p className="text-destructive text-sm" role="alert">
               {error.message}
             </p>
-          ) : isLoading ? (
-            <p className="text-muted-foreground text-sm">Loading tasks...</p>
-          ) : (
-            <FocusTaskList
-              tasks={tasks}
-              activeTaskId={activeTaskId}
-              onItemClick={setActiveTask}
-            />
           )}
+          {!error &&
+            (isLoading ? (
+              <p className="text-muted-foreground text-sm">Loading tasks...</p>
+            ) : (
+              <FocusTaskList
+                tasks={tasks}
+                activeTaskId={activeTaskId}
+                onItemClick={setActiveTask}
+              />
+            ))}
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
