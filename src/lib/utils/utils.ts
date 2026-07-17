@@ -79,3 +79,20 @@ export function getInitials(name: string) {
 
   return initials || "?";
 }
+
+export const getLocalDateFromTimeZone = (
+  timeZone: string,
+  date = new Date(),
+) => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value;
+
+  return `${getPart("year")}-${getPart("month")}-${getPart("day")}`;
+};

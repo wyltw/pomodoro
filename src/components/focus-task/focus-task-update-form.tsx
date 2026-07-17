@@ -57,7 +57,7 @@ export function FocusTaskUpdateForm({
     resolver: zodResolver(focusTaskUpdateFormSchema),
     defaultValues: {
       title: task.title,
-      description: task.description,
+      description: task.description ?? "",
       estimatedPomodoros: task.estimatedPomodoros,
     },
   });
@@ -176,7 +176,11 @@ export function FocusTaskUpdateForm({
           type="button"
           variant="outline"
           onClick={() => {
-            form.reset(task);
+            form.reset({
+              title: task.title,
+              description: task.description ?? "",
+              estimatedPomodoros: task.estimatedPomodoros,
+            });
             onEditingEnd();
           }}
         >

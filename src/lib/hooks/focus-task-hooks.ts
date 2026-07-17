@@ -2,12 +2,15 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { focusTasksQueryKey, getFocusTasks } from "@/lib/api/focus-tasks";
+import { getFocusTasks } from "@/lib/api/focus-tasks";
 
 type UseFocusTasksQueryOptions = {
   enabled: boolean;
   localDate: string;
 };
+
+export const focusTasksQueryKey = (localDate: string) =>
+  ["focus-tasks", localDate] as const;
 
 export function useFocusTasksQuery({
   enabled,

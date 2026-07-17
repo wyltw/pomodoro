@@ -19,7 +19,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-import { useFocusTasksQuery } from "@/lib/hooks/use-focus-tasks-query";
+import { useFocusTasksQuery } from "@/lib/hooks/focus-task-hooks";
 import { focusTaskFormSchema } from "@/lib/schemas";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import NumberInput from "./number-input";
@@ -145,6 +145,7 @@ function FocusTaskForm() {
               id="focus-task-description"
               placeholder="Add a short note"
               type="text"
+              value={field.value ?? ""}
             />
             <FieldError
               errors={[fieldState.error]}

@@ -15,9 +15,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
-import { focusTasksQueryKey } from "@/lib/api/focus-tasks";
 import { getInitials, getLocalDateKey } from "@/lib/utils/utils";
 import { getOrCreateDailyFocusDay } from "@/lib/actions/daily-focus-day-actions";
+import { focusTasksQueryKey } from "@/lib/hooks/focus-task-hooks";
 
 export function AuthMenu() {
   const { data: session, isPending } = authClient.useSession();
@@ -42,7 +42,8 @@ export function AuthMenu() {
 
   const initializeDailyFocusDay = useEffectEvent(async () => {
     const localDate = getLocalDateKey();
-    await getOrCreateDailyFocusDay(localDate);
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    await getOrCreateDailyFocusDay(localDate, timeZone);
     await queryClient.invalidateQueries({
       queryKey: focusTasksQueryKey(localDate),
     });

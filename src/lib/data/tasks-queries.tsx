@@ -1,10 +1,16 @@
 import "server-only";
 
-import { verifySession } from "@/lib/dal";
+import { getSession } from "@/lib/dal";
 import prisma from "@/lib/prisma";
 
 export const getFocusTasks = async (localDate: string) => {
-  const { userId } = await verifySession();
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("Please sign in to load your focus tasks.");
+  }
+
+  const userId = session.user.id;
 
   const dailyFocusDay = await prisma.dailyFocusDay.findUnique({
     where: {
@@ -13,13 +19,28 @@ export const getFocusTasks = async (localDate: string) => {
         localDate,
       },
     },
+    select: {
+      id: true,
+    },
   });
 
   if (!dailyFocusDay) {
     return [];
   }
 
-  return prisma.focusTask.findMany({
+  const tasks = await prisma.focusTask.findMany({
     where: { dailyFocusDayId: dailyFocusDay.id },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      estimatedPomodoros: true,
+      completedPomodoros: true,
+    },
   });
+
+  return tasks.map(({ description, ...task }) => ({
+    ...task,
+    description: description ?? undefined,
+  }));
 };

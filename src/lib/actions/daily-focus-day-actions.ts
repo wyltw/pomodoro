@@ -1,10 +1,28 @@
 "use server";
 
-import prisma from "../prisma";
-import { verifySession } from "@/lib/dal";
+import { cookies } from "next/headers";
 
-export const getOrCreateDailyFocusDay = async (localDate: string) => {
-  const { userId } = await verifySession();
+import { getSession } from "@/lib/dal";
+import prisma from "../prisma";
+
+export const getOrCreateDailyFocusDay = async (
+  localDate: string,
+  timezone: string,
+) => {
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("Please sign in to initialize your daily focus day.");
+  }
+
+  const userId = session.user.id;
+  const cookieStore = await cookies();
+  cookieStore.set("timezone", timezone, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
 
   await prisma.dailyFocusDay.upsert({
     where: {
