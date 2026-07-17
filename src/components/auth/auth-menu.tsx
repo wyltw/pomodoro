@@ -15,12 +15,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
+import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import { getInitials, getLocalDateKey } from "@/lib/utils/utils";
 import { getOrCreateDailyFocusDay } from "@/lib/actions/daily-focus-day-actions";
 import { focusTasksQueryKey } from "@/lib/hooks/focus-task-hooks";
 
 export function AuthMenu() {
-  const { data: session, isPending } = authClient.useSession();
+  const { session, isPending } = useAuthSession();
   const queryClient = useQueryClient();
   const [isSigningOut, setIsSigningOut] = useState(false);
 

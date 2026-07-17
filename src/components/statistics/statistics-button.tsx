@@ -5,11 +5,10 @@ import Link from "next/link";
 
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { useAuthSession } from "@/lib/hooks/auth-hooks";
 
 export function StatisticsButton() {
-  const { data: session, isPending } = authClient.useSession();
-  const isSignedIn = session !== null;
+  const { isPending, isSignedIn } = useAuthSession();
 
   if (isPending)
     return (

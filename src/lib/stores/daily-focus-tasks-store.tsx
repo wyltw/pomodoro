@@ -5,7 +5,7 @@ import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { DAILY_FOCUS_TASKS_STORAGE_KEY } from "@/lib/constants";
-import { authClient } from "@/lib/auth-client";
+import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import { dailyFocusTasksSchema } from "@/lib/schemas";
 import type { DailyFocusTasks, FocusTask } from "@/lib/types/types";
 import { getLocalDateKey } from "@/lib/utils/utils";
@@ -165,7 +165,7 @@ export function DailyFocusTasksStoreProvider({
   children,
   initialValues,
 }: DailyFocusTasksStoreProviderProps) {
-  const { data: session } = authClient.useSession();
+  const { session } = useAuthSession();
   const userId = session?.user.id;
 
   return (
