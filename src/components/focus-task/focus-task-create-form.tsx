@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "lucide-react";
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -11,11 +11,32 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { focusTaskFormSchema } from "@/lib/schemas";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
+import {
+  focusTasksQueryKey,
+  useCreateFocusTask,
+} from "@/lib/hooks/focus-task-hooks";
+import { useAuthSession } from "@/lib/hooks/auth-hooks";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { getLocalDateKey } from "@/lib/utils/utils";
 
 type FocusTaskCreateFormInput = z.input<typeof focusTaskFormSchema>;
 type FocusTaskCreateFormValues = z.output<typeof focusTaskFormSchema>;
 
 export function FocusTaskCreateForm() {
+  const { isSignedIn } = useAuthSession();
+  const queryClient = useQueryClient();
+  const mutation = useCreateFocusTask({
+    onSuccess() {
+      toast.success("Focus task created.");
+      queryClient.invalidateQueries({
+        queryKey: focusTasksQueryKey(getLocalDateKey()),
+      });
+    },
+    onError(error) {
+      toast.error(error.message || "Unable to create focus task.");
+    },
+  });
   const addTask = useDailyFocusTasksStore((state) => state.addTask);
   const form = useForm<
     FocusTaskCreateFormInput,
@@ -30,8 +51,12 @@ export function FocusTaskCreateForm() {
     },
   });
 
-  function onSubmit(values: FocusTaskCreateFormValues) {
-    addTask(values);
+  async function onSubmit(values: FocusTaskCreateFormValues) {
+    if (isSignedIn) {
+      mutation.mutate(values);
+    } else {
+      addTask(values);
+    }
     form.reset();
   }
 
@@ -135,8 +160,12 @@ export function FocusTaskCreateForm() {
           </Field>
         )}
       />
-      <Button type="submit">
-        <PlusIcon />
+      <Button type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? (
+          <Loader2Icon className="animate-spin" />
+        ) : (
+          <PlusIcon />
+        )}
         Save task
       </Button>
     </form>

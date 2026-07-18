@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { useFocusTasksQuery } from "@/lib/hooks/focus-task-hooks";
+import { useFocusTasks } from "@/lib/hooks/focus-task-hooks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export function FocusTaskSidebar() {
@@ -28,7 +28,7 @@ export function FocusTaskSidebar() {
     tasks: queriedTasks,
     error,
     isLoading,
-  } = useFocusTasksQuery({
+  } = useFocusTasks({
     enabled: isSignedIn,
     localDate,
   });
