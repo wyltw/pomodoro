@@ -4,6 +4,7 @@ import type {
   createFocusTaskPayloadSchema,
   dailyFocusTasksSchema,
   focusTaskSchema,
+  updateFocusTaskPayloadSchema,
 } from "@/lib/schemas";
 
 export type TimerType = "pomodoro" | "shortBreak" | "longBreak";
@@ -12,6 +13,10 @@ export type FocusTask = z.infer<typeof focusTaskSchema>;
 
 export type CreateFocusTaskPayload = z.input<
   typeof createFocusTaskPayloadSchema
+>;
+
+export type UpdateFocusTaskPayload = z.input<
+  typeof updateFocusTaskPayloadSchema
 >;
 
 export type DailyFocusTasks = z.infer<typeof dailyFocusTasksSchema>;

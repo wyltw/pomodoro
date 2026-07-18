@@ -53,7 +53,7 @@ export function FocusTaskCreateForm() {
 
   async function onSubmit(values: FocusTaskCreateFormValues) {
     if (isSignedIn) {
-      mutation.mutate(values);
+      mutation.mutate({ payload: values });
     } else {
       addTask(values);
     }

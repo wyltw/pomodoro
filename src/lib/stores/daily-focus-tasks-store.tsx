@@ -13,11 +13,16 @@ import { getLocalDateKey } from "@/lib/utils/utils";
 
 export type DailyFocusTasksState = DailyFocusTasks;
 
+type EditableFocusTask = Pick<
+  FocusTask,
+  "title" | "description" | "estimatedPomodoros"
+>;
+
 export type DailyFocusTasksActions = {
   addTask: (
     newTask: Pick<FocusTask, "title" | "description" | "estimatedPomodoros">,
   ) => void;
-  updateTask: (taskId: string, payload: Partial<FocusTask>) => void;
+  updateTask: (taskId: string, payload: EditableFocusTask) => void;
   completeActivePomodoro: () => void;
   removeTask: (taskId: string) => void;
   setActiveTask: (taskId: string) => void;
@@ -89,9 +94,14 @@ export function createDailyFocusTasksStore({
         };
       }),
     removeTask: (taskId) =>
-      set((state) => ({
-        tasks: state.tasks.filter((task) => task.id !== taskId),
-      })),
+      set((state) => {
+        const isRemovingActiveTask = state.activeTaskId === taskId;
+
+        return {
+          tasks: state.tasks.filter((task) => task.id !== taskId),
+          activeTaskId: isRemovingActiveTask ? undefined : state.activeTaskId,
+        };
+      }),
     setActiveTask: (taskId) => set({ activeTaskId: taskId }),
     clearActiveTask: () => set({ activeTaskId: undefined }),
     replaceTasks: (tasks) =>

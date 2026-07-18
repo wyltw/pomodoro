@@ -1,6 +1,6 @@
 "use client";
 
-import { SquarePenIcon, Trash2Icon } from "lucide-react";
+import { SquarePenIcon } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
+import { FocusTaskDeleteDialog } from "./focus-task-delete-dialog";
 import { FocusTaskDetails } from "./focus-task-details";
 import { FocusTaskUpdateForm } from "./focus-task-update-form";
 
@@ -60,17 +61,7 @@ export default function FocusTaskPanel() {
             >
               <SquarePenIcon />
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-lg"
-              className="text-destructive hover:text-destructive"
-              aria-label="Delete task"
-              disabled={isEditing}
-              title="Delete task"
-            >
-              <Trash2Icon />
-            </Button>
+            <FocusTaskDeleteDialog disabled={isEditing} task={focusingTask} />
           </div>
         </CardTitle>
         <CardDescription>

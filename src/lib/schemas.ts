@@ -17,9 +17,13 @@ export const createFocusTaskPayloadSchema = z.object({
     .transform((value) => value || undefined),
   estimatedPomodoros: z
     .number({ error: "Estimated Pomodoros is required." })
-    .min(1, "Estimated Pomodoros must be at least 1.")
+    .min(1, "Enter at least 1.")
     .max(8, "Consider splitting this into smaller tasks."),
 });
+
+export const updateFocusTaskPayloadSchema = createFocusTaskPayloadSchema;
+
+export const focusTaskIdSchema = z.uuid("Invalid focus task ID.");
 
 export const localDateSchema = z.iso.date();
 
