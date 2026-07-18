@@ -5,6 +5,7 @@ import { useEffect } from "react";
 
 import { FocusTaskCreateForm } from "@/components/focus-task/focus-task-create-form";
 import { FocusTaskList } from "@/components/focus-task/focus-task-list";
+import { FocusTaskListSkeleton } from "@/components/focus-task/focus-task-list-skeleton";
 import {
   Sidebar,
   SidebarContent,
@@ -62,7 +63,7 @@ export function FocusTaskSidebar() {
           )}
           {!error &&
             (isLoading ? (
-              <p className="text-muted-foreground text-sm">Loading tasks...</p>
+              <FocusTaskListSkeleton />
             ) : (
               <FocusTaskList
                 tasks={tasks}
