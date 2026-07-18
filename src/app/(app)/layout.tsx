@@ -3,12 +3,14 @@ import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TimerStatusProvider } from "@/lib/contexts/timer-status-context";
+import { AppProvider } from "@/lib/stores/daily-focus-tasks-store";
 import { ReactNode } from "react";
+import { Toaster } from "sonner";
 
 type HomeLayoutProps = { children: ReactNode };
 export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
-    <>
+    <AppProvider>
       <Header />
       <TimerStatusProvider>
         <SidebarProvider>
@@ -21,6 +23,7 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
           </SidebarInset>
         </SidebarProvider>
       </TimerStatusProvider>
-    </>
+      <Toaster />
+    </AppProvider>
   );
 }

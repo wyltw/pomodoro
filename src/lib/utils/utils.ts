@@ -8,6 +8,10 @@ export function formatTime(totalSeconds: number) {
   return `${paddedMinutes}:${paddedSeconds}`;
 }
 
+export function sleep(milliseconds: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
+}
+
 export function getLocalDateKey(date = new Date()) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -66,4 +70,33 @@ export const notifyUser = async (
   }
 
   createNotification(title, options);
+};
+
+export function getInitials(name: string) {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  return initials || "?";
+}
+
+export const getLocalDateFromTimeZone = (
+  timeZone: string,
+  date = new Date(),
+) => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value;
+
+  return `${getPart("year")}-${getPart("month")}-${getPart("day")}`;
 };

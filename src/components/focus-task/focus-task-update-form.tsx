@@ -1,14 +1,21 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SaveIcon, Undo2Icon } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Loader2Icon, SaveIcon, Undo2Icon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuthSession } from "@/lib/hooks/auth-hooks";
+import {
+  focusTasksQueryKey,
+  useUpdateFocusTask,
+} from "@/lib/hooks/focus-task-hooks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import type { FocusTask } from "@/lib/types/types";
 import NumberInput from "./number-input";
@@ -18,7 +25,7 @@ function createFocusTaskUpdateFormSchema(completedPomodoros: number) {
   const minimumEstimatedPomodorosError =
     completedPomodoros > 0
       ? `Estimated Pomodoros cannot be less than the ${completedPomodoros} already completed.`
-      : "Estimated Pomodoros must be at least 1.";
+      : "Enter at least 1.";
 
   return z.object({
     title: z.string().trim().min(1, "Title is required."),
@@ -45,7 +52,22 @@ export function FocusTaskUpdateForm({
   task,
   onEditingEnd,
 }: FocusTaskUpdateFormProps) {
+  const { isPending: isAuthPending, isSignedIn } = useAuthSession();
+  const queryClient = useQueryClient();
+  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const updateTask = useDailyFocusTasksStore((state) => state.updateTask);
+  const mutation = useUpdateFocusTask({
+    async onSuccess() {
+      await queryClient.invalidateQueries({
+        queryKey: focusTasksQueryKey(localDate),
+      });
+      toast.success("Focus task updated.");
+      onEditingEnd();
+    },
+    onError(error) {
+      toast.error(error.message || "Unable to update focus task.");
+    },
+  });
   const focusTaskUpdateFormSchema = createFocusTaskUpdateFormSchema(
     task.completedPomodoros,
   );
@@ -57,14 +79,22 @@ export function FocusTaskUpdateForm({
     resolver: zodResolver(focusTaskUpdateFormSchema),
     defaultValues: {
       title: task.title,
-      description: task.description,
+      description: task.description ?? "",
       estimatedPomodoros: task.estimatedPomodoros,
     },
   });
 
   function onSubmit(values: FocusTaskUpdateFormValues) {
+    if (isAuthPending) return;
+
+    if (isSignedIn) {
+      mutation.mutate({ taskId: task.id, payload: values });
+      return;
+    }
+
     updateTask(task.id, values);
     form.reset(values);
+    toast.success("Focus task updated.");
     onEditingEnd();
   }
 
@@ -168,15 +198,29 @@ export function FocusTaskUpdateForm({
       />
 
       <div className="flex flex-col gap-2">
-        <Button type="submit" disabled={!form.formState.isDirty}>
-          <SaveIcon />
+        <Button
+          type="submit"
+          disabled={
+            !form.formState.isDirty || isAuthPending || mutation.isPending
+          }
+        >
+          {mutation.isPending ? (
+            <Loader2Icon className="animate-spin" />
+          ) : (
+            <SaveIcon />
+          )}
           Update task
         </Button>
         <Button
           type="button"
           variant="outline"
+          disabled={isAuthPending || mutation.isPending}
           onClick={() => {
-            form.reset(task);
+            form.reset({
+              title: task.title,
+              description: task.description ?? "",
+              estimatedPomodoros: task.estimatedPomodoros,
+            });
             onEditingEnd();
           }}
         >

@@ -14,21 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
-
-function getInitials(name: string) {
-  const initials = name
-    .trim()
-    .split(/\s+/)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  return initials || "?";
-}
+import { useAuthSession } from "@/lib/hooks/auth-hooks";
+import { getInitials } from "@/lib/utils/utils";
 
 export function AuthMenu() {
-  const { data: session, isPending } = authClient.useSession();
+  const { session, isPending } = useAuthSession();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function handleSignOut() {
