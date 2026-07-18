@@ -55,7 +55,7 @@ export function FocusTaskSidebar() {
           <SidebarGroupLabel>Add task</SidebarGroupLabel>
           <FocusTaskCreateForm />
         </SidebarGroup>
-        <SidebarGroup className="border-sidebar-border border-t pt-4">
+        <SidebarGroup className="border-sidebar-border flex min-h-0 flex-1 flex-col border-t pt-4">
           {error && (
             <p className="text-destructive text-sm" role="alert">
               {error.message}
