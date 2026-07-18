@@ -1,8 +1,7 @@
 "use client";
 
 import { ChevronDown, LoaderCircle, LogOut } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { LoginDialog } from "@/components/auth/login-dialog";
@@ -16,13 +15,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { getInitials, getLocalDateKey } from "@/lib/utils/utils";
-import { getOrCreateDailyFocusDay } from "@/lib/actions/daily-focus-day-actions";
-import { focusTasksQueryKey } from "@/lib/hooks/focus-task-hooks";
+import { getInitials } from "@/lib/utils/utils";
 
 export function AuthMenu() {
   const { session, isPending } = useAuthSession();
-  const queryClient = useQueryClient();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function handleSignOut() {
@@ -40,21 +36,6 @@ export function AuthMenu() {
       setIsSigningOut(false);
     }
   }
-
-  const initializeDailyFocusDay = useEffectEvent(async () => {
-    const localDate = getLocalDateKey();
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    await getOrCreateDailyFocusDay(localDate, timeZone);
-    await queryClient.invalidateQueries({
-      queryKey: focusTasksQueryKey(localDate),
-    });
-  });
-
-  useEffect(() => {
-    const userId = session?.user.id;
-    if (!userId) return;
-    initializeDailyFocusDay();
-  }, [session?.user.id]);
 
   if (isPending) {
     return (

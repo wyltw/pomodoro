@@ -4,6 +4,7 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 import { useStore } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
+import { ReactQueryProvider } from "@/components/providers/react-query-provider";
 import { DAILY_FOCUS_TASKS_STORAGE_KEY } from "@/lib/constants";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import { dailyFocusTasksSchema } from "@/lib/schemas";
@@ -154,47 +155,43 @@ type DailyFocusTasksStoreApi = ReturnType<typeof createDailyFocusTasksStore>;
 const DailyFocusTasksStoreContext =
   createContext<DailyFocusTasksStoreApi | null>(null);
 
-type DailyFocusTasksStoreProviderProps = Pick<
+type AppProviderProps = Pick<
   CreateDailyFocusTasksStoreOptions,
   "initialValues"
 > & {
   children: ReactNode;
 };
 
-export function DailyFocusTasksStoreProvider({
-  children,
-  initialValues,
-}: DailyFocusTasksStoreProviderProps) {
+export function AppProvider({ children, initialValues }: AppProviderProps) {
   const { session } = useAuthSession();
   const userId = session?.user.id;
 
   return (
-    <DailyFocusTasksStoreProviderInner
+    <DailyFocusTasksStoreProvider
       key={userId ?? "anonymous"}
       initialValues={initialValues}
       shouldPersist={!userId}
     >
       {children}
-    </DailyFocusTasksStoreProviderInner>
+    </DailyFocusTasksStoreProvider>
   );
 }
 
-type DailyFocusTasksStoreProviderInnerProps =
-  DailyFocusTasksStoreProviderProps & {
-    shouldPersist: boolean;
-  };
+type DailyFocusTasksStoreProviderProps = AppProviderProps & {
+  shouldPersist: boolean;
+};
 
-function DailyFocusTasksStoreProviderInner({
+function DailyFocusTasksStoreProvider({
   children,
   initialValues,
   shouldPersist,
-}: DailyFocusTasksStoreProviderInnerProps) {
+}: DailyFocusTasksStoreProviderProps) {
   const [store] = useState(() =>
     createDailyFocusTasksStore({ initialValues, shouldPersist }),
   );
   return (
     <DailyFocusTasksStoreContext.Provider value={store}>
-      {children}
+      <ReactQueryProvider>{children}</ReactQueryProvider>
     </DailyFocusTasksStoreContext.Provider>
   );
 }

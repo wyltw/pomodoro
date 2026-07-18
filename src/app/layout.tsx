@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { Toaster } from "sonner";
 
-import { ReactQueryProvider } from "@/components/providers/react-query-provider";
-
 import "./globals.css";
 
 import { cn } from "@/lib/utils/cn";
@@ -43,10 +41,8 @@ export default function RootLayout({
       )}
     >
       <body className="flex h-full flex-col bg-[#FCFCFC]">
-        <ReactQueryProvider>
-          {children}
-          <Toaster />
-        </ReactQueryProvider>
+        {children}
+        <Toaster />
       </body>
     </html>
   );
