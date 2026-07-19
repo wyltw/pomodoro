@@ -1,7 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
-
 import { getSession } from "../dal";
 import prisma from "../prisma";
 import type {
@@ -12,12 +10,16 @@ import { getLocalDateFromTimeZone } from "../utils/utils";
 import {
   createFocusTaskPayloadSchema,
   focusTaskIdSchema,
+  timeZoneSchema,
   updateFocusTaskPayloadSchema,
 } from "../schemas";
 
 const focusTaskNotFoundError = "Focus task not found.";
 
-export const createFocusTask = async (payload: CreateFocusTaskPayload) => {
+export const createFocusTask = async (
+  payload: CreateFocusTaskPayload,
+  timeZone: string,
+) => {
   const session = await getSession();
 
   if (!session) {
@@ -27,30 +29,36 @@ export const createFocusTask = async (payload: CreateFocusTaskPayload) => {
   const userId = session.user.id;
 
   const parsedPayload = createFocusTaskPayloadSchema.safeParse(payload);
+  const parsedTimeZone = timeZoneSchema.safeParse(timeZone);
   if (!parsedPayload.success) throw new Error(parsedPayload.error.message);
+  if (!parsedTimeZone.success) throw new Error(parsedTimeZone.error.message);
   const { title, description, estimatedPomodoros } = parsedPayload.data;
 
-  const cookieStore = await cookies();
-  const timezone = cookieStore.get("timezone");
-  if (!timezone) {
-    throw new Error("Timezone is not initialized.");
-  }
-
-  const localDate = getLocalDateFromTimeZone(timezone.value);
-  await prisma.focusTask.create({
-    data: {
-      title,
-      description,
-      estimatedPomodoros,
-      dailyFocusDay: {
-        connect: {
-          userId_localDate: {
-            userId,
-            localDate,
-          },
+  const localDate = getLocalDateFromTimeZone(parsedTimeZone.data);
+  await prisma.$transaction(async (transaction) => {
+    const dailyFocusDay = await transaction.dailyFocusDay.upsert({
+      where: {
+        userId_localDate: {
+          userId,
+          localDate,
         },
       },
-    },
+      update: {},
+      create: {
+        userId,
+        localDate,
+      },
+      select: { id: true },
+    });
+
+    await transaction.focusTask.create({
+      data: {
+        title,
+        description,
+        estimatedPomodoros,
+        dailyFocusDayId: dailyFocusDay.id,
+      },
+    });
   });
 };
 

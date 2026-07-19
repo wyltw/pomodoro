@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+function isValidTimeZone(timeZone: string) {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export const focusTaskSchema = z.object({
   id: z.uuid(),
   title: z.string(),
@@ -26,6 +35,12 @@ export const updateFocusTaskPayloadSchema = createFocusTaskPayloadSchema;
 export const focusTaskIdSchema = z.uuid("Invalid focus task ID.");
 
 export const localDateSchema = z.iso.date();
+
+export const timeZoneSchema = z
+  .string()
+  .trim()
+  .min(1, "Time zone is required.")
+  .refine(isValidTimeZone, "Time zone is invalid.");
 
 export const dailyFocusTasksSchema = z.object({
   localDate: localDateSchema,

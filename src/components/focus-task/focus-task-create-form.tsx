@@ -56,7 +56,8 @@ export function FocusTaskCreateForm() {
     if (isAuthPending) return;
 
     if (isSignedIn) {
-      mutation.mutate({ payload: values });
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      mutation.mutate({ payload: values, timeZone });
       return;
     }
 
