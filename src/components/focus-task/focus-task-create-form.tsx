@@ -18,25 +18,14 @@ import {
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { getLocalDateKey } from "@/lib/utils/utils";
 
 type FocusTaskCreateFormInput = z.input<typeof focusTaskFormSchema>;
 type FocusTaskCreateFormValues = z.output<typeof focusTaskFormSchema>;
 
 export function FocusTaskCreateForm() {
-  const { isSignedIn } = useAuthSession();
+  const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
-  const mutation = useCreateFocusTask({
-    onSuccess() {
-      toast.success("Focus task created.");
-      queryClient.invalidateQueries({
-        queryKey: focusTasksQueryKey(getLocalDateKey()),
-      });
-    },
-    onError(error) {
-      toast.error(error.message || "Unable to create focus task.");
-    },
-  });
+  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const addTask = useDailyFocusTasksStore((state) => state.addTask);
   const form = useForm<
     FocusTaskCreateFormInput,
@@ -50,124 +39,145 @@ export function FocusTaskCreateForm() {
       estimatedPomodoros: 1,
     },
   });
+  const mutation = useCreateFocusTask({
+    async onSuccess() {
+      await queryClient.invalidateQueries({
+        queryKey: focusTasksQueryKey(localDate),
+      });
+      form.reset();
+      toast.success("Focus task created.");
+    },
+    onError(error) {
+      toast.error(error.message || "Unable to create focus task.");
+    },
+  });
 
-  async function onSubmit(values: FocusTaskCreateFormValues) {
+  function onSubmit(values: FocusTaskCreateFormValues) {
+    if (isAuthPending) return;
+
     if (isSignedIn) {
       mutation.mutate({ payload: values });
-    } else {
-      addTask(values);
+      return;
     }
+
+    addTask(values);
     form.reset();
+    toast.success("Focus task created.");
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-3">
-      <Controller
-        control={form.control}
-        name="title"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-title">Title</FieldLabel>
-            <Input
-              {...field}
-              aria-describedby={
-                fieldState.error ? "focus-task-title-error" : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-title"
-              placeholder="What are you focusing on?"
-              type="text"
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-title-error"
-            />
-          </Field>
-        )}
-      />
-      <Controller
-        control={form.control}
-        name="description"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-description">
-              Description
-            </FieldLabel>
-            <Input
-              {...field}
-              aria-describedby={
-                fieldState.error ? "focus-task-description-error" : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-description"
-              placeholder="Add a short note"
-              type="text"
-              value={field.value ?? ""}
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-description-error"
-            />
-          </Field>
-        )}
-      />
-      <Controller
-        control={form.control}
-        name="estimatedPomodoros"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-estimated-pomodoros">
-              Estimated Pomodoros
-            </FieldLabel>
-            <NumberInput
-              {...field}
-              aria-describedby={
-                fieldState.error
-                  ? "focus-task-estimated-pomodoros-error"
-                  : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-estimated-pomodoros"
-              inputMode="numeric"
-              onChange={async (event) => {
-                const value = Math.max(0, Number(event.currentTarget.value));
-                event.currentTarget.value = String(value);
-                field.onChange(value);
-                await form.trigger("estimatedPomodoros");
-              }}
-              onIncrease={() => {
-                const value = field.value;
-                form.setValue("estimatedPomodoros", Math.min(9, value + 1), {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                });
-              }}
-              onDecrease={() => {
-                const value = field.value;
-                form.setValue("estimatedPomodoros", Math.max(0, value - 1), {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                });
-              }}
-              placeholder="1"
-              type="number"
-              value={Number.isNaN(field.value) ? "" : field.value}
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-estimated-pomodoros-error"
-            />
-          </Field>
-        )}
-      />
-      <Button type="submit" disabled={mutation.isPending}>
-        {mutation.isPending ? (
-          <Loader2Icon className="animate-spin" />
-        ) : (
-          <PlusIcon />
-        )}
-        Save task
-      </Button>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <fieldset
+        className="grid gap-3"
+        disabled={isAuthPending || mutation.isPending}
+      >
+        <Controller
+          control={form.control}
+          name="title"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="focus-task-title">Title</FieldLabel>
+              <Input
+                {...field}
+                aria-describedby={
+                  fieldState.error ? "focus-task-title-error" : undefined
+                }
+                aria-invalid={fieldState.invalid}
+                id="focus-task-title"
+                placeholder="What are you focusing on?"
+                type="text"
+              />
+              <FieldError
+                errors={[fieldState.error]}
+                id="focus-task-title-error"
+              />
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="description"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="focus-task-description">
+                Description
+              </FieldLabel>
+              <Input
+                {...field}
+                aria-describedby={
+                  fieldState.error ? "focus-task-description-error" : undefined
+                }
+                aria-invalid={fieldState.invalid}
+                id="focus-task-description"
+                placeholder="Add a short note"
+                type="text"
+                value={field.value ?? ""}
+              />
+              <FieldError
+                errors={[fieldState.error]}
+                id="focus-task-description-error"
+              />
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="estimatedPomodoros"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="focus-task-estimated-pomodoros">
+                Estimated Pomodoros
+              </FieldLabel>
+              <NumberInput
+                {...field}
+                aria-describedby={
+                  fieldState.error
+                    ? "focus-task-estimated-pomodoros-error"
+                    : undefined
+                }
+                aria-invalid={fieldState.invalid}
+                id="focus-task-estimated-pomodoros"
+                inputMode="numeric"
+                onChange={async (event) => {
+                  const value = Math.max(0, Number(event.currentTarget.value));
+                  event.currentTarget.value = String(value);
+                  field.onChange(value);
+                  await form.trigger("estimatedPomodoros");
+                }}
+                onIncrease={() => {
+                  const value = field.value;
+                  form.setValue("estimatedPomodoros", Math.min(9, value + 1), {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }}
+                onDecrease={() => {
+                  const value = field.value;
+                  form.setValue("estimatedPomodoros", Math.max(0, value - 1), {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }}
+                placeholder="1"
+                type="number"
+                value={Number.isNaN(field.value) ? "" : field.value}
+              />
+              <FieldError
+                errors={[fieldState.error]}
+                id="focus-task-estimated-pomodoros-error"
+              />
+            </Field>
+          )}
+        />
+        <Button type="submit">
+          {mutation.isPending ? (
+            <Loader2Icon className="animate-spin" />
+          ) : (
+            <PlusIcon />
+          )}
+          Save task
+        </Button>
+      </fieldset>
     </form>
   );
 }
