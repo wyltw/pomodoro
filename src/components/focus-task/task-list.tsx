@@ -25,7 +25,7 @@ export function TaskList({
     const methods = {
       all: () => true,
       completed: (task: FocusTask) =>
-        task.estimatedPomodoros === task.completedPomodoros,
+        task.completedPomodoros >= task.estimatedPomodoros,
       incomplete: (task: FocusTask) =>
         task.completedPomodoros < task.estimatedPomodoros,
     };
@@ -73,7 +73,7 @@ export function TaskList({
             >
               <span className="min-w-0 truncate">{task.title}</span>
               <span className="flex gap-2">
-                {task.completedPomodoros === task.estimatedPomodoros ? (
+                {task.completedPomodoros >= task.estimatedPomodoros ? (
                   <CircleCheckBig className="size-5 text-green-500" />
                 ) : (
                   <span className="text-muted-foreground shrink-0 tabular-nums">

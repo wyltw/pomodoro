@@ -38,6 +38,18 @@ describe("completeActivePomodoro", () => {
 
     expect(updatedActiveTask.completedPomodoros).toBe(1);
     expect(updatedInactiveTask.completedPomodoros).toBe(0);
+    expect(store.getState().activeTaskId).toBe(activeTask.id);
+  });
+
+  test("clears the active task after completing its final Pomodoro", () => {
+    store.setState({
+      tasks: [{ ...activeTask, completedPomodoros: 1 }, inactiveTask],
+    });
+
+    store.getState().completeActivePomodoro();
+
+    expect(store.getState().tasks[0].completedPomodoros).toBe(2);
+    expect(store.getState().activeTaskId).toBeUndefined();
   });
 
   test("does nothing when there is no active task", () => {
@@ -46,6 +58,46 @@ describe("completeActivePomodoro", () => {
     store.getState().completeActivePomodoro();
 
     expect(store.getState().tasks).toEqual([activeTask, inactiveTask]);
+  });
+});
+
+describe("updateTask", () => {
+  test("does not update a completed task", () => {
+    const completedTask = { ...activeTask, completedPomodoros: 2 };
+    const store = createDailyFocusTasksStore({
+      shouldPersist: false,
+      initialValues: {
+        localDate: "2026-07-12",
+        tasks: [completedTask],
+        activeTaskId: completedTask.id,
+      },
+    });
+
+    store.getState().updateTask(completedTask.id, {
+      title: "Changed title",
+      description: "Changed description",
+      estimatedPomodoros: 3,
+    });
+
+    expect(store.getState().tasks).toEqual([completedTask]);
+  });
+});
+
+describe("setActiveTask", () => {
+  test("activates an existing task regardless of completion state", () => {
+    const completedTask = { ...activeTask, completedPomodoros: 2 };
+    const store = createDailyFocusTasksStore({
+      shouldPersist: false,
+      initialValues: {
+        localDate: "2026-07-12",
+        tasks: [completedTask],
+        activeTaskId: undefined,
+      },
+    });
+
+    store.getState().setActiveTask(completedTask.id);
+
+    expect(store.getState().activeTaskId).toBe(completedTask.id);
   });
 });
 

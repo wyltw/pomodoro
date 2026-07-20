@@ -1,6 +1,7 @@
 import type { z } from "zod";
 
 import type {
+  completePomodoroPayloadSchema,
   createFocusTaskPayloadSchema,
   dailyFocusTasksSchema,
   focusTaskSchema,
@@ -18,6 +19,14 @@ export type CreateFocusTaskPayload = z.input<
 export type UpdateFocusTaskPayload = z.input<
   typeof updateFocusTaskPayloadSchema
 >;
+
+export type CompletePomodoroPayload = z.input<
+  typeof completePomodoroPayloadSchema
+>;
+
+export type CompletePomodoroResult = {
+  completedTaskId?: string;
+};
 
 export type DailyFocusTasks = z.infer<typeof dailyFocusTasksSchema>;
 

@@ -9,12 +9,14 @@ import { AppProvider } from "@/lib/stores/daily-focus-tasks-store";
 import type { FocusTask } from "@/lib/types/types";
 
 const {
+  completePomodoroMock,
   createFocusTaskMock,
   deleteFocusTaskMock,
   toastErrorMock,
   toastSuccessMock,
   updateFocusTaskMock,
 } = vi.hoisted(() => ({
+  completePomodoroMock: vi.fn(),
   createFocusTaskMock: vi.fn(),
   deleteFocusTaskMock: vi.fn(),
   toastErrorMock: vi.fn(),
@@ -23,6 +25,7 @@ const {
 }));
 
 vi.mock("@/lib/actions/focus-task-actions", () => ({
+  completePomodoro: completePomodoroMock,
   createFocusTask: createFocusTaskMock,
   deleteFocusTask: deleteFocusTaskMock,
   updateFocusTask: updateFocusTaskMock,
@@ -118,6 +121,7 @@ async function enterTaskValues({
 }
 
 beforeEach(() => {
+  completePomodoroMock.mockReset();
   createFocusTaskMock.mockReset();
   deleteFocusTaskMock.mockReset();
   toastErrorMock.mockReset();

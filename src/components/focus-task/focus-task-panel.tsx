@@ -20,7 +20,6 @@ export default function FocusTaskPanel() {
   const [isEditing, setIsEditing] = useState(false);
   const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
-
   const focusingTask = tasks.find((task) => task.id === activeTaskId);
 
   function startEditing() {
@@ -44,6 +43,9 @@ export default function FocusTaskPanel() {
     );
   }
 
+  const isCompleted =
+    focusingTask.completedPomodoros >= focusingTask.estimatedPomodoros;
+
   return (
     <Card className="w-full max-w-md self-start rounded-xl">
       <CardHeader>
@@ -56,7 +58,7 @@ export default function FocusTaskPanel() {
               size="icon-lg"
               aria-label="Edit task"
               title="Edit task"
-              disabled={isEditing}
+              disabled={isEditing || isCompleted}
               onClick={startEditing}
             >
               <SquarePenIcon />

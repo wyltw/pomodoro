@@ -5,11 +5,14 @@ import type { UseMutationOptions } from "@tanstack/react-query";
 
 import { getFocusTasks } from "@/lib/api/focus-tasks";
 import {
+  completePomodoro,
   createFocusTask,
   deleteFocusTask,
   updateFocusTask,
 } from "../actions/focus-task-actions";
 import type {
+  CompletePomodoroPayload,
+  CompletePomodoroResult,
   CreateFocusTaskPayload,
   UpdateFocusTaskPayload,
 } from "../types/types";
@@ -26,6 +29,13 @@ export type CreateFocusTaskVariables = {
 
 type UseCreateFocusTaskOptions = Omit<
   UseMutationOptions<void, Error, CreateFocusTaskVariables>,
+  "mutationFn"
+>;
+
+export type CompletePomodoroVariables = CompletePomodoroPayload;
+
+type UseCompletePomodoroOptions = Omit<
+  UseMutationOptions<CompletePomodoroResult, Error, CompletePomodoroVariables>,
   "mutationFn"
 >;
 
@@ -74,6 +84,10 @@ export function useCreateFocusTask(options: UseCreateFocusTaskOptions) {
     ...options,
     mutationFn: ({ payload, timeZone }) => createFocusTask(payload, timeZone),
   });
+}
+
+export function useCompletePomodoro(options: UseCompletePomodoroOptions) {
+  return useMutation({ ...options, mutationFn: completePomodoro });
 }
 
 export function useUpdateFocusTask(options: UseUpdateFocusTaskOptions) {

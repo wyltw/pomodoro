@@ -1,13 +1,18 @@
 "use server";
 
+import type { Prisma } from "@/generated/prisma/client";
+
 import { getSession } from "../dal";
 import prisma from "../prisma";
 import type {
+  CompletePomodoroPayload,
+  CompletePomodoroResult,
   CreateFocusTaskPayload,
   UpdateFocusTaskPayload,
 } from "../types/types";
 import { getLocalDateFromTimeZone } from "../utils/utils";
 import {
+  completePomodoroPayloadSchema,
   createFocusTaskPayloadSchema,
   focusTaskIdSchema,
   timeZoneSchema,
@@ -15,6 +20,29 @@ import {
 } from "../schemas";
 
 const focusTaskNotFoundError = "Focus task not found.";
+
+async function getOrCreateDailyFocusDay(
+  transaction: Prisma.TransactionClient,
+  userId: string,
+  timeZone: string,
+) {
+  const localDate = getLocalDateFromTimeZone(timeZone);
+
+  return transaction.dailyFocusDay.upsert({
+    where: {
+      userId_localDate: {
+        userId,
+        localDate,
+      },
+    },
+    update: {},
+    create: {
+      userId,
+      localDate,
+    },
+    select: { id: true },
+  });
+}
 
 export const createFocusTask = async (
   payload: CreateFocusTaskPayload,
@@ -34,22 +62,12 @@ export const createFocusTask = async (
   if (!parsedTimeZone.success) throw new Error(parsedTimeZone.error.message);
   const { title, description, estimatedPomodoros } = parsedPayload.data;
 
-  const localDate = getLocalDateFromTimeZone(parsedTimeZone.data);
   await prisma.$transaction(async (transaction) => {
-    const dailyFocusDay = await transaction.dailyFocusDay.upsert({
-      where: {
-        userId_localDate: {
-          userId,
-          localDate,
-        },
-      },
-      update: {},
-      create: {
-        userId,
-        localDate,
-      },
-      select: { id: true },
-    });
+    const dailyFocusDay = await getOrCreateDailyFocusDay(
+      transaction,
+      userId,
+      parsedTimeZone.data,
+    );
 
     await transaction.focusTask.create({
       data: {
@@ -59,6 +77,72 @@ export const createFocusTask = async (
         dailyFocusDayId: dailyFocusDay.id,
       },
     });
+  });
+};
+
+export const completePomodoro = async (
+  payload: CompletePomodoroPayload,
+): Promise<CompletePomodoroResult> => {
+  const session = await getSession();
+
+  if (!session) {
+    throw new Error("Please sign in to complete a Pomodoro.");
+  }
+
+  const parsedPayload = completePomodoroPayloadSchema.safeParse(payload);
+  if (!parsedPayload.success) throw new Error(parsedPayload.error.message);
+
+  const { taskId, timeZone } = parsedPayload.data;
+  return prisma.$transaction(async (transaction) => {
+    const dailyFocusDay = await getOrCreateDailyFocusDay(
+      transaction,
+      session.user.id,
+      timeZone,
+    );
+    let completedTaskId: string | undefined;
+
+    if (taskId) {
+      const task = await transaction.focusTask.findFirst({
+        where: {
+          id: taskId,
+          dailyFocusDayId: dailyFocusDay.id,
+        },
+        select: {
+          completedPomodoros: true,
+          estimatedPomodoros: true,
+        },
+      });
+
+      if (!task) throw new Error(focusTaskNotFoundError);
+      if (task.completedPomodoros >= task.estimatedPomodoros) {
+        throw new Error("This focus task is already complete.");
+      }
+
+      const nextCompletedPomodoros = task.completedPomodoros + 1;
+      const result = await transaction.focusTask.updateMany({
+        where: {
+          id: taskId,
+          dailyFocusDayId: dailyFocusDay.id,
+          completedPomodoros: task.completedPomodoros,
+        },
+        data: { completedPomodoros: nextCompletedPomodoros },
+      });
+
+      if (result.count === 0) {
+        throw new Error("Unable to record this Pomodoro. Please try again.");
+      }
+
+      if (nextCompletedPomodoros >= task.estimatedPomodoros) {
+        completedTaskId = taskId;
+      }
+    }
+
+    await transaction.dailyFocusDay.update({
+      where: { id: dailyFocusDay.id },
+      data: { completedPomodoros: { increment: 1 } },
+    });
+
+    return completedTaskId ? { completedTaskId } : {};
   });
 };
 
@@ -83,10 +167,16 @@ export const updateFocusTask = async (
       id: parsedTaskId.data,
       dailyFocusDay: { userId },
     },
-    select: { completedPomodoros: true },
+    select: {
+      completedPomodoros: true,
+      estimatedPomodoros: true,
+    },
   });
 
   if (!task) throw new Error(focusTaskNotFoundError);
+  if (task.completedPomodoros >= task.estimatedPomodoros) {
+    throw new Error("Completed focus tasks cannot be updated.");
+  }
 
   const { title, description, estimatedPomodoros } = parsedPayload.data;
   if (estimatedPomodoros < task.completedPomodoros) {

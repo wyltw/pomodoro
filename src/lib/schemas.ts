@@ -42,6 +42,11 @@ export const timeZoneSchema = z
   .min(1, "Time zone is required.")
   .refine(isValidTimeZone, "Time zone is invalid.");
 
+export const completePomodoroPayloadSchema = z.object({
+  taskId: focusTaskIdSchema.optional(),
+  timeZone: timeZoneSchema,
+});
+
 export const dailyFocusTasksSchema = z.object({
   localDate: localDateSchema,
   tasks: z.array(focusTaskSchema),

@@ -1,24 +1,48 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Timer from "./timer";
 import type { TimerType } from "@/lib/types/types";
 import { Armchair, Clock5, Coffee } from "lucide-react";
+import { useAuthSession } from "@/lib/hooks/auth-hooks";
+import {
+  focusTasksQueryKey,
+  useCompletePomodoro,
+} from "@/lib/hooks/focus-task-hooks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { TimerCompletedView } from "./timer-completed-view";
 import { notifyUser } from "@/lib/utils/utils";
 
 export default function TimerTabs() {
+  const { isSignedIn } = useAuthSession();
+  const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState<TimerType | "completed">(
     "pomodoro",
   );
+  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const completeActivePomodoro = useDailyFocusTasksStore(
     (state) => state.completeActivePomodoro,
+  );
+  const clearActiveTask = useDailyFocusTasksStore(
+    (state) => state.clearActiveTask,
   );
   const activeTask = useDailyFocusTasksStore((state) =>
     state.tasks.find((task) => task.id === state.activeTaskId),
   );
+  const mutation = useCompletePomodoro({
+    async onSuccess({ completedTaskId }) {
+      if (completedTaskId) clearActiveTask();
+      await queryClient.invalidateQueries({
+        queryKey: focusTasksQueryKey(localDate),
+      });
+    },
+    onError(error) {
+      toast.error(error.message || "Unable to save this Pomodoro.");
+    },
+  });
 
   const handleContinue = () => {
     setSelectedTab("pomodoro");
@@ -30,7 +54,14 @@ export default function TimerTabs() {
 
   const handleComplete = (type: TimerType) => {
     if (type === "pomodoro") {
-      completeActivePomodoro();
+      if (isSignedIn) {
+        mutation.mutate({
+          taskId: activeTask?.id,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        });
+      } else {
+        completeActivePomodoro();
+      }
     }
 
     setSelectedTab("completed");

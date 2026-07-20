@@ -27,6 +27,29 @@ function TimerStatusControl() {
 }
 
 describe("FocusTaskList", () => {
+  test("allows completed task selection for displaying its details", () => {
+    const onItemClick = vi.fn();
+    const completedTask = { ...task, completedPomodoros: 2 };
+
+    render(
+      <TimerStatusProvider>
+        <FocusTaskList
+          tasks={[completedTask]}
+          activeTaskId={undefined}
+          onItemClick={onItemClick}
+        />
+      </TimerStatusProvider>,
+    );
+
+    const taskButton = screen.getByRole("button", {
+      name: /Write integration test/,
+    }) as HTMLButtonElement;
+
+    expect(taskButton.disabled).toBe(false);
+    fireEvent.click(taskButton);
+    expect(onItemClick).toHaveBeenCalledWith(completedTask.id);
+  });
+
   test("disables task selection while the timer is running", () => {
     const onItemClick = vi.fn();
 
