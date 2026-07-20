@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import { formatTime } from "@/lib/utils/utils";
 import {
   CircularProgress,
@@ -41,11 +41,22 @@ export default function Timer({
 
 function CountdownTimer({ sessionMax, sessionMin, onComplete }: TimerProps) {
   const { seconds, status } = useTimerData();
+  const hasHandledCompletion = useRef(false);
+  const handleComplete = useEffectEvent(() => {
+    onComplete?.();
+  });
 
   useEffect(() => {
-    if (status !== "completed") return;
-    onComplete?.();
-  }, [onComplete, status]);
+    if (status !== "completed") {
+      hasHandledCompletion.current = false;
+      return;
+    }
+
+    if (hasHandledCompletion.current) return;
+
+    hasHandledCompletion.current = true;
+    handleComplete();
+  }, [status]);
 
   return (
     <>
