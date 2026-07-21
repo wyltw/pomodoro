@@ -45,6 +45,10 @@ export const timeZoneSchema = z
 export const completePomodoroPayloadSchema = z.object({
   taskId: focusTaskIdSchema.optional(),
   timeZone: timeZoneSchema,
+  durationSeconds: z
+    .number({ error: "Session duration is required." })
+    .int("Session duration must be a whole number of seconds.")
+    .positive("Session duration must be greater than zero."),
 });
 
 export const dailyFocusTasksSchema = z.object({

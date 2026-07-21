@@ -1,8 +1,8 @@
 "use server";
 
-import type { Prisma } from "@/generated/prisma/client";
-
 import { getSession } from "../dal";
+import { getOrCreateDailyFocusDay } from "../data/daily-focus-day-queries";
+import { createPomodoroSession } from "../data/pomodoro-session-queries";
 import prisma from "../prisma";
 import type {
   CompletePomodoroPayload,
@@ -10,7 +10,6 @@ import type {
   CreateFocusTaskPayload,
   UpdateFocusTaskPayload,
 } from "../types/types";
-import { getLocalDateFromTimeZone } from "../utils/utils";
 import {
   completePomodoroPayloadSchema,
   createFocusTaskPayloadSchema,
@@ -20,29 +19,6 @@ import {
 } from "../schemas";
 
 const focusTaskNotFoundError = "Focus task not found.";
-
-async function getOrCreateDailyFocusDay(
-  transaction: Prisma.TransactionClient,
-  userId: string,
-  timeZone: string,
-) {
-  const localDate = getLocalDateFromTimeZone(timeZone);
-
-  return transaction.dailyFocusDay.upsert({
-    where: {
-      userId_localDate: {
-        userId,
-        localDate,
-      },
-    },
-    update: {},
-    create: {
-      userId,
-      localDate,
-    },
-    select: { id: true },
-  });
-}
 
 export const createFocusTask = async (
   payload: CreateFocusTaskPayload,
@@ -92,7 +68,7 @@ export const completePomodoro = async (
   const parsedPayload = completePomodoroPayloadSchema.safeParse(payload);
   if (!parsedPayload.success) throw new Error(parsedPayload.error.message);
 
-  const { taskId, timeZone } = parsedPayload.data;
+  const { durationSeconds, taskId, timeZone } = parsedPayload.data;
   return prisma.$transaction(async (transaction) => {
     const dailyFocusDay = await getOrCreateDailyFocusDay(
       transaction,
@@ -100,46 +76,49 @@ export const completePomodoro = async (
       timeZone,
     );
     let completedTaskId: string | undefined;
+    let focusTask: { id: string; title: string } | undefined;
 
     if (taskId) {
       const task = await transaction.focusTask.findFirst({
-        where: {
-          id: taskId,
-          dailyFocusDayId: dailyFocusDay.id,
-        },
+        where: { id: taskId },
         select: {
           completedPomodoros: true,
+          dailyFocusDayId: true,
           estimatedPomodoros: true,
+          title: true,
         },
       });
 
-      if (!task) throw new Error(focusTaskNotFoundError);
-      if (task.completedPomodoros >= task.estimatedPomodoros) {
-        throw new Error("This focus task is already complete.");
+      if (task && task.dailyFocusDayId !== dailyFocusDay.id) {
+        throw new Error("Focus task is not available for this focus day.");
       }
 
-      const nextCompletedPomodoros = task.completedPomodoros + 1;
-      const result = await transaction.focusTask.updateMany({
-        where: {
-          id: taskId,
-          dailyFocusDayId: dailyFocusDay.id,
-          completedPomodoros: task.completedPomodoros,
-        },
-        data: { completedPomodoros: nextCompletedPomodoros },
-      });
+      if (task && task.completedPomodoros < task.estimatedPomodoros) {
+        const nextCompletedPomodoros = task.completedPomodoros + 1;
+        const result = await transaction.focusTask.updateMany({
+          where: {
+            id: taskId,
+            dailyFocusDayId: dailyFocusDay.id,
+            completedPomodoros: task.completedPomodoros,
+          },
+          data: { completedPomodoros: nextCompletedPomodoros },
+        });
 
-      if (result.count === 0) {
-        throw new Error("Unable to record this Pomodoro. Please try again.");
-      }
+        if (result.count === 0) {
+          throw new Error("Unable to record this Pomodoro. Please try again.");
+        }
 
-      if (nextCompletedPomodoros >= task.estimatedPomodoros) {
-        completedTaskId = taskId;
+        focusTask = { id: taskId, title: task.title };
+        if (nextCompletedPomodoros >= task.estimatedPomodoros) {
+          completedTaskId = taskId;
+        }
       }
     }
 
-    await transaction.dailyFocusDay.update({
-      where: { id: dailyFocusDay.id },
-      data: { completedPomodoros: { increment: 1 } },
+    await createPomodoroSession(transaction, {
+      dailyFocusDayId: dailyFocusDay.id,
+      durationSeconds,
+      focusTask,
     });
 
     return completedTaskId ? { completedTaskId } : {};

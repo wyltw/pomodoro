@@ -58,11 +58,12 @@ model FocusTask {
 }
 
 model PomodoroSession {
-  id              String   @id @default(uuid())
-  dailyFocusDayId String
-  focusTaskId     String?
-  durationSeconds Int
-  completedAt     DateTime @default(now())
+  id                String   @id @default(uuid())
+  dailyFocusDayId   String
+  focusTaskId       String?
+  taskTitleSnapshot String?
+  durationSeconds   Int
+  completedAt       DateTime @default(now())
 
   dailyFocusDay DailyFocusDay @relation(fields: [dailyFocusDayId], references: [id], onDelete: Cascade)
   focusTask     FocusTask?    @relation(fields: [focusTaskId], references: [id], onDelete: SetNull)

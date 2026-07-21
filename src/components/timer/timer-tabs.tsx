@@ -16,6 +16,8 @@ import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { TimerCompletedView } from "./timer-completed-view";
 import { notifyUser } from "@/lib/utils/utils";
 
+const POMODORO_DURATION_SECONDS = 3;
+
 export default function TimerTabs() {
   const { isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
@@ -56,6 +58,7 @@ export default function TimerTabs() {
     if (type === "pomodoro") {
       if (isSignedIn) {
         mutation.mutate({
+          durationSeconds: POMODORO_DURATION_SECONDS,
           taskId: activeTask?.id,
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
@@ -94,7 +97,7 @@ export default function TimerTabs() {
 
       <TabsContent value="pomodoro">
         <Timer
-          sessionMax={3}
+          sessionMax={POMODORO_DURATION_SECONDS}
           sessionMin={0}
           onComplete={() => {
             handleComplete("pomodoro");

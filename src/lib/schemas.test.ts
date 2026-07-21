@@ -15,13 +15,17 @@ describe("timeZoneSchema", () => {
 describe("completePomodoroPayloadSchema", () => {
   test("accepts a time zone without a focus task", () => {
     expect(
-      completePomodoroPayloadSchema.parse({ timeZone: "Asia/Taipei" }),
-    ).toEqual({ timeZone: "Asia/Taipei" });
+      completePomodoroPayloadSchema.parse({
+        durationSeconds: 1500,
+        timeZone: "Asia/Taipei",
+      }),
+    ).toEqual({ durationSeconds: 1500, timeZone: "Asia/Taipei" });
   });
 
   test("rejects an invalid focus task ID", () => {
     expect(
       completePomodoroPayloadSchema.safeParse({
+        durationSeconds: 1500,
         taskId: "not-a-uuid",
         timeZone: "Asia/Taipei",
       }).success,
