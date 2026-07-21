@@ -2,7 +2,7 @@ import "server-only";
 
 import { getSession } from "@/lib/dal";
 import prisma from "@/lib/prisma";
-import { getLocalDateFromTimeZone } from "@/lib/utils/utils";
+import { getOrCreateDailyFocusDay } from "@/lib/services/daily-focus-day";
 
 export const getFocusTasks = async (timeZone: string) => {
   const session = await getSession();
@@ -12,33 +12,36 @@ export const getFocusTasks = async (timeZone: string) => {
   }
 
   const userId = session.user.id;
-  const localDate = getLocalDateFromTimeZone(timeZone);
+  const tasks = await prisma.$transaction(async (transaction) => {
+    const dailyFocusDay = await getOrCreateDailyFocusDay(
+      transaction,
+      userId,
+      timeZone,
+    );
 
-  const dailyFocusDay = await prisma.dailyFocusDay.findUnique({
-    where: {
-      userId_localDate: {
-        userId,
-        localDate,
+    await transaction.focusTask.updateMany({
+      where: {
+        dailyFocusDay: {
+          userId,
+          localDate: { lt: dailyFocusDay.localDate },
+        },
+        completedPomodoros: {
+          lt: transaction.focusTask.fields.estimatedPomodoros,
+        },
       },
-    },
-    select: {
-      id: true,
-    },
-  });
+      data: { dailyFocusDayId: dailyFocusDay.id },
+    });
 
-  if (!dailyFocusDay) {
-    return [];
-  }
-
-  const tasks = await prisma.focusTask.findMany({
-    where: { dailyFocusDayId: dailyFocusDay.id },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      estimatedPomodoros: true,
-      completedPomodoros: true,
-    },
+    return transaction.focusTask.findMany({
+      where: { dailyFocusDayId: dailyFocusDay.id },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        estimatedPomodoros: true,
+        completedPomodoros: true,
+      },
+    });
   });
 
   return tasks.map(({ description, ...task }) => ({

@@ -20,6 +20,6 @@ export function getOrCreateDailyFocusDay(
       userId,
       localDate,
     },
-    select: { id: true },
+    select: { id: true, localDate: true },
   });
 }
