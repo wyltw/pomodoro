@@ -24,7 +24,6 @@ export default function TimerTabs() {
   const [selectedTab, setSelectedTab] = useState<TimerType | "completed">(
     "pomodoro",
   );
-  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const completeActivePomodoro = useDailyFocusTasksStore(
     (state) => state.completeActivePomodoro,
   );
@@ -38,7 +37,7 @@ export default function TimerTabs() {
     async onSuccess({ completedTaskId }) {
       if (completedTaskId) clearActiveTask();
       await queryClient.invalidateQueries({
-        queryKey: focusTasksQueryKey(localDate),
+        queryKey: focusTasksQueryKey,
       });
     },
     onError(error) {

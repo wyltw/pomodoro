@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { getSession } from "@/lib/dal";
 import { getFocusTasks } from "@/lib/data/tasks-queries";
-import { localDateSchema } from "@/lib/schemas";
+import { timeZoneSchema } from "@/lib/schemas";
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,18 +15,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const localDate = localDateSchema.safeParse(
-      request.nextUrl.searchParams.get("localDate"),
+    const timeZone = timeZoneSchema.safeParse(
+      request.nextUrl.searchParams.get("timeZone"),
     );
 
-    if (!localDate.success) {
+    if (!timeZone.success) {
       return Response.json(
-        { error: "The local date is invalid." },
+        { error: "The time zone is invalid." },
         { status: 400 },
       );
     }
 
-    const tasks = await getFocusTasks(localDate.data);
+    const tasks = await getFocusTasks(timeZone.data);
 
     return Response.json({ data: tasks });
   } catch (error) {

@@ -20,7 +20,6 @@ import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export function FocusTaskSidebar() {
   const { isSignedIn } = useAuthSession();
-  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
   const replaceTasks = useDailyFocusTasksStore((state) => state.replaceTasks);
@@ -31,7 +30,6 @@ export function FocusTaskSidebar() {
     isLoading,
   } = useFocusTasks({
     enabled: isSignedIn,
-    localDate,
   });
 
   useEffect(() => {

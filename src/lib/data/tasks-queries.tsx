@@ -2,8 +2,9 @@ import "server-only";
 
 import { getSession } from "@/lib/dal";
 import prisma from "@/lib/prisma";
+import { getLocalDateFromTimeZone } from "@/lib/utils/utils";
 
-export const getFocusTasks = async (localDate: string) => {
+export const getFocusTasks = async (timeZone: string) => {
   const session = await getSession();
 
   if (!session) {
@@ -11,6 +12,7 @@ export const getFocusTasks = async (localDate: string) => {
   }
 
   const userId = session.user.id;
+  const localDate = getLocalDateFromTimeZone(timeZone);
 
   const dailyFocusDay = await prisma.dailyFocusDay.findUnique({
     where: {

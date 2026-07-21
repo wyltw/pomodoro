@@ -25,7 +25,6 @@ type FocusTaskCreateFormValues = z.output<typeof focusTaskFormSchema>;
 export function FocusTaskCreateForm() {
   const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
-  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const addTask = useDailyFocusTasksStore((state) => state.addTask);
   const form = useForm<
     FocusTaskCreateFormInput,
@@ -42,7 +41,7 @@ export function FocusTaskCreateForm() {
   const mutation = useCreateFocusTask({
     async onSuccess() {
       await queryClient.invalidateQueries({
-        queryKey: focusTasksQueryKey(localDate),
+        queryKey: focusTasksQueryKey,
       });
       form.reset();
       toast.success("Focus task created.");

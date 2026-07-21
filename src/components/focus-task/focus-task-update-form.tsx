@@ -56,12 +56,11 @@ export function FocusTaskUpdateForm({
 }: FocusTaskUpdateFormProps) {
   const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
-  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const updateTask = useDailyFocusTasksStore((state) => state.updateTask);
   const mutation = useUpdateFocusTask({
     async onSuccess() {
       await queryClient.invalidateQueries({
-        queryKey: focusTasksQueryKey(localDate),
+        queryKey: focusTasksQueryKey,
       });
       toast.success("Focus task updated.");
       onEditingEnd();

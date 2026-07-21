@@ -19,7 +19,6 @@ import type {
 
 type UseFocusTasksQueryOptions = {
   enabled: boolean;
-  localDate: string;
 };
 
 export type CreateFocusTaskVariables = {
@@ -57,21 +56,17 @@ type UseDeleteFocusTaskOptions = Omit<
   "mutationFn"
 >;
 
-export const focusTasksQueryKey = (localDate: string) =>
-  ["focus-tasks", localDate] as const;
+export const focusTasksQueryKey = ["focus-tasks"] as const;
 
-export function useFocusTasks({
-  enabled,
-  localDate,
-}: UseFocusTasksQueryOptions) {
+export function useFocusTasks({ enabled }: UseFocusTasksQueryOptions) {
   const {
     data: tasks,
     error,
     isLoading,
   } = useQuery({
     enabled,
-    queryFn: () => getFocusTasks(localDate),
-    queryKey: focusTasksQueryKey(localDate),
+    queryFn: getFocusTasks,
+    queryKey: focusTasksQueryKey,
     retry: false,
   });
 
