@@ -28,12 +28,14 @@ function createFocusTaskUpdateFormSchema(completedPomodoros: number) {
       : "Enter at least 1.";
 
   return z.object({
-    title: z.string().trim().min(1, "Title is required."),
+    title: z.string().trim().min(1, { error: "Title is required." }),
     description: z.string().trim(),
     estimatedPomodoros: z
       .number({ error: "Estimated Pomodoros is required." })
-      .min(minimumEstimatedPomodoros, minimumEstimatedPomodorosError)
-      .max(8, "Consider splitting this into smaller tasks."),
+      .min(minimumEstimatedPomodoros, {
+        error: minimumEstimatedPomodorosError,
+      })
+      .max(8, { error: "Consider splitting this into smaller tasks." }),
   });
 }
 

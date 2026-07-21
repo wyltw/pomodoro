@@ -17,8 +17,18 @@ export const focusTaskSchema = z.object({
   completedPomodoros: z.number(),
 });
 
+export const focusTaskIdSchema = z.uuid({ error: "Invalid focus task ID." });
+
+export const localDateSchema = z.iso.date();
+
+export const timeZoneSchema = z
+  .string()
+  .trim()
+  .min(1, { error: "Time zone is required." })
+  .refine(isValidTimeZone, { error: "Time zone is invalid." });
+
 export const createFocusTaskPayloadSchema = z.object({
-  title: z.string().trim().min(1, "Title is required."),
+  title: z.string().trim().min(1, { error: "Title is required." }),
   description: z
     .string()
     .trim()
@@ -26,29 +36,31 @@ export const createFocusTaskPayloadSchema = z.object({
     .transform((value) => value || undefined),
   estimatedPomodoros: z
     .number({ error: "Estimated Pomodoros is required." })
-    .min(1, "Enter at least 1.")
-    .max(8, "Consider splitting this into smaller tasks."),
+    .min(1, { error: "Enter at least 1." })
+    .max(8, { error: "Consider splitting this into smaller tasks." }),
+  timeZone: timeZoneSchema,
 });
 
-export const updateFocusTaskPayloadSchema = createFocusTaskPayloadSchema;
-
-export const focusTaskIdSchema = z.uuid("Invalid focus task ID.");
-
-export const localDateSchema = z.iso.date();
-
-export const timeZoneSchema = z
-  .string()
-  .trim()
-  .min(1, "Time zone is required.")
-  .refine(isValidTimeZone, "Time zone is invalid.");
+export const updateFocusTaskPayloadSchema = z.object({
+  title: z.string().trim().min(1, { error: "Title is required." }),
+  description: z
+    .string()
+    .trim()
+    .optional()
+    .transform((value) => value || null),
+  estimatedPomodoros: z
+    .number({ error: "Estimated Pomodoros is required." })
+    .min(1, { error: "Enter at least 1." })
+    .max(8, { error: "Consider splitting this into smaller tasks." }),
+});
 
 export const completePomodoroPayloadSchema = z.object({
   taskId: focusTaskIdSchema.optional(),
   timeZone: timeZoneSchema,
   durationSeconds: z
     .number({ error: "Session duration is required." })
-    .int("Session duration must be a whole number of seconds.")
-    .positive("Session duration must be greater than zero."),
+    .int({ error: "Session duration must be a whole number of seconds." })
+    .positive({ error: "Session duration must be greater than zero." }),
 });
 
 export const dailyFocusTasksSchema = z.object({
@@ -57,6 +69,11 @@ export const dailyFocusTasksSchema = z.object({
   activeTaskId: z.string().optional(),
 });
 
-export const focusTaskFormSchema = createFocusTaskPayloadSchema.extend({
+export const focusTaskFormSchema = z.object({
+  title: z.string().trim().min(1, { error: "Title is required." }),
   description: z.string().trim(),
+  estimatedPomodoros: z
+    .number({ error: "Estimated Pomodoros is required." })
+    .min(1, { error: "Enter at least 1." })
+    .max(8, { error: "Consider splitting this into smaller tasks." }),
 });

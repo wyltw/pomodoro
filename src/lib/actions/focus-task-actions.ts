@@ -14,16 +14,12 @@ import {
   completePomodoroPayloadSchema,
   createFocusTaskPayloadSchema,
   focusTaskIdSchema,
-  timeZoneSchema,
   updateFocusTaskPayloadSchema,
 } from "../schemas";
 
 const focusTaskNotFoundError = "Focus task not found.";
 
-export const createFocusTask = async (
-  payload: CreateFocusTaskPayload,
-  timeZone: string,
-) => {
+export const createFocusTask = async (payload: CreateFocusTaskPayload) => {
   const session = await getSession();
 
   if (!session) {
@@ -33,16 +29,15 @@ export const createFocusTask = async (
   const userId = session.user.id;
 
   const parsedPayload = createFocusTaskPayloadSchema.safeParse(payload);
-  const parsedTimeZone = timeZoneSchema.safeParse(timeZone);
   if (!parsedPayload.success) throw new Error(parsedPayload.error.message);
-  if (!parsedTimeZone.success) throw new Error(parsedTimeZone.error.message);
-  const { title, description, estimatedPomodoros } = parsedPayload.data;
+  const { description, estimatedPomodoros, timeZone, title } =
+    parsedPayload.data;
 
   await prisma.$transaction(async (transaction) => {
     const dailyFocusDay = await getOrCreateDailyFocusDay(
       transaction,
       userId,
-      parsedTimeZone.data,
+      timeZone,
     );
 
     await transaction.focusTask.create({
@@ -171,7 +166,7 @@ export const updateFocusTask = async (
     },
     data: {
       title,
-      description: description ?? null,
+      description,
       estimatedPomodoros,
     },
   });

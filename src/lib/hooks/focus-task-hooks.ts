@@ -24,7 +24,6 @@ type UseFocusTasksQueryOptions = {
 
 export type CreateFocusTaskVariables = {
   payload: CreateFocusTaskPayload;
-  timeZone: string;
 };
 
 type UseCreateFocusTaskOptions = Omit<
@@ -82,7 +81,7 @@ export function useFocusTasks({
 export function useCreateFocusTask(options: UseCreateFocusTaskOptions) {
   return useMutation({
     ...options,
-    mutationFn: ({ payload, timeZone }) => createFocusTask(payload, timeZone),
+    mutationFn: ({ payload }) => createFocusTask(payload),
   });
 }
 

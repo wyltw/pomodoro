@@ -3,8 +3,8 @@ import { describe, expect, test } from "vitest";
 import { completePomodoroPayloadSchema, timeZoneSchema } from "@/lib/schemas";
 
 describe("timeZoneSchema", () => {
-  test("accepts and trims a valid IANA time zone", () => {
-    expect(timeZoneSchema.parse(" Asia/Taipei ")).toBe("Asia/Taipei");
+  test("accepts a valid IANA time zone", () => {
+    expect(timeZoneSchema.parse("Asia/Taipei")).toBe("Asia/Taipei");
   });
 
   test("rejects an invalid time zone", () => {

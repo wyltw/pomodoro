@@ -139,14 +139,12 @@ describe("FocusTaskCreateForm", () => {
 
     await user.click(screen.getByRole("button", { name: "Save task" }));
 
-    expect(createFocusTaskMock).toHaveBeenCalledWith(
-      {
-        description: "Keep input when requests fail",
-        estimatedPomodoros: 3,
-        title: "Ship reliable forms",
-      },
-      Intl.DateTimeFormat().resolvedOptions().timeZone,
-    );
+    expect(createFocusTaskMock).toHaveBeenCalledWith({
+      description: "Keep input when requests fail",
+      estimatedPomodoros: 3,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      title: "Ship reliable forms",
+    });
     expect(fields.fieldset.disabled).toBe(true);
     expect(fields.title.value).toBe("Ship reliable forms");
     expect(toastSuccessMock).not.toHaveBeenCalled();

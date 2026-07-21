@@ -20,7 +20,7 @@ export type UpdateFocusTaskPayload = z.input<
   typeof updateFocusTaskPayloadSchema
 >;
 
-export type CompletePomodoroPayload = z.input<
+export type CompletePomodoroPayload = z.infer<
   typeof completePomodoroPayloadSchema
 >;
 
