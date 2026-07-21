@@ -24,7 +24,7 @@ const {
   updateFocusTaskMock: vi.fn(),
 }));
 
-vi.mock("@/lib/actions/focus-task-actions", () => ({
+vi.mock("@/lib/services/focus-task", () => ({
   completePomodoro: completePomodoroMock,
   createFocusTask: createFocusTaskMock,
   deleteFocusTask: deleteFocusTaskMock,

@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { getSession } from "@/lib/dal";
-import { getFocusTasks } from "@/lib/data/tasks-queries";
+import { getFocusTasks } from "@/lib/data/focus-task-queries";
 import { timeZoneSchema } from "@/lib/schemas";
 
 export async function GET(request: NextRequest) {

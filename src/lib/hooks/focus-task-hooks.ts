@@ -9,7 +9,7 @@ import {
   createFocusTask,
   deleteFocusTask,
   updateFocusTask,
-} from "../actions/focus-task-actions";
+} from "../services/focus-task";
 import type {
   CompletePomodoroPayload,
   CompletePomodoroResult,

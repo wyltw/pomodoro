@@ -1,9 +1,9 @@
 "use server";
 
 import { getSession } from "../dal";
-import { getOrCreateDailyFocusDay } from "../data/daily-focus-day-queries";
-import { createPomodoroSession } from "../data/pomodoro-session-queries";
 import prisma from "../prisma";
+import { getOrCreateDailyFocusDay } from "./daily-focus-day";
+import { createPomodoroSession } from "./pomodoro-session";
 import type {
   CompletePomodoroPayload,
   CompletePomodoroResult,
