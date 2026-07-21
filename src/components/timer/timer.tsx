@@ -16,12 +16,14 @@ import {
 import TimerButtonList from "./timer-button-list";
 
 type TimerProps = {
+  disabled?: boolean;
   sessionMax: number;
   sessionMin: number;
   onComplete?: () => void;
 };
 
 export default function Timer({
+  disabled,
   sessionMax,
   sessionMin,
   onComplete,
@@ -33,13 +35,19 @@ export default function Timer({
           sessionMax={sessionMax}
           sessionMin={sessionMin}
           onComplete={onComplete}
+          disabled={disabled}
         />
       </div>
     </TimerContextProvider>
   );
 }
 
-function CountdownTimer({ sessionMax, sessionMin, onComplete }: TimerProps) {
+function CountdownTimer({
+  disabled,
+  sessionMax,
+  sessionMin,
+  onComplete,
+}: TimerProps) {
   const { seconds, status } = useTimerData();
   const hasHandledCompletion = useRef(false);
   const handleComplete = useEffectEvent(() => {
@@ -77,7 +85,7 @@ function CountdownTimer({ sessionMax, sessionMin, onComplete }: TimerProps) {
         </CircularProgressIndicator>
         <CircularProgressValueText className="text-4xl" />
       </CircularProgress>
-      <TimerButtonList />
+      <TimerButtonList disabled={disabled} />
     </>
   );
 }

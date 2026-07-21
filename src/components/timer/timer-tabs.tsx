@@ -15,6 +15,7 @@ import {
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { TimerCompletedView } from "./timer-completed-view";
 import { notifyUser } from "@/lib/utils/utils";
+import { completedPomodorosQueryKey } from "@/lib/hooks/pomodoro-session-hooks";
 
 const POMODORO_DURATION_SECONDS = 3;
 
@@ -36,9 +37,15 @@ export default function TimerTabs() {
   const mutation = useCompletePomodoro({
     async onSuccess({ completedTaskId }) {
       if (completedTaskId) clearActiveTask();
-      await queryClient.invalidateQueries({
-        queryKey: focusTasksQueryKey,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: focusTasksQueryKey,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: completedPomodorosQueryKey,
+        }),
+      ]);
+      setSelectedTab("completed");
     },
     onError(error) {
       toast.error(error.message || "Unable to save this Pomodoro.");
@@ -53,19 +60,23 @@ export default function TimerTabs() {
     setSelectedTab(type);
   };
 
-  const handleComplete = (type: TimerType) => {
-    if (type === "pomodoro") {
-      if (isSignedIn) {
-        mutation.mutate({
-          durationSeconds: POMODORO_DURATION_SECONDS,
-          taskId: activeTask?.id,
-          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        });
-      } else {
-        completeActivePomodoro();
-      }
+  const handlePomodoroComplete = () => {
+    if (!isSignedIn) {
+      completeActivePomodoro();
+      setSelectedTab("completed");
+      return;
     }
 
+    if (mutation.isPending) return;
+
+    mutation.mutate({
+      durationSeconds: POMODORO_DURATION_SECONDS,
+      taskId: activeTask?.id,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+  };
+
+  const handleBreakComplete = () => {
     setSelectedTab("completed");
   };
 
@@ -80,15 +91,15 @@ export default function TimerTabs() {
       className="mt-4 gap-4"
     >
       <TabsList className="self-center">
-        <TabsTrigger value="pomodoro">
+        <TabsTrigger value="pomodoro" disabled={mutation.isPending}>
           <Clock5 data-icon="inline-start" />
           Pomodoro
         </TabsTrigger>
-        <TabsTrigger value="shortBreak">
+        <TabsTrigger value="shortBreak" disabled={mutation.isPending}>
           <Coffee data-icon="inline-start" />
           Short Break
         </TabsTrigger>
-        <TabsTrigger value="longBreak">
+        <TabsTrigger value="longBreak" disabled={mutation.isPending}>
           <Armchair data-icon="inline-start" />
           Long Break
         </TabsTrigger>
@@ -96,10 +107,11 @@ export default function TimerTabs() {
 
       <TabsContent value="pomodoro">
         <Timer
+          disabled={mutation.isPending}
           sessionMax={POMODORO_DURATION_SECONDS}
           sessionMin={0}
           onComplete={() => {
-            handleComplete("pomodoro");
+            handlePomodoroComplete();
             void notifyUser("Pomodoro complete", "/sounds/decide2.wav", {
               body: activeTask
                 ? `Finished focusing on "${activeTask.title}".`
@@ -107,13 +119,18 @@ export default function TimerTabs() {
             });
           }}
         />
+        {mutation.isPending && (
+          <p className="text-muted-foreground text-center text-sm">
+            Saving Pomodoro...
+          </p>
+        )}
       </TabsContent>
       <TabsContent value="shortBreak">
         <Timer
           sessionMax={300}
           sessionMin={0}
           onComplete={() => {
-            handleComplete("shortBreak");
+            handleBreakComplete();
             void notifyUser("Short break over", "/sounds/decide24.mp3", {
               body: "Time to focus again.",
             });
@@ -125,7 +142,7 @@ export default function TimerTabs() {
           sessionMax={900}
           sessionMin={0}
           onComplete={() => {
-            handleComplete("longBreak");
+            handleBreakComplete();
             void notifyUser("Long break over", "/sounds/decide24.mp3", {
               body: "Ready for another focus session?",
             });

@@ -67,4 +67,4 @@ Focus tests on integration behavior using Vitest with Testing Library. Test file
 - Use a concise Conventional Commits type such as `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `build`, `ci`, `perf`, `revert`, or `chore`.
 - Write the description as a concise imperative summary, for example `fix(timer): handle reset state`.
 - Do not add prefixes outside this format, including `[codex]`.
-- Include a short description and test results in the PR body.
+- Include the description and test results in the PR body.
