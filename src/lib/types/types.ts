@@ -42,7 +42,4 @@ export type ApiResponse<T, E> =
 
 export type FocusTasksResponse = ApiResponse<FocusTask[], string>;
 
-export type CompletedPomodorosResponse = ApiResponse<
-  { completedPomodoros: number },
-  string
->;
+export type TodayPomodoroCountResponse = ApiResponse<{ count: number }, string>;

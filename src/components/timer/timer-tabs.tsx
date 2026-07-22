@@ -15,7 +15,7 @@ import {
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { TimerCompletedView } from "./timer-completed-view";
 import { notifyUser } from "@/lib/utils/utils";
-import { completedPomodorosQueryKey } from "@/lib/hooks/pomodoro-session-hooks";
+import { todayPomodoroCountQueryKey } from "@/lib/hooks/pomodoro-session-hooks";
 
 const POMODORO_DURATION_SECONDS = 3;
 
@@ -42,7 +42,7 @@ export default function TimerTabs() {
           queryKey: focusTasksQueryKey,
         }),
         queryClient.invalidateQueries({
-          queryKey: completedPomodorosQueryKey,
+          queryKey: todayPomodoroCountQueryKey,
         }),
       ]);
       setSelectedTab("completed");

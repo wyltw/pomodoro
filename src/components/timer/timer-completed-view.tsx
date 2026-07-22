@@ -1,6 +1,6 @@
 import type { TimerType } from "@/lib/types/types";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { useCompletedPomodoros } from "@/lib/hooks/pomodoro-session-hooks";
+import { useTodayPomodoroCount } from "@/lib/hooks/pomodoro-session-hooks";
 import { Button } from "../ui/button";
 
 type TimerCompletedViewProps = {
@@ -13,7 +13,7 @@ export function TimerCompletedView({
   onBreak,
 }: TimerCompletedViewProps) {
   const { isPending: isAuthPending, isSignedIn } = useAuthSession();
-  const { completedPomodoros, error, isLoading } = useCompletedPomodoros({
+  const { count, error, isLoading } = useTodayPomodoroCount({
     enabled: isSignedIn,
   });
 
@@ -23,8 +23,8 @@ export function TimerCompletedView({
     message = "Loading today's Pomodoro progress...";
   } else if (isSignedIn && error) {
     message = "Unable to load today's Pomodoro progress.";
-  } else if (isSignedIn && completedPomodoros !== undefined) {
-    message = `You have finished ${completedPomodoros} pomodoros today.`;
+  } else if (isSignedIn && count !== undefined) {
+    message = `You have finished ${count} pomodoros today.`;
   }
 
   return (

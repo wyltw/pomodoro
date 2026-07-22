@@ -2,30 +2,30 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getCompletedPomodoros } from "@/lib/api/pomodoro-sessions";
+import { getTodayPomodoroCount } from "@/lib/api/pomodoro-sessions";
 
-type UseCompletedPomodorosOptions = {
+type UseTodayPomodoroCountOptions = {
   enabled: boolean;
 };
 
-export const completedPomodorosQueryKey = [
+export const todayPomodoroCountQueryKey = [
   "pomodoro-sessions",
-  "completed-count",
+  "today",
 ] as const;
 
-export function useCompletedPomodoros({
+export function useTodayPomodoroCount({
   enabled,
-}: UseCompletedPomodorosOptions) {
+}: UseTodayPomodoroCountOptions) {
   const {
-    data: completedPomodoros,
+    data: count,
     error,
     isLoading,
   } = useQuery({
     enabled,
-    queryFn: getCompletedPomodoros,
-    queryKey: completedPomodorosQueryKey,
+    queryFn: getTodayPomodoroCount,
+    queryKey: todayPomodoroCountQueryKey,
     retry: false,
   });
 
-  return { completedPomodoros, error, isLoading };
+  return { count, error, isLoading };
 }

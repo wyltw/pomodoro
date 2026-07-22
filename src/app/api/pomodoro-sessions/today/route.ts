@@ -1,5 +1,5 @@
 import { getSession } from "@/lib/dal";
-import { getCompletedPomodoros } from "@/lib/data/pomodoro-session-queries";
+import { getTodayPomodoroSessionCount } from "@/lib/data/pomodoro-session-queries";
 import { timeZoneSchema } from "@/lib/schemas";
 import type { NextRequest } from "next/server";
 
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
     if (!session) {
       return Response.json(
-        { error: "Please sign in to load completed Pomodoros." },
+        { error: "Please sign in to load today's Pomodoro count." },
         { status: 401 },
       );
     }
@@ -25,16 +25,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const completedPomodoros = await getCompletedPomodoros(
+    const count = await getTodayPomodoroSessionCount(
       session.user.id,
       timeZone.data,
     );
 
-    return Response.json({ data: { completedPomodoros } });
+    return Response.json({ data: { count } });
   } catch (error) {
-    console.error("Unable to load completed Pomodoros", error);
+    console.error("Unable to load today's Pomodoro count", error);
     return Response.json(
-      { error: "Unable to load completed Pomodoros right now." },
+      { error: "Unable to load today's Pomodoro count right now." },
       { status: 500 },
     );
   }

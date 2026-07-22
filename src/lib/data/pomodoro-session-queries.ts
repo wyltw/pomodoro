@@ -3,7 +3,7 @@ import "server-only";
 import prisma from "@/lib/prisma";
 import { getLocalDateFromTimeZone } from "@/lib/utils/utils";
 
-export function getCompletedPomodoros(userId: string, timeZone: string) {
+export function getTodayPomodoroSessionCount(userId: string, timeZone: string) {
   const localDate = getLocalDateFromTimeZone(timeZone);
 
   return prisma.pomodoroSession.count({
