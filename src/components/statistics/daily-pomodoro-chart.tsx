@@ -1,5 +1,13 @@
 import dayjs from "dayjs";
-import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Rectangle,
+  XAxis,
+  YAxis,
+  type BarShapeProps,
+} from "recharts";
 
 import {
   Card,
@@ -83,15 +91,22 @@ export default function DailyPomodoroChart({
                 />
               }
             />
-            <Bar dataKey="sessions" fill="var(--color-sessions)" radius={6}>
-              {data.map((day) => (
-                <Cell
-                  key={day.date}
+            <Bar
+              dataKey="sessions"
+              fill="var(--color-sessions)"
+              radius={6}
+              shape={(props: BarShapeProps) => (
+                <Rectangle
+                  {...props}
                   className="cursor-pointer"
-                  fillOpacity={day.date === selectedDate ? 1 : 0.35}
+                  fillOpacity={
+                    data[props.originalDataIndex]?.date === selectedDate
+                      ? 1
+                      : 0.35
+                  }
                 />
-              ))}
-            </Bar>
+              )}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>
