@@ -1,3 +1,7 @@
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
 export function formatTime(totalSeconds: number) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -99,4 +103,15 @@ export const getLocalDateFromTimeZone = (
     parts.find((part) => part.type === type)?.value;
 
   return `${getPart("year")}-${getPart("month")}-${getPart("day")}`;
+};
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+export const getLastSevenDays = (localDate: string, timeZone: string) => {
+  const endDate = dayjs.tz(localDate, timeZone);
+
+  return Array.from({ length: 7 }, (_, index) =>
+    endDate.subtract(6 - index, "day").format("YYYY-MM-DD"),
+  );
 };
