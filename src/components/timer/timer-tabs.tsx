@@ -94,7 +94,7 @@ export default function TimerTabs() {
       onValueChange={(value) => {
         setSelectedTab(value as TimerType);
       }}
-      className="mt-4 gap-4"
+      className="mt-10 gap-4"
     >
       <TabsList className="self-center">
         <TabsTrigger value="pomodoro" disabled={mutation.isPending}>

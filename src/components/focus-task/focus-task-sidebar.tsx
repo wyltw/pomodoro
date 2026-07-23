@@ -10,15 +10,16 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import { useFocusTasks } from "@/lib/hooks/focus-task-hooks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export function FocusTaskSidebar() {
+  const { isMobile, setOpenMobile } = useSidebar();
   const { isSignedIn } = useAuthSession();
   const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
@@ -37,18 +38,23 @@ export function FocusTaskSidebar() {
     replaceTasks(queriedTasks);
   }, [queriedTasks, replaceTasks]);
 
+  function handleItemClick(taskId: string) {
+    setActiveTask(taskId);
+
+    if (isMobile) setOpenMobile(false);
+  }
+
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <ListChecksIcon className="size-4 shrink-0 group-data-[state=collapsed]/sidebar:hidden" />
-        <h2 className="font-heading min-w-0 flex-1 truncate text-sm font-medium group-data-[state=collapsed]/sidebar:hidden">
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="flex-row items-center">
+        <ListChecksIcon className="size-4 shrink-0 group-data-[collapsible=icon]:hidden" />
+        <h2 className="font-heading min-w-0 flex-1 truncate text-sm font-medium group-data-[collapsible=icon]:hidden">
           Focus tasks
         </h2>
         <SidebarTrigger className="ml-auto" />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="group-data-[collapsible=icon]:hidden">
         <SidebarGroup>
-          <SidebarGroupLabel>Add task</SidebarGroupLabel>
           <FocusTaskCreateForm />
         </SidebarGroup>
         <SidebarGroup className="border-sidebar-border flex min-h-0 flex-1 flex-col border-t pt-4">
@@ -64,7 +70,7 @@ export function FocusTaskSidebar() {
               <FocusTaskList
                 tasks={tasks}
                 activeTaskId={activeTaskId}
-                onItemClick={setActiveTask}
+                onItemClick={handleItemClick}
               />
             ))}
         </SidebarGroup>

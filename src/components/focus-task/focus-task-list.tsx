@@ -26,7 +26,9 @@ export function FocusTaskList({
   return (
     <>
       <div className="flex items-center justify-between gap-3">
-        <SidebarGroupLabel>Today&apos;s tasks</SidebarGroupLabel>
+        <SidebarGroupLabel className="font-heading h-auto px-0 text-base font-medium">
+          Today&apos;s tasks
+        </SidebarGroupLabel>
         <TaskFilter value={filter} onValueChange={setFilter} />
       </div>
       <TaskList

@@ -52,13 +52,16 @@ export function AuthMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="lg" className="max-w-52">
+        <Button
+          variant="ghost"
+          className="size-9 max-w-52 min-[900px]:w-auto min-[900px]:px-4"
+        >
           <Avatar size="sm">
             <AvatarImage src={image ?? undefined} alt="" />
             <AvatarFallback>{getInitials(name)}</AvatarFallback>
           </Avatar>
-          <span className="truncate">{name}</span>
-          <ChevronDown data-icon="inline-end" />
+          <span className="hidden truncate min-[900px]:inline">{name}</span>
+          <ChevronDown className="hidden min-[900px]:block" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

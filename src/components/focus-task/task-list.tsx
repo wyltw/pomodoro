@@ -39,8 +39,8 @@ export function TaskList({
 
   if (tasks.length === 0) {
     return (
-      <p className="text-muted-foreground text-center">
-        No tasks yet. Add one to start focusing.
+      <p className="text-muted-foreground mt-4 flex flex-col text-base">
+        <span>No tasks yet.</span> <span>Add one to start focusing.</span>
       </p>
     );
   }

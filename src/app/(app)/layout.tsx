@@ -11,14 +11,14 @@ type HomeLayoutProps = { children: ReactNode };
 export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <AppProvider>
-      <Header />
       <TimerStatusProvider>
         <SidebarProvider>
           <FocusTaskSidebar />
           <SidebarInset>
-            <main className="container mx-auto grid flex-1 grid-rows-[min-content_1fr] items-center justify-items-center gap-4 px-4">
+            <Header showSidebarTrigger />
+            <div className="container mx-auto grid flex-1 grid-rows-[min-content_1fr] items-center justify-items-center gap-4 px-4">
               {children}
-            </main>
+            </div>
             <Footer />
           </SidebarInset>
         </SidebarProvider>

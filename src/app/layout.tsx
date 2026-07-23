@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 
 import "./globals.css";
 
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { TimerSettingsProvider } from "@/lib/stores/timer-settings-store";
 import { cn } from "@/lib/utils/cn";
 
@@ -42,7 +43,9 @@ export default function RootLayout({
       )}
     >
       <body className="flex h-full flex-col bg-[#FCFCFC]">
-        <TimerSettingsProvider>{children}</TimerSettingsProvider>
+        <TooltipProvider>
+          <TimerSettingsProvider>{children}</TimerSettingsProvider>
+        </TooltipProvider>
         <Toaster />
       </body>
     </html>

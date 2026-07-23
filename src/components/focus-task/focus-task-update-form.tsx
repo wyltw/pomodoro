@@ -35,7 +35,7 @@ function createFocusTaskUpdateFormSchema(completedPomodoros: number) {
       .min(minimumEstimatedPomodoros, {
         error: minimumEstimatedPomodorosError,
       })
-      .max(8, { error: "Consider splitting this into smaller tasks." }),
+      .max(8, { error: "Split into smaller tasks." }),
   });
 }
 

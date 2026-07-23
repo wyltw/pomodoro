@@ -37,7 +37,7 @@ export const createFocusTaskPayloadSchema = z.object({
   estimatedPomodoros: z
     .number({ error: "Estimated Pomodoros is required." })
     .min(1, { error: "Enter at least 1." })
-    .max(8, { error: "Consider splitting this into smaller tasks." }),
+    .max(8, { error: "Split into smaller tasks." }),
   timeZone: timeZoneSchema,
 });
 
@@ -51,7 +51,7 @@ export const updateFocusTaskPayloadSchema = z.object({
   estimatedPomodoros: z
     .number({ error: "Estimated Pomodoros is required." })
     .min(1, { error: "Enter at least 1." })
-    .max(8, { error: "Consider splitting this into smaller tasks." }),
+    .max(8, { error: "Split into smaller tasks." }),
 });
 
 export const completePomodoroPayloadSchema = z.object({
@@ -84,5 +84,5 @@ export const focusTaskFormSchema = z.object({
   estimatedPomodoros: z
     .number({ error: "Estimated Pomodoros is required." })
     .min(1, { error: "Enter at least 1." })
-    .max(8, { error: "Consider splitting this into smaller tasks." }),
+    .max(8, { error: "Split into smaller tasks." }),
 });

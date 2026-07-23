@@ -9,30 +9,49 @@ import { useAuthSession } from "@/lib/hooks/auth-hooks";
 
 export function StatisticsButton() {
   const { isPending, isSignedIn } = useAuthSession();
+  const buttonContent = (
+    <>
+      <ChartColumn />
+      <span className="hidden min-[900px]:inline">Statistics</span>
+    </>
+  );
 
-  if (isPending)
+  if (isPending) {
     return (
-      <Button variant="ghost" size="lg" disabled aria-busy="true">
-        <ChartColumn data-icon="inline-start" />
-        Statistics
+      <Button
+        aria-busy="true"
+        aria-label="Statistics"
+        className="size-9 min-[900px]:w-auto min-[900px]:px-4"
+        disabled
+        variant="ghost"
+      >
+        {buttonContent}
       </Button>
     );
+  }
 
-  if (!isSignedIn)
+  if (!isSignedIn) {
     return (
       <LoginDialog from="statistics">
-        <Button variant="ghost" size="lg">
-          <ChartColumn data-icon="inline-start" />
-          Statistics
+        <Button
+          aria-label="Statistics"
+          className="size-9 min-[900px]:w-auto min-[900px]:px-4"
+          variant="ghost"
+        >
+          {buttonContent}
         </Button>
       </LoginDialog>
     );
+  }
+
   return (
-    <Button variant="ghost" size="lg" asChild>
-      <Link href="/statistics" className="flex items-center gap-1.5">
-        <ChartColumn data-icon="inline-start" />
-        Statistics
-      </Link>
+    <Button
+      aria-label="Statistics"
+      asChild
+      className="size-9 min-[900px]:w-auto min-[900px]:px-4"
+      variant="ghost"
+    >
+      <Link href="/statistics">{buttonContent}</Link>
     </Button>
   );
 }
