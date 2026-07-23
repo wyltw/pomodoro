@@ -19,7 +19,7 @@ type TimerProps = {
   disabled?: boolean;
   sessionMax: number;
   sessionMin: number;
-  onComplete?: () => void;
+  onComplete?: (durationSeconds: number) => void;
 };
 
 export default function Timer({
@@ -32,7 +32,6 @@ export default function Timer({
     <TimerContextProvider initialSeconds={sessionMin} endSeconds={sessionMax}>
       <div className="flex flex-col items-center gap-2">
         <CountdownTimer
-          sessionMax={sessionMax}
           sessionMin={sessionMin}
           onComplete={onComplete}
           disabled={disabled}
@@ -44,14 +43,13 @@ export default function Timer({
 
 function CountdownTimer({
   disabled,
-  sessionMax,
   sessionMin,
   onComplete,
-}: TimerProps) {
-  const { seconds, status } = useTimerData();
+}: Omit<TimerProps, "sessionMax">) {
+  const { endSeconds, seconds, status } = useTimerData();
   const hasHandledCompletion = useRef(false);
-  const handleComplete = useEffectEvent(() => {
-    onComplete?.();
+  const handleComplete = useEffectEvent((durationSeconds: number) => {
+    onComplete?.(durationSeconds);
   });
 
   useEffect(() => {
@@ -63,19 +61,19 @@ function CountdownTimer({
     if (hasHandledCompletion.current) return;
 
     hasHandledCompletion.current = true;
-    handleComplete();
-  }, [status]);
+    handleComplete(endSeconds - sessionMin);
+  }, [endSeconds, sessionMin, status]);
 
   return (
     <>
       <CircularProgress
         value={seconds}
-        max={sessionMax}
+        max={endSeconds}
         min={sessionMin}
         size={208}
         thickness={8}
         getValueText={(value) => {
-          const secondsLeft = sessionMax - value;
+          const secondsLeft = endSeconds - value;
           return formatTime(secondsLeft);
         }}
       >

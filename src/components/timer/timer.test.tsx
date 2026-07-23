@@ -35,4 +35,24 @@ describe("Timer", () => {
 
     expect(onComplete).toHaveBeenCalledOnce();
   });
+
+  test("reports the current session duration when the maximum changes", () => {
+    vi.useFakeTimers();
+    const onComplete = vi.fn();
+    const renderTimer = (sessionMax: number) => (
+      <TimerStatusProvider>
+        <Timer sessionMax={sessionMax} sessionMin={0} onComplete={onComplete} />
+      </TimerStatusProvider>
+    );
+    const { rerender } = render(renderTimer(1));
+
+    fireEvent.click(screen.getByRole("button", { name: "start timer" }));
+    rerender(renderTimer(10));
+
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    expect(onComplete).toHaveBeenCalledWith(1);
+  });
 });

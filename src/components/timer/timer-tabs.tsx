@@ -16,12 +16,18 @@ import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { TimerCompletedView } from "./timer-completed-view";
 import { notifyUser } from "@/lib/utils/utils";
 import { todayPomodoroCountQueryKey } from "@/lib/hooks/pomodoro-session-hooks";
-
-const POMODORO_DURATION_SECONDS = 3;
+import { useTimerSettingsStore } from "@/lib/stores/timer-settings-store";
 
 export default function TimerTabs() {
   const { isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
+  const pomodoroMinutes = useTimerSettingsStore(
+    (state) => state.pomodoroMinutes,
+  );
+  const notificationVolume = useTimerSettingsStore(
+    (state) => state.notificationVolume,
+  );
+  const pomodoroDurationSeconds = pomodoroMinutes * 60;
   const [selectedTab, setSelectedTab] = useState<TimerType | "completed">(
     "pomodoro",
   );
@@ -60,7 +66,7 @@ export default function TimerTabs() {
     setSelectedTab(type);
   };
 
-  const handlePomodoroComplete = () => {
+  const handlePomodoroComplete = (durationSeconds: number) => {
     if (!isSignedIn) {
       completeActivePomodoro();
       setSelectedTab("completed");
@@ -70,7 +76,7 @@ export default function TimerTabs() {
     if (mutation.isPending) return;
 
     mutation.mutate({
-      durationSeconds: POMODORO_DURATION_SECONDS,
+      durationSeconds,
       taskId: activeTask?.id,
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
@@ -108,14 +114,15 @@ export default function TimerTabs() {
       <TabsContent value="pomodoro">
         <Timer
           disabled={mutation.isPending}
-          sessionMax={POMODORO_DURATION_SECONDS}
+          sessionMax={pomodoroDurationSeconds}
           sessionMin={0}
-          onComplete={() => {
-            handlePomodoroComplete();
+          onComplete={(durationSeconds) => {
+            handlePomodoroComplete(durationSeconds);
             void notifyUser("Pomodoro complete", "/sounds/decide2.wav", {
               body: activeTask
                 ? `Finished focusing on "${activeTask.title}".`
                 : "Your focus session has finished.",
+              volume: notificationVolume,
             });
           }}
         />
@@ -133,6 +140,7 @@ export default function TimerTabs() {
             handleBreakComplete();
             void notifyUser("Short break over", "/sounds/decide24.mp3", {
               body: "Time to focus again.",
+              volume: notificationVolume,
             });
           }}
         />
@@ -145,6 +153,7 @@ export default function TimerTabs() {
             handleBreakComplete();
             void notifyUser("Long break over", "/sounds/decide24.mp3", {
               body: "Ready for another focus session?",
+              volume: notificationVolume,
             });
           }}
         />

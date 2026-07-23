@@ -49,9 +49,9 @@ export const createNotification = (
   return notification;
 };
 
-export const playNotifySound = async (soundPath: string) => {
+export const playNotifySound = async (soundPath: string, volume = 0.35) => {
   const sound = new Audio(soundPath);
-  sound.volume = 0.35;
+  sound.volume = Math.min(1, Math.max(0, volume));
 
   try {
     await sound.play();
@@ -60,20 +60,25 @@ export const playNotifySound = async (soundPath: string) => {
   }
 };
 
+type NotifyUserConfig = NotificationOptions & {
+  volume?: number;
+};
+
 export const notifyUser = async (
   title: string,
   soundPath: string,
-  options?: NotificationOptions,
+  config: NotifyUserConfig = {},
 ) => {
+  const { volume, ...notificationOptions } = config;
   const isAppActive =
     document.visibilityState === "visible" && document.hasFocus();
 
   if (isAppActive) {
-    await playNotifySound(soundPath);
+    await playNotifySound(soundPath, volume);
     return;
   }
 
-  createNotification(title, options);
+  createNotification(title, notificationOptions);
 };
 
 export function getInitials(name: string) {

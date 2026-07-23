@@ -69,6 +69,15 @@ export const dailyFocusTasksSchema = z.object({
   activeTaskId: z.string().optional(),
 });
 
+export const timerSettingsSchema = z.object({
+  pomodoroMinutes: z
+    .number({ error: "Pomodoro length is required." })
+    .int({ error: "Pomodoro length must be a whole number of minutes." })
+    .min(1, { error: "Pomodoro length must be at least 1 minute." })
+    .max(60, { error: "Pomodoro length cannot exceed 60 minutes." }),
+  notificationVolume: z.number().min(0).max(1),
+});
+
 export const focusTaskFormSchema = z.object({
   title: z.string().trim().min(1, { error: "Title is required." }),
   description: z.string().trim(),
