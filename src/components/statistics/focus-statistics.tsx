@@ -52,7 +52,7 @@ export default function FocusStatistics() {
   }
 
   return (
-    <div className="grid w-full gap-4 lg:grid-cols-2">
+    <div className="grid w-full gap-4 md:grid-cols-2">
       <DailyPomodoroChart
         data={dailyData}
         selectedDate={activeDate}

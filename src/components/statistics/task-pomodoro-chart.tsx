@@ -96,7 +96,7 @@ export default function TaskPomodoroChart({
         ) : (
           <ChartContainer
             config={config}
-            className="mx-auto aspect-square h-64 w-full max-w-72"
+            className="mx-auto aspect-square h-56 w-full max-w-72"
           >
             <RadialBarChart
               accessibilityLayer
