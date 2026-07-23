@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { ReactQueryProvider } from "@/components/providers/react-query-provider";
 import React, { ReactNode } from "react";
+
+export const metadata: Metadata = {
+  title: "Focus Statistics",
+  description:
+    "Review your completed Pomodoro sessions from the last seven days.",
+};
+
 type LayoutProps = { children: ReactNode };
+
 export default function Layout({ children }: LayoutProps) {
   return (
     <ReactQueryProvider>
