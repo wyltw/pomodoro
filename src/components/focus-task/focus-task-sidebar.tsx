@@ -15,14 +15,11 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { useInitializeDailyFocusDay } from "@/lib/hooks/daily-focus-day-hooks";
 import { useFocusTasks } from "@/lib/hooks/focus-task-hooks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export function FocusTaskSidebar() {
-  const { session, isSignedIn } = useAuthSession();
-  useInitializeDailyFocusDay(session?.user.id);
-  const localDate = useDailyFocusTasksStore((state) => state.localDate);
+  const { isSignedIn } = useAuthSession();
   const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
   const replaceTasks = useDailyFocusTasksStore((state) => state.replaceTasks);
@@ -33,7 +30,6 @@ export function FocusTaskSidebar() {
     isLoading,
   } = useFocusTasks({
     enabled: isSignedIn,
-    localDate,
   });
 
   useEffect(() => {

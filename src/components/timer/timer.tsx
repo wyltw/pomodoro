@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import { formatTime } from "@/lib/utils/utils";
 import {
   CircularProgress,
@@ -16,12 +16,14 @@ import {
 import TimerButtonList from "./timer-button-list";
 
 type TimerProps = {
+  disabled?: boolean;
   sessionMax: number;
   sessionMin: number;
-  onComplete?: () => void;
+  onComplete?: (durationSeconds: number) => void;
 };
 
 export default function Timer({
+  disabled,
   sessionMax,
   sessionMin,
   onComplete,
@@ -30,33 +32,48 @@ export default function Timer({
     <TimerContextProvider initialSeconds={sessionMin} endSeconds={sessionMax}>
       <div className="flex flex-col items-center gap-2">
         <CountdownTimer
-          sessionMax={sessionMax}
           sessionMin={sessionMin}
           onComplete={onComplete}
+          disabled={disabled}
         />
       </div>
     </TimerContextProvider>
   );
 }
 
-function CountdownTimer({ sessionMax, sessionMin, onComplete }: TimerProps) {
-  const { seconds, status } = useTimerData();
+function CountdownTimer({
+  disabled,
+  sessionMin,
+  onComplete,
+}: Omit<TimerProps, "sessionMax">) {
+  const { endSeconds, seconds, status } = useTimerData();
+  const hasHandledCompletion = useRef(false);
+  const handleComplete = useEffectEvent((durationSeconds: number) => {
+    onComplete?.(durationSeconds);
+  });
 
   useEffect(() => {
-    if (status !== "completed") return;
-    onComplete?.();
-  }, [onComplete, status]);
+    if (status !== "completed") {
+      hasHandledCompletion.current = false;
+      return;
+    }
+
+    if (hasHandledCompletion.current) return;
+
+    hasHandledCompletion.current = true;
+    handleComplete(endSeconds - sessionMin);
+  }, [endSeconds, sessionMin, status]);
 
   return (
     <>
       <CircularProgress
         value={seconds}
-        max={sessionMax}
+        max={endSeconds}
         min={sessionMin}
         size={208}
         thickness={8}
         getValueText={(value) => {
-          const secondsLeft = sessionMax - value;
+          const secondsLeft = endSeconds - value;
           return formatTime(secondsLeft);
         }}
       >
@@ -66,7 +83,7 @@ function CountdownTimer({ sessionMax, sessionMin, onComplete }: TimerProps) {
         </CircularProgressIndicator>
         <CircularProgressValueText className="text-4xl" />
       </CircularProgress>
-      <TimerButtonList />
+      <TimerButtonList disabled={disabled} />
     </>
   );
 }

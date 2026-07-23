@@ -24,6 +24,14 @@ describe("useTimer", () => {
     expect(result.current.seconds).toBe(0);
   });
 
+  test("should update the end while idle", () => {
+    const { result, rerender } = setupUseTimer();
+
+    rerender({ initialSeconds: 0, endSeconds: 20 });
+
+    expect(result.current.endSeconds).toBe(20);
+  });
+
   test("should start counting after startTimer", () => {
     vi.useFakeTimers();
     const { result } = setupUseTimer();
@@ -54,6 +62,28 @@ describe("useTimer", () => {
     });
 
     expect(result.current.seconds).toBe(2);
+  });
+
+  test("should keep the current end after pausing and resuming", () => {
+    vi.useFakeTimers();
+    const { result, rerender } = setupUseTimer(0, 3);
+
+    act(() => result.current.startTimer());
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    act(() => result.current.pauseTimer());
+
+    rerender({ initialSeconds: 0, endSeconds: 10 });
+
+    expect(result.current.endSeconds).toBe(3);
+
+    act(() => result.current.startTimer());
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    expect(result.current.status).toBe("completed");
   });
 
   test("should reset seconds after stopTimer", () => {

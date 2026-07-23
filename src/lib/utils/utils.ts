@@ -1,3 +1,7 @@
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
 export function formatTime(totalSeconds: number) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -45,9 +49,9 @@ export const createNotification = (
   return notification;
 };
 
-export const playNotifySound = async (soundPath: string) => {
+export const playNotifySound = async (soundPath: string, volume = 0.35) => {
   const sound = new Audio(soundPath);
-  sound.volume = 0.35;
+  sound.volume = Math.min(1, Math.max(0, volume));
 
   try {
     await sound.play();
@@ -56,20 +60,25 @@ export const playNotifySound = async (soundPath: string) => {
   }
 };
 
+type NotifyUserConfig = NotificationOptions & {
+  volume?: number;
+};
+
 export const notifyUser = async (
   title: string,
   soundPath: string,
-  options?: NotificationOptions,
+  config: NotifyUserConfig = {},
 ) => {
+  const { volume, ...notificationOptions } = config;
   const isAppActive =
     document.visibilityState === "visible" && document.hasFocus();
 
   if (isAppActive) {
-    await playNotifySound(soundPath);
+    await playNotifySound(soundPath, volume);
     return;
   }
 
-  createNotification(title, options);
+  createNotification(title, notificationOptions);
 };
 
 export function getInitials(name: string) {
@@ -99,4 +108,15 @@ export const getLocalDateFromTimeZone = (
     parts.find((part) => part.type === type)?.value;
 
   return `${getPart("year")}-${getPart("month")}-${getPart("day")}`;
+};
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+export const getLastSevenDays = (localDate: string, timeZone: string) => {
+  const endDate = dayjs.tz(localDate, timeZone);
+
+  return Array.from({ length: 7 }, (_, index) =>
+    endDate.subtract(6 - index, "day").format("YYYY-MM-DD"),
+  );
 };

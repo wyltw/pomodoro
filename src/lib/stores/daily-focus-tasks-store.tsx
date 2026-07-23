@@ -66,28 +66,41 @@ export function createDailyFocusTasksStore({
         ],
       })),
     updateTask: (taskId, payload) =>
-      set((state) => ({
-        tasks: state.tasks.map((task) =>
-          task.id === taskId ? { ...task, ...payload } : task,
-        ),
-      })),
+      set((state) => {
+        const task = state.tasks.find((task) => task.id === taskId);
+        if (!task || task.completedPomodoros >= task.estimatedPomodoros) {
+          return state;
+        }
+
+        return {
+          tasks: state.tasks.map((task) =>
+            task.id === taskId ? { ...task, ...payload } : task,
+          ),
+        };
+      }),
     completeActivePomodoro: () =>
       set((state) => {
         const { activeTaskId, tasks } = state;
         const activeTask = tasks.find((task) => task.id === activeTaskId);
         if (!state.activeTaskId || !activeTask) return state;
-        if (activeTask.completedPomodoros + 1 > activeTask.estimatedPomodoros) {
+        if (activeTask.completedPomodoros >= activeTask.estimatedPomodoros) {
           return {
             activeTaskId: undefined,
           };
         }
 
+        const completedPomodoros = activeTask.completedPomodoros + 1;
+
         return {
+          activeTaskId:
+            completedPomodoros >= activeTask.estimatedPomodoros
+              ? undefined
+              : activeTaskId,
           tasks: tasks.map((task) =>
             task.id === state.activeTaskId
               ? {
                   ...task,
-                  completedPomodoros: task.completedPomodoros + 1,
+                  completedPomodoros,
                 }
               : task,
           ),
@@ -102,7 +115,12 @@ export function createDailyFocusTasksStore({
           activeTaskId: isRemovingActiveTask ? undefined : state.activeTaskId,
         };
       }),
-    setActiveTask: (taskId) => set({ activeTaskId: taskId }),
+    setActiveTask: (taskId) =>
+      set((state) => ({
+        activeTaskId: hasTaskId(state.tasks, taskId)
+          ? taskId
+          : state.activeTaskId,
+      })),
     clearActiveTask: () => set({ activeTaskId: undefined }),
     replaceTasks: (tasks) =>
       set((state) => ({

@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { getSession } from "@/lib/dal";
-import { getFocusTasks } from "@/lib/data/focus-task-queries";
+import { getFocusStatisticsSessions } from "@/lib/data/pomodoro-session-queries";
 import { timeZoneSchema } from "@/lib/schemas";
 
 export async function GET(request: NextRequest) {
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
     if (!session) {
       return Response.json(
-        { error: "Please sign in to load your focus tasks." },
+        { error: "Please sign in to view focus statistics." },
         { status: 401 },
       );
     }
@@ -26,13 +26,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const tasks = await getFocusTasks(timeZone.data);
+    const sessions = await getFocusStatisticsSessions(
+      session.user.id,
+      timeZone.data,
+    );
 
-    return Response.json({ data: tasks });
+    return Response.json({ data: sessions });
   } catch (error) {
-    console.error("Unable to load focus tasks", error);
+    console.error("Unable to load focus statistics", error);
     return Response.json(
-      { error: "Unable to load focus tasks right now." },
+      { error: "Unable to load focus statistics right now." },
       { status: 500 },
     );
   }

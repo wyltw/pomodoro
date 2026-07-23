@@ -5,18 +5,20 @@ import type { UseMutationOptions } from "@tanstack/react-query";
 
 import { getFocusTasks } from "@/lib/api/focus-tasks";
 import {
+  completePomodoro,
   createFocusTask,
   deleteFocusTask,
   updateFocusTask,
-} from "../actions/focus-task-actions";
+} from "../services/focus-task";
 import type {
+  CompletePomodoroPayload,
+  CompletePomodoroResult,
   CreateFocusTaskPayload,
   UpdateFocusTaskPayload,
 } from "../types/types";
 
 type UseFocusTasksQueryOptions = {
   enabled: boolean;
-  localDate: string;
 };
 
 export type CreateFocusTaskVariables = {
@@ -25,6 +27,13 @@ export type CreateFocusTaskVariables = {
 
 type UseCreateFocusTaskOptions = Omit<
   UseMutationOptions<void, Error, CreateFocusTaskVariables>,
+  "mutationFn"
+>;
+
+export type CompletePomodoroVariables = CompletePomodoroPayload;
+
+type UseCompletePomodoroOptions = Omit<
+  UseMutationOptions<CompletePomodoroResult, Error, CompletePomodoroVariables>,
   "mutationFn"
 >;
 
@@ -47,21 +56,17 @@ type UseDeleteFocusTaskOptions = Omit<
   "mutationFn"
 >;
 
-export const focusTasksQueryKey = (localDate: string) =>
-  ["focus-tasks", localDate] as const;
+export const focusTasksQueryKey = ["focus-tasks"] as const;
 
-export function useFocusTasks({
-  enabled,
-  localDate,
-}: UseFocusTasksQueryOptions) {
+export function useFocusTasks({ enabled }: UseFocusTasksQueryOptions) {
   const {
     data: tasks,
     error,
     isLoading,
   } = useQuery({
     enabled,
-    queryFn: () => getFocusTasks(localDate),
-    queryKey: focusTasksQueryKey(localDate),
+    queryFn: getFocusTasks,
+    queryKey: focusTasksQueryKey,
     retry: false,
   });
 
@@ -73,6 +78,10 @@ export function useCreateFocusTask(options: UseCreateFocusTaskOptions) {
     ...options,
     mutationFn: ({ payload }) => createFocusTask(payload),
   });
+}
+
+export function useCompletePomodoro(options: UseCompletePomodoroOptions) {
+  return useMutation({ ...options, mutationFn: completePomodoro });
 }
 
 export function useUpdateFocusTask(options: UseUpdateFocusTaskOptions) {

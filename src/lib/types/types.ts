@@ -1,6 +1,7 @@
 import type { z } from "zod";
 
 import type {
+  completePomodoroPayloadSchema,
   createFocusTaskPayloadSchema,
   dailyFocusTasksSchema,
   focusTaskSchema,
@@ -19,6 +20,14 @@ export type UpdateFocusTaskPayload = z.input<
   typeof updateFocusTaskPayloadSchema
 >;
 
+export type CompletePomodoroPayload = z.infer<
+  typeof completePomodoroPayloadSchema
+>;
+
+export type CompletePomodoroResult = {
+  completedTaskId?: string;
+};
+
 export type DailyFocusTasks = z.infer<typeof dailyFocusTasksSchema>;
 
 export type ApiResponse<T, E> =
@@ -32,3 +41,17 @@ export type ApiResponse<T, E> =
     };
 
 export type FocusTasksResponse = ApiResponse<FocusTask[], string>;
+
+export type TodayPomodoroCountResponse = ApiResponse<{ count: number }, string>;
+
+export type FocusStatisticsSession = {
+  id: string;
+  localDate: string;
+  durationSeconds: number;
+  taskTitleSnapshot: string | null;
+};
+
+export type FocusStatisticsResponse = ApiResponse<
+  FocusStatisticsSession[],
+  string
+>;

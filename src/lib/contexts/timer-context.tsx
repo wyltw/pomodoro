@@ -4,7 +4,7 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { useTimer } from "@/lib/hooks/useTimer";
 
 type Timer = ReturnType<typeof useTimer>;
-type TimerData = Pick<Timer, "seconds" | "status">;
+type TimerData = Pick<Timer, "endSeconds" | "seconds" | "status">;
 type TimerApi = Pick<Timer, "startTimer" | "pauseTimer" | "stopTimer">;
 
 const TimerDataContext = createContext<TimerData | null>(null);
@@ -21,17 +21,22 @@ export function TimerContextProvider({
   endSeconds,
   initialSeconds,
 }: TimerContextProviderProps) {
-  const { seconds, status, startTimer, pauseTimer, stopTimer } = useTimer(
-    initialSeconds,
-    endSeconds,
-  );
+  const {
+    endSeconds: currentEndSeconds,
+    seconds,
+    status,
+    startTimer,
+    pauseTimer,
+    stopTimer,
+  } = useTimer(initialSeconds, endSeconds);
 
   const data = useMemo(
     () => ({
+      endSeconds: currentEndSeconds,
       seconds,
       status,
     }),
-    [seconds, status],
+    [currentEndSeconds, seconds, status],
   );
 
   const api = useMemo(

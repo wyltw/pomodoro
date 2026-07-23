@@ -36,14 +36,13 @@ export function FocusTaskDeleteDialog({
   const [isOpen, setIsOpen] = useState(false);
   const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
-  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const removeTask = useDailyFocusTasksStore((state) => state.removeTask);
   const mutation = useDeleteFocusTask({
     async onSuccess() {
       setIsOpen(false);
       toast.success("Focus task deleted.");
       await queryClient.invalidateQueries({
-        queryKey: focusTasksQueryKey(localDate),
+        queryKey: focusTasksQueryKey,
       });
     },
     onError(error) {

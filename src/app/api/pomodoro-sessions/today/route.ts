@@ -1,8 +1,7 @@
-import type { NextRequest } from "next/server";
-
 import { getSession } from "@/lib/dal";
-import { getFocusTasks } from "@/lib/data/focus-task-queries";
+import { getTodayPomodoroSessionCount } from "@/lib/data/pomodoro-session-queries";
 import { timeZoneSchema } from "@/lib/schemas";
+import type { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +9,7 @@ export async function GET(request: NextRequest) {
 
     if (!session) {
       return Response.json(
-        { error: "Please sign in to load your focus tasks." },
+        { error: "Please sign in to load today's Pomodoro count." },
         { status: 401 },
       );
     }
@@ -26,13 +25,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const tasks = await getFocusTasks(timeZone.data);
+    const count = await getTodayPomodoroSessionCount(
+      session.user.id,
+      timeZone.data,
+    );
 
-    return Response.json({ data: tasks });
+    return Response.json({ data: { count } });
   } catch (error) {
-    console.error("Unable to load focus tasks", error);
+    console.error("Unable to load today's Pomodoro count", error);
     return Response.json(
-      { error: "Unable to load focus tasks right now." },
+      { error: "Unable to load today's Pomodoro count right now." },
       { status: 500 },
     );
   }

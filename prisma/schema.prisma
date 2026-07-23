@@ -34,8 +34,9 @@ model DailyFocusDay {
   localDate          String
   completedPomodoros Int    @default(0)
 
-  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tasks FocusTask[]
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks    FocusTask[]
+  sessions PomodoroSession[]
 
   @@unique([userId, localDate])
   @@map("daily_focus_day")
@@ -50,9 +51,26 @@ model FocusTask {
   completedPomodoros Int       @default(0)
   completedAt        DateTime?
 
-  dailyFocusDay DailyFocusDay @relation(fields: [dailyFocusDayId], references: [id], onDelete: Cascade)
+  dailyFocusDay DailyFocusDay     @relation(fields: [dailyFocusDayId], references: [id], onDelete: Cascade)
+  sessions      PomodoroSession[]
 
   @@map("focus_task")
+}
+
+model PomodoroSession {
+  id                String   @id @default(uuid())
+  dailyFocusDayId   String
+  focusTaskId       String?
+  taskTitleSnapshot String?
+  durationSeconds   Int
+  completedAt       DateTime @default(now())
+
+  dailyFocusDay DailyFocusDay @relation(fields: [dailyFocusDayId], references: [id], onDelete: Cascade)
+  focusTask     FocusTask?    @relation(fields: [focusTaskId], references: [id], onDelete: SetNull)
+
+  @@index([dailyFocusDayId])
+  @@index([focusTaskId])
+  @@map("pomodoro_session")
 }
 
 model Session {

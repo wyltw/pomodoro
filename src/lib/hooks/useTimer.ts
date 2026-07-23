@@ -6,6 +6,7 @@ import {
 } from "@/lib/contexts/timer-status-context";
 
 type TimerState = {
+  endSeconds: number;
   seconds: number;
   status: TimerStatus;
 };
@@ -14,7 +15,8 @@ type TimerAction =
   | { type: "start" }
   | { type: "pause" }
   | { type: "stop"; initialSeconds: number }
-  | { type: "tick"; initialSeconds: number; endSeconds: number };
+  | { type: "setEndSeconds"; endSeconds: number }
+  | { type: "tick"; initialSeconds: number };
 
 function timerReducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
@@ -23,12 +25,17 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
     case "pause":
       return { ...state, status: "paused" };
     case "stop":
-      return { seconds: action.initialSeconds, status: "idle" };
+      return { ...state, seconds: action.initialSeconds, status: "idle" };
+    case "setEndSeconds":
+      if (state.endSeconds === action.endSeconds) return state;
+
+      return { ...state, endSeconds: action.endSeconds };
     case "tick": {
       if (state.status !== "running") return state;
 
-      if (state.seconds >= action.endSeconds) {
+      if (state.seconds >= state.endSeconds) {
         return {
+          ...state,
           seconds: action.initialSeconds,
           status: "completed",
         };
@@ -36,17 +43,19 @@ function timerReducer(state: TimerState, action: TimerAction): TimerState {
 
       return {
         ...state,
-        seconds: Math.min(state.seconds + 1, action.endSeconds),
+        seconds: Math.min(state.seconds + 1, state.endSeconds),
       };
     }
   }
 }
 
 export const useTimer = (initialSeconds: number, endSeconds: number) => {
-  const [{ seconds, status }, dispatch] = useReducer(timerReducer, {
+  const [state, dispatch] = useReducer(timerReducer, {
+    endSeconds,
     seconds: initialSeconds,
     status: "idle",
   });
+  const { status } = state;
   const { setStatus } = useTimerStatus();
 
   const stopTimer = useCallback(() => {
@@ -66,6 +75,12 @@ export const useTimer = (initialSeconds: number, endSeconds: number) => {
   }, [status, setStatus]);
 
   useEffect(() => {
+    if (status !== "idle") return;
+
+    dispatch({ type: "setEndSeconds", endSeconds });
+  }, [endSeconds, status]);
+
+  useEffect(() => {
     return () => {
       setStatus("idle");
     };
@@ -76,12 +91,12 @@ export const useTimer = (initialSeconds: number, endSeconds: number) => {
 
     // status changes trigger cleaner function, so countdown will stop automatically
     const intervalId = setInterval(() => {
-      dispatch({ type: "tick", initialSeconds, endSeconds });
+      dispatch({ type: "tick", initialSeconds });
     }, 1000);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [status, initialSeconds, endSeconds]);
-  return { seconds, status, startTimer, pauseTimer, stopTimer };
+  }, [status, initialSeconds]);
+  return { ...state, startTimer, pauseTimer, stopTimer };
 };

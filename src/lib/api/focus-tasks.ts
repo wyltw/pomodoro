@@ -2,8 +2,9 @@ import "client-only";
 
 import type { FocusTasksResponse } from "@/lib/types/types";
 
-export async function getFocusTasks(localDate: string) {
-  const searchParams = new URLSearchParams({ localDate });
+export async function getFocusTasks() {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const searchParams = new URLSearchParams({ timeZone });
   const response = await fetch(`/api/focus-tasks?${searchParams}`);
   const result: FocusTasksResponse = await response.json();
 

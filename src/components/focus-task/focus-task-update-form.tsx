@@ -28,12 +28,14 @@ function createFocusTaskUpdateFormSchema(completedPomodoros: number) {
       : "Enter at least 1.";
 
   return z.object({
-    title: z.string().trim().min(1, "Title is required."),
+    title: z.string().trim().min(1, { error: "Title is required." }),
     description: z.string().trim(),
     estimatedPomodoros: z
       .number({ error: "Estimated Pomodoros is required." })
-      .min(minimumEstimatedPomodoros, minimumEstimatedPomodorosError)
-      .max(8, "Consider splitting this into smaller tasks."),
+      .min(minimumEstimatedPomodoros, {
+        error: minimumEstimatedPomodorosError,
+      })
+      .max(8, { error: "Consider splitting this into smaller tasks." }),
   });
 }
 
@@ -54,12 +56,11 @@ export function FocusTaskUpdateForm({
 }: FocusTaskUpdateFormProps) {
   const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
-  const localDate = useDailyFocusTasksStore((state) => state.localDate);
   const updateTask = useDailyFocusTasksStore((state) => state.updateTask);
   const mutation = useUpdateFocusTask({
     async onSuccess() {
       await queryClient.invalidateQueries({
-        queryKey: focusTasksQueryKey(localDate),
+        queryKey: focusTasksQueryKey,
       });
       toast.success("Focus task updated.");
       onEditingEnd();
@@ -99,135 +100,134 @@ export function FocusTaskUpdateForm({
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-      <Controller
-        control={form.control}
-        name="title"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-update-title">Title</FieldLabel>
-            <Input
-              {...field}
-              aria-describedby={
-                fieldState.error ? "focus-task-update-title-error" : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-update-title"
-              type="text"
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-update-title-error"
-            />
-          </Field>
-        )}
-      />
-      <Controller
-        control={form.control}
-        name="description"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-update-description">
-              Description
-            </FieldLabel>
-            <Textarea
-              {...field}
-              aria-describedby={
-                fieldState.error
-                  ? "focus-task-update-description-error"
-                  : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-update-description"
-              placeholder="Add a short note"
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-update-description-error"
-            />
-          </Field>
-        )}
-      />
-      <Controller
-        control={form.control}
-        name="estimatedPomodoros"
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="focus-task-update-estimated-pomodoros">
-              Estimated Pomodoros
-            </FieldLabel>
-            <NumberInput
-              {...field}
-              aria-describedby={
-                fieldState.error
-                  ? "focus-task-update-estimated-pomodoros-error"
-                  : undefined
-              }
-              aria-invalid={fieldState.invalid}
-              id="focus-task-update-estimated-pomodoros"
-              inputMode="numeric"
-              onChange={async (event) => {
-                const value = Math.max(0, Number(event.currentTarget.value));
-                event.currentTarget.value = String(value);
-                field.onChange(value);
-                await form.trigger("estimatedPomodoros");
-              }}
-              onIncrease={() => {
-                const value = field.value;
-                form.setValue("estimatedPomodoros", Math.min(9, value + 1), {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                });
-              }}
-              onDecrease={() => {
-                const value = field.value;
-                form.setValue("estimatedPomodoros", Math.max(0, value - 1), {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                });
-              }}
-              type="number"
-              value={Number.isNaN(field.value) ? "" : field.value}
-            />
-            <FieldError
-              errors={[fieldState.error]}
-              id="focus-task-update-estimated-pomodoros-error"
-            />
-          </Field>
-        )}
-      />
-
-      <div className="flex flex-col gap-2">
-        <Button
-          type="submit"
-          disabled={
-            !form.formState.isDirty || isAuthPending || mutation.isPending
-          }
-        >
-          {mutation.isPending ? (
-            <Loader2Icon className="animate-spin" />
-          ) : (
-            <SaveIcon />
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <fieldset
+        className="grid gap-4"
+        disabled={isAuthPending || mutation.isPending}
+      >
+        <Controller
+          control={form.control}
+          name="title"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="focus-task-update-title">Title</FieldLabel>
+              <Input
+                {...field}
+                aria-describedby={
+                  fieldState.error ? "focus-task-update-title-error" : undefined
+                }
+                aria-invalid={fieldState.invalid}
+                id="focus-task-update-title"
+                type="text"
+              />
+              <FieldError
+                errors={[fieldState.error]}
+                id="focus-task-update-title-error"
+              />
+            </Field>
           )}
-          Update task
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={isAuthPending || mutation.isPending}
-          onClick={() => {
-            form.reset({
-              title: task.title,
-              description: task.description ?? "",
-              estimatedPomodoros: task.estimatedPomodoros,
-            });
-            onEditingEnd();
-          }}
-        >
-          <Undo2Icon />
-          Cancel
-        </Button>
-      </div>
+        />
+        <Controller
+          control={form.control}
+          name="description"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="focus-task-update-description">
+                Description
+              </FieldLabel>
+              <Textarea
+                {...field}
+                aria-describedby={
+                  fieldState.error
+                    ? "focus-task-update-description-error"
+                    : undefined
+                }
+                aria-invalid={fieldState.invalid}
+                id="focus-task-update-description"
+                placeholder="Add a short note"
+              />
+              <FieldError
+                errors={[fieldState.error]}
+                id="focus-task-update-description-error"
+              />
+            </Field>
+          )}
+        />
+        <Controller
+          control={form.control}
+          name="estimatedPomodoros"
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="focus-task-update-estimated-pomodoros">
+                Estimated Pomodoros
+              </FieldLabel>
+              <NumberInput
+                {...field}
+                aria-describedby={
+                  fieldState.error
+                    ? "focus-task-update-estimated-pomodoros-error"
+                    : undefined
+                }
+                aria-invalid={fieldState.invalid}
+                id="focus-task-update-estimated-pomodoros"
+                inputMode="numeric"
+                onChange={async (event) => {
+                  const value = Math.max(0, Number(event.currentTarget.value));
+                  event.currentTarget.value = String(value);
+                  field.onChange(value);
+                  await form.trigger("estimatedPomodoros");
+                }}
+                onIncrease={() => {
+                  const value = field.value;
+                  form.setValue("estimatedPomodoros", Math.min(9, value + 1), {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }}
+                onDecrease={() => {
+                  const value = field.value;
+                  form.setValue("estimatedPomodoros", Math.max(0, value - 1), {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }}
+                type="number"
+                value={Number.isNaN(field.value) ? "" : field.value}
+              />
+              <FieldError
+                errors={[fieldState.error]}
+                id="focus-task-update-estimated-pomodoros-error"
+              />
+            </Field>
+          )}
+        />
+
+        <div className="flex flex-col gap-2">
+          <Button type="submit" disabled={!form.formState.isDirty}>
+            {mutation.isPending ? (
+              <Loader2Icon className="animate-spin" />
+            ) : (
+              <SaveIcon />
+            )}
+            Update task
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              form.reset({
+                title: task.title,
+                description: task.description ?? "",
+                estimatedPomodoros: task.estimatedPomodoros,
+              });
+              onEditingEnd();
+            }}
+          >
+            <Undo2Icon />
+            Cancel
+          </Button>
+        </div>
+      </fieldset>
     </form>
   );
 }

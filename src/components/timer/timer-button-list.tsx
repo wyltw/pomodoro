@@ -5,7 +5,11 @@ import { useTimerApi, useTimerData } from "@/lib/contexts/timer-context";
 import { requestNotification } from "@/lib/utils/utils";
 import { toast } from "sonner";
 
-export default function TimerButtonList() {
+type TimerButtonListProps = {
+  disabled?: boolean;
+};
+
+export default function TimerButtonList({ disabled }: TimerButtonListProps) {
   const { status } = useTimerData();
   const { pauseTimer, startTimer, stopTimer } = useTimerApi();
 
@@ -13,6 +17,7 @@ export default function TimerButtonList() {
     <ul className="flex gap-2">
       <li>
         <TimerToggleButton
+          disabled={disabled}
           isRunning={status === "running"}
           onToggle={async (isRunning) => {
             if (isRunning) {
@@ -29,7 +34,7 @@ export default function TimerButtonList() {
         />
       </li>
       <li>
-        <Button onClick={stopTimer}>
+        <Button disabled={disabled} onClick={stopTimer}>
           <RotateCcw />
           <span className="hidden">reset timer</span>
         </Button>
