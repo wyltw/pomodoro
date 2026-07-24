@@ -39,8 +39,8 @@ export function TaskList({
 
   if (tasks.length === 0) {
     return (
-      <p className="text-muted-foreground text-center">
-        No tasks yet. Add one to start focusing.
+      <p className="text-muted-foreground mt-4 flex flex-col text-base">
+        <span>No tasks yet.</span> <span>Add one to start focusing.</span>
       </p>
     );
   }
@@ -54,7 +54,7 @@ export function TaskList({
   }
 
   return (
-    <ScrollArea className="min-h-0 flex-1">
+    <ScrollArea className="mt-2 min-h-0 flex-1">
       <ul className="space-y-2 pr-3">
         {filteredTask.map((task) => (
           <li key={task.id}>

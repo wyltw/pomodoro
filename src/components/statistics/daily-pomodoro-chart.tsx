@@ -55,7 +55,7 @@ export default function DailyPomodoroChart({
       <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-64 w-full"
+          className="aspect-auto h-56 w-full"
         >
           <BarChart
             accessibilityLayer

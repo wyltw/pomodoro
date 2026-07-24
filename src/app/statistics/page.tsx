@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 import FocusStatistics from "@/components/statistics/focus-statistics";
+import PomodoroTips from "@/components/statistics/pomodoro-tips";
 import { Button } from "@/components/ui/button";
 
 export default function StatisticsPage() {
@@ -22,6 +23,7 @@ export default function StatisticsPage() {
         </p>
       </div>
       <FocusStatistics />
+      <PomodoroTips />
     </section>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChartColumn } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { Button } from "@/components/ui/button";
@@ -9,30 +9,34 @@ import { useAuthSession } from "@/lib/hooks/auth-hooks";
 
 export function StatisticsButton() {
   const { isPending, isSignedIn } = useAuthSession();
+  const router = useRouter();
 
-  if (isPending)
-    return (
-      <Button variant="ghost" size="lg" disabled aria-busy="true">
-        <ChartColumn data-icon="inline-start" />
-        Statistics
-      </Button>
-    );
-
-  if (!isSignedIn)
+  if (!isSignedIn) {
     return (
       <LoginDialog from="statistics">
-        <Button variant="ghost" size="lg">
-          <ChartColumn data-icon="inline-start" />
-          Statistics
+        <Button
+          aria-busy={isPending || undefined}
+          aria-label="Statistics"
+          className="size-9 min-[900px]:w-auto min-[900px]:px-4"
+          disabled={isPending}
+          variant="ghost"
+        >
+          <ChartColumn />
+          <span className="hidden min-[900px]:inline">Statistics</span>
         </Button>
       </LoginDialog>
     );
+  }
+
   return (
-    <Button variant="ghost" size="lg" asChild>
-      <Link href="/statistics" className="flex items-center gap-1.5">
-        <ChartColumn data-icon="inline-start" />
-        Statistics
-      </Link>
+    <Button
+      aria-label="Statistics"
+      className="size-9 min-[900px]:w-auto min-[900px]:px-4"
+      onClick={() => router.push("/statistics")}
+      variant="ghost"
+    >
+      <ChartColumn />
+      <span className="hidden min-[900px]:inline">Statistics</span>
     </Button>
   );
 }

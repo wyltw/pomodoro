@@ -72,9 +72,13 @@ export function SettingsDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="lg">
-          <SettingsIcon data-icon="inline-start" />
-          Settings
+        <Button
+          aria-label="Settings"
+          className="size-9 min-[900px]:w-auto min-[900px]:px-4"
+          variant="ghost"
+        >
+          <SettingsIcon />
+          <span className="hidden min-[900px]:inline">Settings</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
