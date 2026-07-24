@@ -54,7 +54,7 @@ export function TaskList({
   }
 
   return (
-    <ScrollArea className="min-h-0 flex-1">
+    <ScrollArea className="mt-2 min-h-0 flex-1">
       <ul className="space-y-2 pr-3">
         {filteredTask.map((task) => (
           <li key={task.id}>

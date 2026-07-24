@@ -8,6 +8,7 @@ import { TaskList } from "@/components/focus-task/task-list";
 import { SidebarGroupLabel } from "@/components/ui/sidebar";
 import { useTimerStatus } from "@/lib/contexts/timer-status-context";
 import type { FocusTask } from "@/lib/types/types";
+import { List } from "lucide-react";
 
 type FocusTaskListProps = {
   tasks: FocusTask[];
@@ -26,7 +27,8 @@ export function FocusTaskList({
   return (
     <>
       <div className="flex items-center justify-between gap-3">
-        <SidebarGroupLabel className="font-heading h-auto px-0 text-base font-medium">
+        <SidebarGroupLabel className="font-heading flex h-auto gap-2 px-0 text-sm">
+          <List />
           Today&apos;s tasks
         </SidebarGroupLabel>
         <TaskFilter value={filter} onValueChange={setFilter} />

@@ -48,7 +48,7 @@ export function FocusTaskSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="flex-row items-center">
         <ListChecksIcon className="size-4 shrink-0 group-data-[collapsible=icon]:hidden" />
-        <h2 className="font-heading min-w-0 flex-1 truncate text-sm font-medium group-data-[collapsible=icon]:hidden">
+        <h2 className="font-heading min-w-0 flex-1 truncate text-base font-medium group-data-[collapsible=icon]:hidden">
           Focus tasks
         </h2>
         <SidebarTrigger className="ml-auto" />
