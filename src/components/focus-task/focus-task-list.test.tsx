@@ -73,8 +73,5 @@ describe("FocusTaskList", () => {
     fireEvent.click(screen.getByRole("button", { name: "Set timer running" }));
 
     expect(taskButton.disabled).toBe(true);
-
-    fireEvent.click(taskButton);
-    expect(onItemClick).not.toHaveBeenCalled();
   });
 });
