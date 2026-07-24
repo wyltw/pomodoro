@@ -1,5 +1,11 @@
 import dayjs from "dayjs";
-import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
+import {
+  Label,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  RadialBar,
+  RadialBarChart,
+} from "recharts";
 
 import {
   Card,
@@ -105,17 +111,27 @@ export default function TaskPomodoroChart({
               innerRadius={80}
               outerRadius={110}
             >
+              <PolarAngleAxis
+                axisLine={false}
+                domain={[0, totalMinutes]}
+                tick={false}
+                tickLine={false}
+                type="number"
+              />
               {tasks.map((task) => (
                 <RadialBar
                   key={task.key}
                   dataKey={task.key}
                   fill={`var(--color-${task.key})`}
                   stackId="tasks"
-                  cornerRadius={5}
+                  cornerRadius={12}
                   className="stroke-transparent stroke-2"
                 />
               ))}
-              <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
               <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
                 <Label
                   content={({ viewBox }) => {
@@ -124,11 +140,16 @@ export default function TaskPomodoroChart({
                     }
 
                     return (
-                      <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
+                      <text
+                        x={viewBox.cx}
+                        y={viewBox.cy}
+                        textAnchor="middle"
+                        transform="translate(0 12)"
+                      >
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy ?? 0) - 16}
-                          className="fill-foreground text-2xl font-bold"
+                          className="fill-foreground text-4xl font-bold"
                         >
                           {totalMinutes.toLocaleString()}
                         </tspan>
