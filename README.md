@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pomodoro
+
+A productivity tool for planning daily priorities, working in focused
+intervals, and reviewing progress over time. It brings task planning, the
+Pomodoro method, and focus insights into one streamlined workspace.
+
+## Features
+
+- Daily focus tasks with Pomodoro estimates and completion progress
+- Task filtering and a dedicated active-task view
+- Configurable focus sessions with pause, resume, and reset controls
+- Structured short and long breaks
+- Persistent focus sessions and seven-day productivity insights for signed-in
+  users
+- Completion notifications and adjustable sound volume
+- Google and Spotify sign-in
+- Responsive sidebar and mobile-friendly layout
+
+## Technology
+
+- Next.js App Router, React, and TypeScript
+- Tailwind CSS and shadcn-style UI primitives
+- Zustand for client state and TanStack Query for server-state synchronization
+- Better Auth with Google and Spotify OAuth
+- Prisma with PostgreSQL
+- Vitest and Testing Library
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 24
+- npm
+- A PostgreSQL database
+- Google and Spotify OAuth credentials for their respective sign-in options
+
+### Environment variables
+
+Create a `.env` file in the project root:
+
+```dotenv
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+SHADOW_DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/SHADOW_DATABASE"
+
+BETTER_AUTH_URL="http://localhost:3000"
+BETTER_AUTH_SECRET="replace-with-a-random-secret-at-least-32-characters-long"
+
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+SPOTIFY_CLIENT_ID=""
+SPOTIFY_CLIENT_SECRET=""
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`SHADOW_DATABASE_URL` is used by Prisma when a shadow database is needed for
+migration workflows. Keep credentials out of version control.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+For local OAuth configuration, register these callback URLs with the providers:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+http://localhost:3000/api/auth/callback/google
+http://localhost:3000/api/auth/callback/spotify
+```
 
-## Learn More
+### Install and initialize
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npx prisma db push
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Commands
 
-## Deploy on Vercel
+| Command             | Purpose                                           |
+| ------------------- | ------------------------------------------------- |
+| `npm run dev`       | Start the local development server on `127.0.0.1` |
+| `npm run lint`      | Run ESLint                                        |
+| `npm test`          | Run Vitest in watch mode                          |
+| `npm test -- --run` | Run the test suite once                           |
+| `npm run build`     | Create a production build                         |
+| `npm run start`     | Serve the production build                        |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Reference Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Product specification](docs/product-spec.md)
+- [Architecture](docs/architecture.md)
+
+These documents describe the implemented application as a reference. The code
+remains authoritative when behavior changes.
