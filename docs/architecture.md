@@ -79,8 +79,11 @@ therefore resets timer-instance state. A separate `TimerStatusProvider` exposes
 the current status to the task list so task selection can be disabled while a
 session is running.
 
-Completion is guarded by a ref in `CountdownTimer`, ensuring that changes to an
-`onComplete` callback do not record the same completion twice.
+The active duration is held in reducer state and only accepts setting changes
+while idle, so a running or paused session keeps the duration with which it
+started. `CountdownTimer` reacts when the status becomes `completed` and uses an
+Effect Event to invoke the latest `onComplete` callback without making callback
+identity a dependency of the completion effect.
 
 ## 4. Client State and Persistence
 

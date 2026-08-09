@@ -6,7 +6,7 @@ import { TimerStatusProvider } from "@/lib/contexts/timer-status-context";
 import Timer from "./timer";
 
 describe("Timer", () => {
-  test("calls onComplete once when its identity changes after completion", () => {
+  test("does not repeat completion when the callback identity changes", () => {
     vi.useFakeTimers();
     const onComplete = vi.fn();
     const renderTimer = () => (
