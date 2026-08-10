@@ -172,13 +172,51 @@ erDiagram
   }
 ```
 
-`DailyFocusDay` is unique by `(userId, localDate)`. This makes the user's local
-calendar day the boundary for task ownership and daily statistics without
-storing a time zone on every record.
+### Daily focus days
 
-`PomodoroSession.focusTaskId` is optional and uses `SetNull` when a task is
-removed. `taskTitleSnapshot` preserves the reporting label independently of the
-task's later title or lifecycle.
+`DailyFocusDay` groups an authenticated user's focus tasks and recorded Pomodoro
+sessions by local calendar date. Each user can have only one record for a given
+date, enforced by the unique `(userId, localDate)` pair.
+
+Server services derive `localDate` from the browser-provided IANA time zone and
+get or create the corresponding day when a task is created, a Pomodoro is
+completed, or the current task list is loaded. The client supplies the time zone
+but does not initialize `DailyFocusDay` records.
+
+### Focus tasks
+
+Every `FocusTask` has a required `dailyFocusDayId`. This relation determines the
+date under which the task currently appears. When the current task list is
+loaded, unfinished tasks from earlier days are reassigned to the current day;
+completed tasks remain associated with their original day. Because reassignment
+updates `dailyFocusDayId`, the relation does not preserve the date on which an
+unfinished task was first created.
+
+`FocusTask.completedPomodoros` stores the task's current progress. Completing a
+Pomodoro with an eligible active task increments this value in the same database
+transaction that records the completed session.
+
+### Pomodoro sessions
+
+Every completed authenticated Pomodoro creates a `PomodoroSession` with a
+required `dailyFocusDayId`. This relation records the local date on which the
+session occurred and does not change when an unfinished task is carried into a
+later day.
+
+`PomodoroSession.focusTaskId` is optional because a user can complete a
+Pomodoro without selecting a task. When a session advances an active task, the
+session stores both the task ID and `taskTitleSnapshot`. Deleting the task sets
+`focusTaskId` to `null`, while the snapshot retains the task name recorded at
+completion. A later task rename also leaves earlier snapshots unchanged, so
+statistics do not rewrite past sessions or require a history of task revisions.
+The task relation is retained for possible features that need task identity,
+such as showing the sessions associated with a specific task.
+
+Daily counts and focus statistics are calculated from `PomodoroSession` rows.
+Task-based statistics group sessions by `taskTitleSnapshot`, using `No task` for
+sessions completed without an associated task.
+
+### Authentication models
 
 Better Auth also owns the `Session`, `Account`, and `Verification` models.
 
