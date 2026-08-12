@@ -1,7 +1,7 @@
 # Pomodoro Architecture
 
 **Document type:** As-built reference  
-**Baseline:** `master` at commit `5120909`
+**Baseline:** commit `e879846`
 
 ## 1. System Overview
 
@@ -220,7 +220,12 @@ sessions completed without an associated task.
 
 Better Auth also owns the `Session`, `Account`, and `Verification` models.
 
-## 7. Main Data Flows
+## 7. Architectural Decisions and Evolution
+
+The reasons and commit history behind the current design are recorded in
+[Architecture Decisions](architecture-decisions.md).
+
+## 8. Main Data Flows
 
 ### Complete a Pomodoro anonymously
 
@@ -258,7 +263,7 @@ Better Auth also owns the `Session`, `Account`, and `Verification` models.
    sessions ordered by completion time.
 4. The client groups sessions by date and task-title snapshot for charting.
 
-## 8. Server Interfaces
+## 9. Server Interfaces
 
 ### Route handlers
 
@@ -278,7 +283,7 @@ Better Auth also owns the `Session`, `Account`, and `Verification` models.
 | `deleteFocusTask`  | Validate ownership and delete a task                           |
 | `completePomodoro` | Advance eligible task progress and record a session atomically |
 
-## 9. Validation and Failure Handling
+## 10. Validation and Failure Handling
 
 Zod schemas validate time zones, UUIDs, task inputs, timer settings, and
 completion payloads. Server mutations repeat validation even when the client
@@ -293,7 +298,7 @@ status codes. Client hooks convert unsuccessful responses into `Error` objects,
 and the UI presents inline errors, loading placeholders, or toast feedback as
 appropriate.
 
-## 10. Testing and Delivery
+## 11. Testing and Delivery
 
 Vitest runs in a jsdom environment with Testing Library setup from
 `src/testing/setup-tests.ts`. Tests are colocated with timer hooks, Zustand
