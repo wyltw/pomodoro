@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useEffectEvent, useRef } from "react";
+import { useEffect, useEffectEvent } from "react";
 import { formatTime } from "@/lib/utils/utils";
 import {
   CircularProgress,
@@ -47,22 +47,17 @@ function CountdownTimer({
   onComplete,
 }: Omit<TimerProps, "sessionMax">) {
   const { endSeconds, seconds, status } = useTimerData();
-  const hasHandledCompletion = useRef(false);
   const handleComplete = useEffectEvent((durationSeconds: number) => {
     onComplete?.(durationSeconds);
   });
 
+  // endSeconds stays fixed outside idle, and Effect Events keep callback
+  // identity non-reactive, so each transition to completed runs this once.
   useEffect(() => {
-    if (status !== "completed") {
-      hasHandledCompletion.current = false;
-      return;
-    }
+    if (status !== "completed") return;
 
-    if (hasHandledCompletion.current) return;
-
-    hasHandledCompletion.current = true;
-    handleComplete(endSeconds - sessionMin);
-  }, [endSeconds, sessionMin, status]);
+    handleComplete(endSeconds);
+  }, [endSeconds, status]);
 
   return (
     <>

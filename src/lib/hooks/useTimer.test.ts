@@ -114,4 +114,18 @@ describe("useTimer", () => {
     expect(result.current.seconds).toBe(0);
     expect(result.current.status).toBe("completed");
   });
+
+  test("should keep the session end while completed", () => {
+    vi.useFakeTimers();
+    const { result, rerender } = setupUseTimer(0, 1);
+
+    act(() => result.current.startTimer());
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+
+    rerender({ initialSeconds: 0, endSeconds: 10 });
+
+    expect(result.current.endSeconds).toBe(1);
+  });
 });

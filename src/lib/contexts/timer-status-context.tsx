@@ -2,7 +2,6 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
   useMemo,
   useState,
@@ -24,13 +23,7 @@ type TimerStatusProviderProps = {
 
 export function TimerStatusProvider({ children }: TimerStatusProviderProps) {
   const [status, setStatus] = useState<TimerStatus>("idle");
-  const handleStatusChange = useCallback((status: TimerStatus) => {
-    setStatus(status);
-  }, []);
-  const value = useMemo(
-    () => ({ status, setStatus: handleStatusChange }),
-    [status, handleStatusChange],
-  );
+  const value = useMemo(() => ({ status, setStatus }), [status]);
 
   return (
     <TimerStatusContext.Provider value={value}>
