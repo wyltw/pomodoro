@@ -52,6 +52,7 @@ model FocusTask {
   dailyFocusDay DailyFocusDay     @relation(fields: [dailyFocusDayId], references: [id], onDelete: Cascade)
   sessions      PomodoroSession[]
 
+  @@index([dailyFocusDayId])
   @@map("focus_task")
 }
 

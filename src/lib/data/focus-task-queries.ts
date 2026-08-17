@@ -1,17 +1,9 @@
 import "server-only";
 
-import { getSession } from "@/lib/dal";
 import prisma from "@/lib/prisma";
 import { getOrCreateDailyFocusDay } from "@/lib/services/daily-focus-day";
 
-export const getFocusTasks = async (timeZone: string) => {
-  const session = await getSession();
-
-  if (!session) {
-    throw new Error("Please sign in to load your focus tasks.");
-  }
-
-  const userId = session.user.id;
+export const getFocusTasks = async (userId: string, timeZone: string) => {
   const tasks = await prisma.$transaction(async (transaction) => {
     const dailyFocusDay = await getOrCreateDailyFocusDay(
       transaction,
