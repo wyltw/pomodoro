@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const tasks = await getFocusTasks(timeZone.data);
+    const tasks = await getFocusTasks(session.user.id, timeZone.data);
 
     return Response.json({ data: tasks });
   } catch (error) {
