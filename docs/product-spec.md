@@ -80,7 +80,7 @@ is 35%. Settings persist in the browser.
 
 ### 2.6 Sign in
 
-The application offers Google and Spotify sign-in. A successful session enables
+The application offers Google sign-in. A successful session enables
 database-backed focus tasks, daily Pomodoro counts, and the statistics page.
 Signing out returns the application to its anonymous browser-backed context.
 
@@ -131,7 +131,7 @@ Signing out returns the application to its anonymous browser-backed context.
 
 ### Authentication and feedback
 
-- **FR-A01:** The application MUST support Google and Spotify OAuth providers.
+- **FR-A01:** The application MUST support Google OAuth.
 - **FR-A02:** Authenticated reads and writes MUST be scoped to the current user.
 - **FR-A03:** The application MUST communicate loading, success, and failure
   states for persisted task and Pomodoro operations.

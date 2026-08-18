@@ -35,7 +35,7 @@ export function LoginDialog({ children, from }: LoginDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-3">
-          <SocialLoginButton provider="spotify" callbackURL={callbackURL} />
+          {/* <SocialLoginButton provider="spotify" callbackURL={callbackURL} /> */}
           <SocialLoginButton provider="google" callbackURL={callbackURL} />
         </div>
       </DialogContent>

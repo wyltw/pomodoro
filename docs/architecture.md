@@ -120,8 +120,8 @@ to use the same task components and selectors.
 
 ## 5. Authentication and Request Boundaries
 
-Better Auth uses the Prisma adapter and exposes Google and Spotify social
-providers through `src/app/api/auth/[...all]/route.ts`.
+Better Auth uses the Prisma adapter and exposes the Google social provider
+through `src/app/api/auth/[...all]/route.ts`.
 
 `getSession` is the shared server-side session boundary. Server actions and
 authenticated route handlers check it before accessing user data. The
