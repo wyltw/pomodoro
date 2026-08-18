@@ -99,6 +99,21 @@ describe("setActiveTask", () => {
 
     expect(store.getState().activeTaskId).toBe(completedTask.id);
   });
+
+  test("clears the active task when selecting it again", () => {
+    const store = createDailyFocusTasksStore({
+      shouldPersist: false,
+      initialValues: {
+        localDate: "2026-08-18",
+        tasks: [activeTask],
+        activeTaskId: activeTask.id,
+      },
+    });
+
+    store.getState().setActiveTask(activeTask.id);
+
+    expect(store.getState().activeTaskId).toBeUndefined();
+  });
 });
 
 describe("replaceTasks", () => {

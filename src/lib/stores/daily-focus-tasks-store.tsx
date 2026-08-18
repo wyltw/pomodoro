@@ -116,11 +116,17 @@ export function createDailyFocusTasksStore({
         };
       }),
     setActiveTask: (taskId) =>
-      set((state) => ({
-        activeTaskId: hasTaskId(state.tasks, taskId)
-          ? taskId
-          : state.activeTaskId,
-      })),
+      set((state) => {
+        if (state.activeTaskId === taskId) {
+          return { activeTaskId: undefined };
+        }
+
+        if (!hasTaskId(state.tasks, taskId)) {
+          return state;
+        }
+
+        return { activeTaskId: taskId };
+      }),
     clearActiveTask: () => set({ activeTaskId: undefined }),
     replaceTasks: (tasks) =>
       set((state) => ({
