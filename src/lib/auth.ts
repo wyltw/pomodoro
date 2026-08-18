@@ -13,9 +13,9 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     },
-    spotify: {
-      clientId: process.env.SPOTIFY_CLIENT_ID ?? "",
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? "",
-    },
+    // spotify: {
+    //   clientId: process.env.SPOTIFY_CLIENT_ID ?? "",
+    //   clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? "",
+    // },
   },
 });

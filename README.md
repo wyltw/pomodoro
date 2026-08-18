@@ -13,7 +13,7 @@ Pomodoro method, and focus insights into one streamlined workspace.
 - Persistent focus sessions and seven-day productivity insights for signed-in
   users
 - Completion notifications and adjustable sound volume
-- Google and Spotify sign-in
+- Google sign-in
 - Responsive sidebar and mobile-friendly layout
 
 ## Technology
@@ -21,7 +21,7 @@ Pomodoro method, and focus insights into one streamlined workspace.
 - Next.js App Router, React, and TypeScript
 - Tailwind CSS and shadcn-style UI primitives
 - Zustand for client state and TanStack Query for server-state synchronization
-- Better Auth with Google and Spotify OAuth
+- Better Auth with Google OAuth
 - Prisma with PostgreSQL
 - Vitest and Testing Library
 
@@ -32,7 +32,7 @@ Pomodoro method, and focus insights into one streamlined workspace.
 - Node.js 24
 - npm
 - A PostgreSQL database
-- Google and Spotify OAuth credentials for their respective sign-in options
+- Google OAuth credentials
 
 ### Environment variables
 
@@ -47,8 +47,6 @@ BETTER_AUTH_SECRET="replace-with-a-random-secret-at-least-32-characters-long"
 
 GOOGLE_CLIENT_ID=""
 GOOGLE_CLIENT_SECRET=""
-SPOTIFY_CLIENT_ID=""
-SPOTIFY_CLIENT_SECRET=""
 ```
 
 `SHADOW_DATABASE_URL` is used by Prisma when a shadow database is needed for
@@ -58,7 +56,6 @@ For local OAuth configuration, register these callback URLs with the providers:
 
 ```text
 http://localhost:3000/api/auth/callback/google
-http://localhost:3000/api/auth/callback/spotify
 ```
 
 ### Install and initialize
