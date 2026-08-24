@@ -24,11 +24,11 @@ const sessionIds = Array.from(
     `00000000-0000-4000-8001-${String(index + 1).padStart(12, "0")}`,
 );
 
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl = process.env.DIRECT_URL;
 const userId = process.env.SEED_USER_ID;
 const timeZone = process.env.SEED_TIME_ZONE ?? "Asia/Taipei";
 
-if (!databaseUrl) throw new Error("DATABASE_URL is required to seed data.");
+if (!databaseUrl) throw new Error("DIRECT_URL is required to seed data.");
 if (!userId) throw new Error("SEED_USER_ID is required to seed data.");
 
 const prisma = new PrismaClient({
