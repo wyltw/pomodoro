@@ -1,8 +1,14 @@
 # Pomodoro
 
-A productivity tool for planning daily priorities, working in focused
+> A productivity tool for planning daily priorities, working in focused
 intervals, and reviewing progress over time. It brings task planning, the
 Pomodoro method, and focus insights into one streamlined workspace.
+
+[Live Demo](https://pomodoro-rose-nine.vercel.app/)
+
+<img width="1148" height="798" alt="image" src="https://github.com/user-attachments/assets/bd99cbab-100d-4cae-8e27-015792f54f75" />
+
+<img width="1132" height="798" alt="image" src="https://github.com/user-attachments/assets/ac1c58f1-836f-449d-b76e-4c116e1fb607" />
 
 ## Features
 
