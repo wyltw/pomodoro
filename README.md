@@ -39,7 +39,10 @@ Pomodoro method, and focus insights into one streamlined workspace.
 Create a `.env` file in the project root:
 
 ```dotenv
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+DATABASE_URL="postgresql://USER:PASSWORD@POOLED_HOST:PORT/DATABASE"
+DIRECT_URL="postgresql://USER:PASSWORD@DIRECT_HOST:PORT/DATABASE"
+
+# Optional: only needed by prisma migrate dev
 SHADOW_DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/SHADOW_DATABASE"
 
 BETTER_AUTH_URL="http://localhost:3000"
@@ -49,8 +52,12 @@ GOOGLE_CLIENT_ID=""
 GOOGLE_CLIENT_SECRET=""
 ```
 
-`SHADOW_DATABASE_URL` is used by Prisma when a shadow database is needed for
-migration workflows. Keep credentials out of version control.
+`DATABASE_URL` is used by the application runtime and should use a pooled
+connection in hosted environments. `DIRECT_URL` is used by Prisma CLI database
+commands such as `prisma db push` and `prisma migrate deploy`. For a local
+PostgreSQL database without a connection pooler, both variables can use the same
+connection string. `SHADOW_DATABASE_URL` is optional and is only used by
+`prisma migrate dev`. Keep credentials out of version control.
 
 For local OAuth configuration, register these callback URLs with the providers:
 
