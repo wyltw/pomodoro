@@ -19,7 +19,7 @@
     "utils": "@/lib/utils/cn",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/hooks"
+    "hooks": "@//lib/hooks"
   },
   "registries": {
     "@diceui": "https://diceui.com/r/{style}/{name}.json"
