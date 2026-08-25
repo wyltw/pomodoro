@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { TimerSettingsProvider } from "@/lib/stores/timer-settings-store";
 import { cn } from "@/lib/utils/cn";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -47,9 +46,7 @@ export default function RootLayout({
       )}
     >
       <body className="flex h-full flex-col bg-[#FCFCFC]">
-        <TooltipProvider>
-          <TimerSettingsProvider>{children}</TimerSettingsProvider>
-        </TooltipProvider>
+        <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
       </body>
     </html>

@@ -2,10 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
 import { SettingsDialog } from "@/components/settings/settings-dialog";
-import {
-  TimerSettingsProvider,
-  useTimerSettingsStore,
-} from "@/lib/stores/timer-settings-store";
+import { useTimerSettingsStore } from "@/lib/stores/timer-settings-store";
 
 function CurrentSettings() {
   const pomodoroMinutes = useTimerSettingsStore(
@@ -25,10 +22,10 @@ function CurrentSettings() {
 describe("SettingsDialog", () => {
   test("saves the Pomodoro length and notification volume", () => {
     render(
-      <TimerSettingsProvider>
+      <>
         <SettingsDialog />
         <CurrentSettings />
-      </TimerSettingsProvider>,
+      </>,
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Settings" }));

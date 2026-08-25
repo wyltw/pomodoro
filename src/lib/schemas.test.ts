@@ -1,6 +1,10 @@
 import { describe, expect, test } from "vitest";
 
-import { completePomodoroPayloadSchema, timeZoneSchema } from "@/lib/schemas";
+import {
+  completePomodoroPayloadSchema,
+  timerSettingsSchema,
+  timeZoneSchema,
+} from "@/lib/schemas";
 
 describe("timeZoneSchema", () => {
   test("accepts a valid IANA time zone", () => {
@@ -31,4 +35,20 @@ describe("completePomodoroPayloadSchema", () => {
       }).success,
     ).toBe(false);
   });
+});
+
+describe("timerSettingsSchema", () => {
+  test.each([Number.NaN, -0.01, 1.01])(
+    "rejects an invalid notification volume: %s",
+    (notificationVolume) => {
+      const result = timerSettingsSchema.safeParse({
+        pomodoroMinutes: 25,
+        notificationVolume,
+      });
+
+      expect(result.error?.flatten().fieldErrors.notificationVolume).toEqual([
+        "Notification volume is invalid.",
+      ]);
+    },
+  );
 });

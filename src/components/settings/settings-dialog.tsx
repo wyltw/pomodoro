@@ -40,7 +40,10 @@ export function SettingsDialog() {
   const [notificationVolumePercent, setNotificationVolumePercent] = useState(
     notificationVolume * 100,
   );
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<{
+    pomodoroMinutes?: string[] | undefined;
+    notificationVolume?: string[] | undefined;
+  }>();
 
   function handleOpenChange(open: boolean) {
     setIsOpen(open);
@@ -61,7 +64,7 @@ export function SettingsDialog() {
     });
 
     if (!settings.success) {
-      setError(settings.error.issues[0]?.message);
+      setError(settings.error.flatten().fieldErrors);
       return;
     }
 
@@ -95,8 +98,6 @@ export function SettingsDialog() {
             <Input
               id="pomodoro-minutes"
               inputMode="numeric"
-              max={60}
-              min={1}
               onChange={(event) => {
                 setPomodoroMinutesInput(event.currentTarget.value);
                 setError(undefined);
@@ -105,7 +106,13 @@ export function SettingsDialog() {
               type="number"
               value={pomodoroMinutesInput}
             />
-            <FieldDescription>Between 1 and 60 minutes.</FieldDescription>
+            {error?.pomodoroMinutes ? (
+              <FieldError>
+                {error?.pomodoroMinutes ? error.pomodoroMinutes?.[0] : ""}
+              </FieldError>
+            ) : (
+              <FieldDescription>Between 1 and 60 minutes.</FieldDescription>
+            )}
           </Field>
 
           <Field>
@@ -120,17 +127,17 @@ export function SettingsDialog() {
             <Slider
               aria-label="Notification volume"
               id="notification-volume"
-              max={100}
-              min={0}
               onValueChange={(value) => {
                 setNotificationVolumePercent(value[0] ?? 0);
+                setError(undefined);
               }}
               step={1}
               value={[notificationVolumePercent]}
             />
+            <FieldError>
+              {error?.notificationVolume ? error.notificationVolume?.[0] : ""}
+            </FieldError>
           </Field>
-
-          <FieldError>{error}</FieldError>
 
           <DialogFooter>
             <DialogClose asChild>
