@@ -201,13 +201,14 @@ export function AppProvider({ children, initialValues }: AppProviderProps) {
   const userId = session?.user.id;
 
   return (
-    <DailyFocusTasksStoreProvider
-      key={userId ?? "anonymous"}
-      initialValues={initialValues}
-      shouldPersist={!userId}
-    >
-      {children}
-    </DailyFocusTasksStoreProvider>
+    <ReactQueryProvider key={userId ?? "anonymous"}>
+      <DailyFocusTasksStoreProvider
+        initialValues={initialValues}
+        shouldPersist={!userId}
+      >
+        {children}
+      </DailyFocusTasksStoreProvider>
+    </ReactQueryProvider>
   );
 }
 
@@ -225,7 +226,7 @@ function DailyFocusTasksStoreProvider({
   );
   return (
     <DailyFocusTasksStoreContext.Provider value={store}>
-      <ReactQueryProvider>{children}</ReactQueryProvider>
+      {children}
     </DailyFocusTasksStoreContext.Provider>
   );
 }
