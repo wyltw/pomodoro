@@ -1,7 +1,7 @@
 "use client";
 
 import { SettingsIcon } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { SubmitEvent, useState } from "react";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,7 @@ export function SettingsDialog() {
     setError(undefined);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const settings = timerSettingsSchema.safeParse({
