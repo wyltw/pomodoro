@@ -2,6 +2,7 @@
 
 import { SettingsIcon } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -64,7 +65,7 @@ export function SettingsDialog() {
     });
 
     if (!settings.success) {
-      setError(settings.error.flatten().fieldErrors);
+      setError(z.flattenError(settings.error).fieldErrors);
       return;
     }
 
