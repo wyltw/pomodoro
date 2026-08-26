@@ -113,6 +113,8 @@ Signing out returns the application to its anonymous browser-backed context.
 - **FR-F07:** Reaching the estimate MUST clear the task from active focus.
 - **FR-F08:** Older incomplete tasks MUST be carried into the current local
   focus day.
+- **FR-F09:** Selecting the currently active task again MUST clear the active
+  selection.
 
 ### Persistence and statistics
 
