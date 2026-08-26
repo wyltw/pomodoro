@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import { FocusTaskList } from "@/components/focus-task/focus-task-list";
@@ -27,7 +28,8 @@ function TimerStatusControl() {
 }
 
 describe("FocusTaskList", () => {
-  test("allows completed task selection for displaying its details", () => {
+  test("allows selecting a completed task", async () => {
+    const user = userEvent.setup();
     const onItemClick = vi.fn();
     const completedTask = { ...task, completedPomodoros: 2 };
 
@@ -46,11 +48,12 @@ describe("FocusTaskList", () => {
     }) as HTMLButtonElement;
 
     expect(taskButton.disabled).toBe(false);
-    fireEvent.click(taskButton);
+    await user.click(taskButton);
     expect(onItemClick).toHaveBeenCalledWith(completedTask.id);
   });
 
-  test("disables task selection while the timer is running", () => {
+  test("disables task selection while the timer is running", async () => {
+    const user = userEvent.setup();
     const onItemClick = vi.fn();
 
     render(
@@ -70,7 +73,7 @@ describe("FocusTaskList", () => {
 
     expect(taskButton.disabled).toBe(false);
 
-    fireEvent.click(screen.getByRole("button", { name: "Set timer running" }));
+    await user.click(screen.getByRole("button", { name: "Set timer running" }));
 
     expect(taskButton.disabled).toBe(true);
   });
