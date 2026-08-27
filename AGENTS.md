@@ -65,6 +65,7 @@ Focus tests on integration behavior using Vitest with Testing Library. Test file
 
 - Format commit messages and PR titles as `<type>[optional scope]: <description>`.
 - Use a concise Conventional Commits type such as `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `build`, `ci`, `perf`, `revert`, or `chore`.
-- Write the description as a concise imperative summary, for example `fix(timer): handle reset state`.
+- Review every staged change and infer the commit's core purpose before writing the description.
+- Write the description as a concise imperative summary of that purpose. If the staged changes serve multiple distinct purposes, mention each one rather than describing only a subset.
 - Do not add prefixes outside this format, including `[codex]`.
 - Include the description and test results in the PR body.
