@@ -109,3 +109,25 @@ task progress and creates the session in the same transaction.
 `eeca7d1` session model → `da1508e` title snapshot and session writes → `184fcc0`
 mutable task-day assignment → `dbc7c11` removed `DailyFocusDay.completedPomodoros`
 and `FocusTask.completedAt`.
+
+## ADR-006: Keep authenticated query data immediately stale
+
+**Context.** Focus tasks, today's Pomodoro count, and focus statistics are small
+authenticated server-state queries. Mutations performed by the current client
+invalidate the known affected query keys, so those updates do not need a timed
+freshness window. The same data can still change outside that path: another tab
+or device may update it, and the meaning of "today" changes at the user's local
+date boundary. Focus statistics also change when a Pomodoro session is created.
+
+**Decision.** Keep TanStack Query's default `staleTime` of `0`. Continue to
+invalidate affected queries immediately after local mutations, while allowing
+stale queries to refetch on normal triggers such as remounting or window focus.
+Do not treat these user-owned records as permanently fresh.
+
+**Consequences.** The application may make repeated background requests when a
+query remounts or the window regains focus, but the payloads are small and the
+extra requests reduce the chance of displaying cross-day or externally changed
+data. Cached data remains available while a stale query refetches. Before using
+a long or infinite `staleTime`, the application must explicitly handle local
+date rollover and external updates; focus-statistics invalidation must also be
+added to the Pomodoro-completion path.
