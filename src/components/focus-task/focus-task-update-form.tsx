@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import {
   focusTasksQueryKey,
   useUpdateFocusTask,
@@ -46,15 +45,18 @@ type FocusTaskUpdateFormInput = z.input<FocusTaskUpdateFormSchema>;
 type FocusTaskUpdateFormValues = z.output<FocusTaskUpdateFormSchema>;
 
 type FocusTaskUpdateFormProps = {
+  isAuthPending: boolean;
+  isSignedIn: boolean;
   task: FocusTask;
   onEditingEnd: () => void;
 };
 
 export function FocusTaskUpdateForm({
+  isAuthPending,
+  isSignedIn,
   task,
   onEditingEnd,
 }: FocusTaskUpdateFormProps) {
-  const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
   const updateTask = useDailyFocusTasksStore((state) => state.updateTask);
   const mutation = useUpdateFocusTask({

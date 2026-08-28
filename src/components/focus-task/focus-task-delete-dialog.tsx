@@ -16,7 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import {
   focusTasksQueryKey,
   useDeleteFocusTask,
@@ -26,15 +25,18 @@ import type { FocusTask } from "@/lib/types/types";
 
 type FocusTaskDeleteDialogProps = {
   disabled: boolean;
+  isAuthPending: boolean;
+  isSignedIn: boolean;
   task: FocusTask;
 };
 
 export function FocusTaskDeleteDialog({
   disabled,
+  isAuthPending,
+  isSignedIn,
   task,
 }: FocusTaskDeleteDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const queryClient = useQueryClient();
   const removeTask = useDailyFocusTasksStore((state) => state.removeTask);
   const mutation = useDeleteFocusTask({

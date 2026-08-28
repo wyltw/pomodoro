@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { FocusTaskDeleteDialog } from "./focus-task-delete-dialog";
 import { FocusTaskDetails } from "./focus-task-details";
@@ -18,6 +19,7 @@ import { FocusTaskUpdateForm } from "./focus-task-update-form";
 
 export default function FocusTaskPanel() {
   const [isEditing, setIsEditing] = useState(false);
+  const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
   const focusingTask = tasks.find((task) => task.id === activeTaskId);
@@ -63,7 +65,12 @@ export default function FocusTaskPanel() {
             >
               <SquarePenIcon />
             </Button>
-            <FocusTaskDeleteDialog disabled={isEditing} task={focusingTask} />
+            <FocusTaskDeleteDialog
+              disabled={isEditing}
+              isAuthPending={isAuthPending}
+              isSignedIn={isSignedIn}
+              task={focusingTask}
+            />
           </div>
         </CardTitle>
         <CardDescription>
@@ -73,6 +80,8 @@ export default function FocusTaskPanel() {
       <CardContent>
         {isEditing ? (
           <FocusTaskUpdateForm
+            isAuthPending={isAuthPending}
+            isSignedIn={isSignedIn}
             key={focusingTask.id}
             task={focusingTask}
             onEditingEnd={stopEditing}
