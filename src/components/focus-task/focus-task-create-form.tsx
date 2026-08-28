@@ -15,15 +15,21 @@ import {
   focusTasksQueryKey,
   useCreateFocusTask,
 } from "@/lib/hooks/focus-task-hooks";
-import { useAuthSession } from "@/lib/hooks/auth-hooks";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
 type FocusTaskCreateFormInput = z.input<typeof focusTaskFormSchema>;
 type FocusTaskCreateFormValues = z.output<typeof focusTaskFormSchema>;
 
-export function FocusTaskCreateForm() {
-  const { isPending: isAuthPending, isSignedIn } = useAuthSession();
+type FocusTaskCreateFormProps = {
+  isAuthPending: boolean;
+  isSignedIn: boolean;
+};
+
+export function FocusTaskCreateForm({
+  isAuthPending,
+  isSignedIn,
+}: FocusTaskCreateFormProps) {
   const queryClient = useQueryClient();
   const addTask = useDailyFocusTasksStore((state) => state.addTask);
   const form = useForm<

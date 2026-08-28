@@ -31,14 +31,6 @@ vi.mock("@/lib/services/focus-task", () => ({
   updateFocusTask: updateFocusTaskMock,
 }));
 
-vi.mock("@/lib/hooks/auth-hooks", () => ({
-  useAuthSession: () => ({
-    isPending: false,
-    isSignedIn: true,
-    session: { user: { id: "user-1" } },
-  }),
-}));
-
 vi.mock("sonner", () => ({
   toast: {
     error: toastErrorMock,
@@ -133,7 +125,7 @@ describe("FocusTaskCreateForm", () => {
   test("resets the form and shows success after the task is created", async () => {
     const deferred = createDeferred();
     createFocusTaskMock.mockReturnValueOnce(deferred.promise);
-    renderForm(<FocusTaskCreateForm />);
+    renderForm(<FocusTaskCreateForm isAuthPending={false} isSignedIn={true} />);
     const fields = getFormFields();
     const user = await enterTaskValues(fields);
 
@@ -162,7 +154,7 @@ describe("FocusTaskCreateForm", () => {
   test("keeps the form values and shows an error when creation fails", async () => {
     const deferred = createDeferred();
     createFocusTaskMock.mockReturnValueOnce(deferred.promise);
-    renderForm(<FocusTaskCreateForm />);
+    renderForm(<FocusTaskCreateForm isAuthPending={false} isSignedIn={true} />);
     const fields = getFormFields();
     const user = await enterTaskValues(fields);
 
@@ -184,7 +176,12 @@ describe("FocusTaskUpdateForm", () => {
     const onEditingEnd = vi.fn();
     updateFocusTaskMock.mockReturnValueOnce(deferred.promise);
     renderForm(
-      <FocusTaskUpdateForm task={task} onEditingEnd={onEditingEnd} />,
+      <FocusTaskUpdateForm
+        isAuthPending={false}
+        isSignedIn={true}
+        task={task}
+        onEditingEnd={onEditingEnd}
+      />,
       [task],
     );
     const fields = getFormFields();
@@ -214,7 +211,12 @@ describe("FocusTaskUpdateForm", () => {
     const onEditingEnd = vi.fn();
     updateFocusTaskMock.mockReturnValueOnce(deferred.promise);
     renderForm(
-      <FocusTaskUpdateForm task={task} onEditingEnd={onEditingEnd} />,
+      <FocusTaskUpdateForm
+        isAuthPending={false}
+        isSignedIn={true}
+        task={task}
+        onEditingEnd={onEditingEnd}
+      />,
       [task],
     );
     const fields = getFormFields();

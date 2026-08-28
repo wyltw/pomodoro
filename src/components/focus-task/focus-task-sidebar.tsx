@@ -20,7 +20,7 @@ import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export function FocusTaskSidebar() {
   const { isMobile, setOpenMobile } = useSidebar();
-  const { isSignedIn } = useAuthSession();
+  const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
   const replaceTasks = useDailyFocusTasksStore((state) => state.replaceTasks);
@@ -55,7 +55,10 @@ export function FocusTaskSidebar() {
       </SidebarHeader>
       <SidebarContent className="group-data-[collapsible=icon]:hidden">
         <SidebarGroup>
-          <FocusTaskCreateForm />
+          <FocusTaskCreateForm
+            isAuthPending={isAuthPending}
+            isSignedIn={isSignedIn}
+          />
         </SidebarGroup>
         <SidebarGroup className="border-sidebar-border flex min-h-0 flex-1 flex-col border-t pt-4">
           {error && (

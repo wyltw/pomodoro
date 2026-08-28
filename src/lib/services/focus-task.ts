@@ -1,5 +1,7 @@
 "use server";
 
+import type { ZodError } from "zod";
+
 import { getSession } from "../dal";
 import prisma from "../prisma";
 import { getOrCreateDailyFocusDay } from "./daily-focus-day";
@@ -19,6 +21,10 @@ import {
 
 const focusTaskNotFoundError = "Focus task not found.";
 
+function getValidationErrorMessage(error: ZodError) {
+  return error.issues[0]?.message ?? "Invalid input.";
+}
+
 export const createFocusTask = async (payload: CreateFocusTaskPayload) => {
   const session = await getSession();
 
@@ -29,7 +35,9 @@ export const createFocusTask = async (payload: CreateFocusTaskPayload) => {
   const userId = session.user.id;
 
   const parsedPayload = createFocusTaskPayloadSchema.safeParse(payload);
-  if (!parsedPayload.success) throw new Error(parsedPayload.error.message);
+  if (!parsedPayload.success) {
+    throw new Error(getValidationErrorMessage(parsedPayload.error));
+  }
   const { description, estimatedPomodoros, timeZone, title } =
     parsedPayload.data;
 
@@ -61,7 +69,9 @@ export const completePomodoro = async (
   }
 
   const parsedPayload = completePomodoroPayloadSchema.safeParse(payload);
-  if (!parsedPayload.success) throw new Error(parsedPayload.error.message);
+  if (!parsedPayload.success) {
+    throw new Error(getValidationErrorMessage(parsedPayload.error));
+  }
 
   const { durationSeconds, taskId, timeZone } = parsedPayload.data;
   return prisma.$transaction(async (transaction) => {
@@ -132,8 +142,12 @@ export const updateFocusTask = async (
 
   const parsedTaskId = focusTaskIdSchema.safeParse(taskId);
   const parsedPayload = updateFocusTaskPayloadSchema.safeParse(payload);
-  if (!parsedTaskId.success) throw new Error(parsedTaskId.error.message);
-  if (!parsedPayload.success) throw new Error(parsedPayload.error.message);
+  if (!parsedTaskId.success) {
+    throw new Error(getValidationErrorMessage(parsedTaskId.error));
+  }
+  if (!parsedPayload.success) {
+    throw new Error(getValidationErrorMessage(parsedPayload.error));
+  }
 
   const userId = session.user.id;
   const task = await prisma.focusTask.findFirst({
@@ -182,7 +196,9 @@ export const deleteFocusTask = async (taskId: string) => {
   }
 
   const parsedTaskId = focusTaskIdSchema.safeParse(taskId);
-  if (!parsedTaskId.success) throw new Error(parsedTaskId.error.message);
+  if (!parsedTaskId.success) {
+    throw new Error(getValidationErrorMessage(parsedTaskId.error));
+  }
 
   const result = await prisma.focusTask.deleteMany({
     where: {

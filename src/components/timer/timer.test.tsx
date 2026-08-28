@@ -36,7 +36,7 @@ describe("Timer", () => {
     expect(onComplete).toHaveBeenCalledOnce();
   });
 
-  test("reports the current session duration when the maximum changes", () => {
+  test("does not change the active session duration when sessionMax changes", () => {
     vi.useFakeTimers();
     const onComplete = vi.fn();
     const renderTimer = (sessionMax: number) => (

@@ -75,7 +75,10 @@ export const timerSettingsSchema = z.object({
     .int({ error: "Pomodoro length must be a whole number of minutes." })
     .min(1, { error: "Pomodoro length must be at least 1 minute." })
     .max(60, { error: "Pomodoro length cannot exceed 60 minutes." }),
-  notificationVolume: z.number().min(0).max(1),
+  notificationVolume: z
+    .number({ error: "Notification volume is invalid." })
+    .min(0, { error: "Notification volume is invalid." })
+    .max(1, { error: "Notification volume is invalid." }),
 });
 
 export const focusTaskFormSchema = z.object({

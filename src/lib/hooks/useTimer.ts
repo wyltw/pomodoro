@@ -77,10 +77,12 @@ export const useTimer = (initialSeconds: number, endSeconds: number) => {
   useEffect(() => {
     if (status !== "idle") return;
 
+    // Apply duration changes only while idle so an active session keeps its original end.
     dispatch({ type: "setEndSeconds", endSeconds });
   }, [endSeconds, status]);
 
   useEffect(() => {
+    // Reset the shared context status; local reducer state is discarded on unmount.
     return () => {
       setStatus("idle");
     };
