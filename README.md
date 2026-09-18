@@ -4,6 +4,8 @@
 intervals, and reviewing progress over time. It brings task planning, the
 Pomodoro method, and focus insights into one streamlined workspace.
 
+## Live Demo
+
 [Live Demo](https://pomodoro-rose-nine.vercel.app/)
 
 <img width="1148" height="798" alt="image" src="https://github.com/user-attachments/assets/bd99cbab-100d-4cae-8e27-015792f54f75" />
