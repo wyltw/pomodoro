@@ -6,6 +6,7 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
 import { PrismaClient } from "../src/generated/prisma/client";
+import { withExplicitPostgresSslMode } from "../src/lib/postgres-url";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -32,7 +33,9 @@ if (!databaseUrl) throw new Error("DIRECT_URL is required to seed data.");
 if (!userId) throw new Error("SEED_USER_ID is required to seed data.");
 
 const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: databaseUrl }),
+  adapter: new PrismaPg({
+    connectionString: withExplicitPostgresSslMode(databaseUrl),
+  }),
 });
 
 async function deleteSeedData() {
