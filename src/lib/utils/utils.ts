@@ -120,3 +120,23 @@ export const getLastSevenDays = (localDate: string, timeZone: string) => {
     endDate.subtract(6 - index, "day").format("YYYY-MM-DD"),
   );
 };
+
+export type RetryConfigs<T> = {
+  retries?: number;
+  wait?: number;
+  action: () => T | Promise<T>;
+  shouldRetry: (result: T) => boolean;
+};
+
+export const retry = async <T>(configs: RetryConfigs<T>): Promise<T> => {
+  const { retries = 1, wait = 1000, action, shouldRetry } = configs;
+  const result = await action();
+
+  await new Promise((resolve) => setTimeout(resolve, wait));
+
+  if (!shouldRetry(result) || retries <= 0) {
+    return result;
+  }
+
+  return retry({ retries: retries - 1, action, shouldRetry, wait });
+};

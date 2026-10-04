@@ -24,17 +24,13 @@ export function AuthMenu() {
   async function handleSignOut() {
     setIsSigningOut(true);
 
-    try {
-      const result = await authClient.signOut();
+    const result = await authClient.signOut();
 
-      if (result.error) {
-        toast.error(result.error.message ?? "Unable to sign out.");
-      }
-    } catch {
-      toast.error("Unable to sign out.");
-    } finally {
-      setIsSigningOut(false);
+    if (result.error) {
+      toast.error(result.error.message ?? "Unable to sign out.");
     }
+
+    setIsSigningOut(false);
   }
 
   if (isPending) {
