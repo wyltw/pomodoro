@@ -131,3 +131,33 @@ data. Cached data remains available while a stale query refetches. Before using
 a long or infinite `staleTime`, the application must explicitly handle local
 date rollover and external updates; focus-statistics invalidation must also be
 added to the Pomodoro-completion path.
+
+## ADR-007: Couple Timer state transitions in a reducer
+
+**Context.** Timer progress and lifecycle status are one state machine: a tick
+can advance elapsed seconds, while the final tick must both reset the displayed
+progress and mark the session completed. The original implementation stored
+`seconds` in local state and `status` in `TimerStatusContext`. To keep them in
+sync, its `setSeconds` updater called `setStatus` when the timer reached its end.
+That scheduled an update to `TimerStatusProvider` while React was processing an
+update owned by `TimerContextProvider`, violating the requirement that state
+updaters remain pure and producing a cross-component render-phase update. The
+two independent setters also made valid Timer state depend on update ordering.
+
+**Decision.** Make the local `useTimer` reducer the source of truth for the
+coupled Timer state. Actions such as start, pause, stop, tick, and duration
+change describe transitions; each reducer call derives `seconds`, `status`, and
+the active `endSeconds` together. Mirror the resulting status to the shared
+`TimerStatusContext` in an effect only so consumers outside the Timer can react
+to whether a session is running. Accept duration changes only while idle so an
+active or completed session retains the duration with which it started.
+
+**Consequences.** Completion and reset are now one atomic transition, interval
+callbacks only dispatch actions, and reducer execution has no cross-component
+side effects. The allowed state transitions and guards live in one function,
+at the cost of action and reducer boilerplate. `TimerStatusContext` is a
+post-render projection for external consumers rather than a second source of
+truth, and changing timer settings does not alter a running or paused session.
+
+**History.** `4a0b72d` coupled seconds and status in a reducer → `7f23f2c`
+added the active duration to reducer state and limited duration changes to idle.
