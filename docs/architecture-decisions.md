@@ -3,29 +3,36 @@
 These compact decision records use Context, Decision, and Consequences to keep
 the reason for each choice separate from its implementation history.
 
-## ADR-001: Share task UI state across persistence modes
+## ADR-001: Keep task sources separate behind a shared read path
 
-**Context.** Anonymous tasks come from local storage, while signed-in tasks come
-from the database. `FocusTaskSidebar` and `TimerTabs` need the same current task
-list and selection from separate branches. The shared Provider remains in
-`src/app/(app)/layout.tsx` and uses the client session.
+**Context.** Anonymous tasks live in a persisted Zustand store, while signed-in
+tasks live in the database and are read through TanStack Query. The sidebar,
+task panel, and `TimerTabs` all need the current task list and selected task ID.
+An earlier `initialValues` path would have initialized the store from
+server-fetched tasks, but the current application fetches signed-in tasks with
+Query on the client.
 
-**Decision.** Use persist middleware only without a `userId`. For a signed-in
-user, fetch with TanStack Query and expose its task list through
-`useCurrentFocusTasks`; anonymous users receive the persisted Zustand task list
-through the same hook. Keep `activeTaskId` in Zustand, validate selections
-against the current task list, and key the Zustand and Query providers by
-`userId`.
+**Decision.** `useCurrentFocusTasks` returns persisted Zustand tasks for
+anonymous users and Query tasks for signed-in users. Do not copy Query tasks
+into Zustand. Keep `activeTaskId` in the shared Zustand store; validate a new
+selection against the current list and clear it when a refreshed server list no
+longer contains the selected task. Writes remain separate: anonymous actions
+update the local store, while signed-in actions write through Server Actions
+and invalidate Query. Enable persist only for anonymous users. Key the outer
+Query provider by `userId` so both its cache and the nested task store are
+recreated when the user changes.
 
-**Consequences.** The task UI does not need separate anonymous and signed-in
-implementations or a second copy of signed-in tasks. Changing users recreates
-both state and cache, while anonymous tasks remain separate and are not merged
-into an account. A refreshed server list can invalidate the current selection,
-which the sidebar clears.
+**Consequences.** The same UI components can read either task source through
+one hook, but their mutations still choose a path based on authentication.
+Signed-in tasks have no second client copy in Zustand, so they require no
+Query-to-store synchronization. Changing users recreates the task store and
+Query cache; an anonymous selection can then be restored from local storage.
+Anonymous tasks remain separate and are not merged into an account.
 
 **History.** `75ead86` persisted store → `44f8b04` Provider and `initialValues` →
-`3dc2564` client query → `63e5d2b` persistence from session → `a876c0b`
-user-keyed providers → current-task hook without a signed-in task copy.
+`3dc2564` client query and store copy → `63e5d2b` persistence from session →
+`a876c0b` user-keyed providers → `968093d` shared read hook without the
+signed-in task copy.
 
 ## ADR-002: Keep task orchestration outside Timer
 
