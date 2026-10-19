@@ -45,6 +45,21 @@ describe("useTimer", () => {
     expect(result.current.seconds).toBe(2);
   });
 
+  test("should catch up after an interval callback is delayed", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));
+    const { result } = setupUseTimer();
+
+    act(() => result.current.startTimer());
+
+    act(() => {
+      vi.setSystemTime(new Date("2026-01-01T00:00:05Z"));
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(result.current.seconds).toBe(6);
+  });
+
   test("should stop counting after pauseTimer", () => {
     vi.useFakeTimers();
     const { result } = setupUseTimer();
@@ -108,7 +123,14 @@ describe("useTimer", () => {
     act(() => result.current.startTimer());
 
     act(() => {
-      vi.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(result.current.seconds).toBe(1);
+    expect(result.current.status).toBe("running");
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
     });
 
     expect(result.current.seconds).toBe(0);

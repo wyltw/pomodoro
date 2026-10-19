@@ -65,14 +65,16 @@ sidebar, header, and footer.
 | State       | Meaning                                              | Allowed transition sources |
 | ----------- | ---------------------------------------------------- | -------------------------- |
 | `idle`      | Timer is reset and accepts a new configured duration | Initial mount or reset     |
-| `running`   | Elapsed seconds increase once per second             | Start or resume            |
+| `running`   | Elapsed time is derived from a wall-clock deadline   | Start or resume            |
 | `paused`    | Elapsed progress is preserved                        | Pause                      |
 | `completed` | The configured end has been reached                  | Final running tick         |
 
-Internally, the reducer counts elapsed seconds upward from `sessionMin` to
-`sessionMax`. The circular progress component converts this to remaining time
-for display. The active timer owns an interval only while running and clears it
-when the status changes or the component unmounts.
+Internally, the reducer records a wall-clock deadline and derives elapsed
+seconds from the remaining milliseconds. The interval refreshes the display
+rather than acting as the time source, so a delayed callback catches up to the
+current time. The circular progress component converts elapsed seconds to
+remaining time for display. The active timer owns an interval only while
+running and clears it when the status changes or the component unmounts.
 
 Each tab mounts its own `Timer` and `TimerContextProvider`. Switching tabs
 therefore resets timer-instance state. A separate `TimerStatusProvider` exposes

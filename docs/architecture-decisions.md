@@ -131,3 +131,64 @@ data. Cached data remains available while a stale query refetches. Before using
 a long or infinite `staleTime`, the application must explicitly handle local
 date rollover and external updates; focus-statistics invalidation must also be
 added to the Pomodoro-completion path.
+
+## ADR-007: Couple Timer state transitions in a reducer
+
+**Context.** Timer lifecycle status and timing data form one state machine. The
+original implementation stored elapsed seconds locally and status in
+`TimerStatusContext`. Completing a session therefore required a `setSeconds`
+updater to call `setStatus`, which made the updater impure and made one logical
+transition depend on updates owned by different components. The deadline-based
+model in ADR-008 adds more related invariants: a running Timer has a deadline,
+a paused Timer preserves its remaining duration without a deadline, and stop or
+completion resets the remaining duration.
+
+**Decision.** Make the local `useTimer` reducer the source of truth for the
+Timer state. Start, pause, stop, tick, and duration change are explicit actions
+that update `durationMs`, `remainingMs`, `deadlineMs`, and `status` together.
+Keep time values in milliseconds inside the reducer and derive the seconds used
+by the component API at the hook boundary. Mirror the resulting status to
+`TimerStatusContext` in an effect so consumers outside the Timer can react to a
+running session. Accept configured duration changes only while idle.
+
+**Consequences.** Each action produces a complete Timer state without nested
+state updates, and transition guards live in one function. The reducer adds
+action and transition boilerplate, but pause, resume, completion, and reset do
+not rely on the ordering of independent setters. `TimerStatusContext` remains a
+projection for external consumers rather than the Timer's source of truth.
+
+**History.** `4a0b72d` coupled elapsed seconds and status in a reducer →
+`7f23f2c` added the active duration and limited duration changes to idle →
+ADR-008 replaced the elapsed-seconds counter with deadline timing state.
+
+## ADR-008: Use a wall-clock deadline as the Timer time source
+
+**Context.** The original Timer treated each `setInterval` callback as one
+elapsed second. Browser scheduling does not guarantee that callbacks run on
+time: background-tab throttling, a busy main thread, or device suspension can
+delay them. Counting callbacks therefore makes a session last longer than its
+configured duration. The Timer must still support pause and resume and retain
+the existing one-second `00:00` display before showing the completed view.
+
+**Decision.** Store the active duration, remaining duration, and deadline in
+milliseconds inside the `useTimer` reducer. Starting or resuming creates a
+deadline from the current time plus the saved remaining duration. Each interval
+callback supplies the current time, and the reducer calculates
+`remainingMs = max(0, deadlineMs - nowMs)` instead of incrementing a counter.
+Pausing snapshots that remaining duration and clears the deadline; resuming
+creates a new deadline so paused time is excluded. Keep the Timer component API
+in seconds and convert units only at the `useTimer` input and output boundaries.
+After the deadline, keep the Timer running at `00:00` for one second before
+transitioning to `completed`.
+
+**Consequences.** Callback frequency controls when the display refreshes, not
+how much time has elapsed. A delayed callback catches up to wall-clock time
+rather than accumulating drift. If JavaScript execution is suspended, the
+Timer recognizes completion on the first callback after execution resumes, so
+the UI and completion notification may still appear late even though the
+session is not extended. Pause and resume require converting between an
+absolute deadline and a relative remaining duration. Changes to the system
+clock also affect a `Date.now()`-based deadline.
+
+**History.** `08c9341` introduced interval-counted elapsed seconds. This
+decision replaces callback counting with a deadline-based timing model.
