@@ -6,23 +6,26 @@ the reason for each choice separate from its implementation history.
 ## ADR-001: Share task UI state across persistence modes
 
 **Context.** Anonymous tasks come from local storage, while signed-in tasks come
-from the database. `FocusTaskSidebar` and `TimerTabs` consume the same Zustand
-store from separate branches, so their Provider cannot move below either branch.
-The original `initialValues` path for server-fetched state was therefore not
-completed; the shared Provider remains in `src/app/(app)/layout.tsx` and uses the
-client session.
+from the database. `FocusTaskSidebar` and `TimerTabs` need the same current task
+list and selection from separate branches. The shared Provider remains in
+`src/app/(app)/layout.tsx` and uses the client session.
 
 **Decision.** Use persist middleware only without a `userId`. For a signed-in
-user, fetch with TanStack Query and copy the result into the same Zustand state
-interface. Key the Zustand and Query providers by `userId`.
+user, fetch with TanStack Query and expose its task list through
+`useCurrentFocusTasks`; anonymous users receive the persisted Zustand task list
+through the same hook. Keep `activeTaskId` in Zustand, validate selections
+against the current task list, and key the Zustand and Query providers by
+`userId`.
 
 **Consequences.** The task UI does not need separate anonymous and signed-in
-implementations. Changing users recreates both state and cache, while anonymous
-tasks remain separate and are not merged into an account.
+implementations or a second copy of signed-in tasks. Changing users recreates
+both state and cache, while anonymous tasks remain separate and are not merged
+into an account. A refreshed server list can invalidate the current selection,
+which the sidebar clears.
 
 **History.** `75ead86` persisted store → `44f8b04` Provider and `initialValues` →
 `3dc2564` client query → `63e5d2b` persistence from session → `a876c0b`
-user-keyed providers.
+user-keyed providers → current-task hook without a signed-in task copy.
 
 ## ADR-002: Keep task orchestration outside Timer
 

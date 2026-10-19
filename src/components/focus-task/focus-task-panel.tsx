@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { useTimerStatus } from "@/lib/contexts/timer-status-context";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
+import { useCurrentFocusTasks } from "@/lib/hooks/current-focus-tasks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { FocusTaskDeleteDialog } from "./focus-task-delete-dialog";
 import { FocusTaskDetails } from "./focus-task-details";
@@ -22,7 +23,7 @@ export default function FocusTaskPanel() {
   const [isEditing, setIsEditing] = useState(false);
   const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const { status: timerStatus } = useTimerStatus();
-  const tasks = useDailyFocusTasksStore((state) => state.tasks);
+  const { tasks } = useCurrentFocusTasks(isSignedIn);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
   const focusingTask = tasks.find((task) => task.id === activeTaskId);
 

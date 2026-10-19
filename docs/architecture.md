@@ -22,6 +22,7 @@ flowchart LR
 
   Session -->|signed in| Query[TanStack Query]
   Query --> Reads[GET route handlers]
+  Query --> UI
   UI --> Actions[Server Actions]
   Reads --> Services[Queries and services]
   Actions --> Services
@@ -113,12 +114,16 @@ active selection only if that task was carried forward.
 
 `AppProvider` keys the daily task provider by the authenticated user ID. In
 signed-in mode, persistence middleware is disabled and `FocusTaskSidebar` loads
-the current tasks through TanStack Query. Query results replace the in-memory
-Zustand task list used by the UI.
+the current tasks through TanStack Query. `useCurrentFocusTasks` returns Query
+tasks for signed-in users and Zustand tasks for anonymous users. Signed-in tasks
+are not copied into Zustand; its `activeTaskId` remains the shared client-side
+selection. `setActiveTask` validates the selected ID against the current list,
+and the sidebar clears the selection if a refreshed server list no longer
+contains it.
 
 Mutations use server actions and invalidate the relevant query keys after
-success. This keeps the database authoritative while allowing both data contexts
-to use the same task components and selectors.
+success. This keeps the database authoritative while allowing both data sources
+to use the same task components.
 
 ## 5. Authentication and Request Boundaries
 
@@ -255,7 +260,8 @@ The reasons and commit history behind the current design are recorded in
 2. The route validates the session and time zone.
 3. The query gets or creates today's `DailyFocusDay`.
 4. Older incomplete tasks are reassigned to today's record.
-5. Today's tasks replace the in-memory UI store.
+5. The current-task hook exposes Query results to the task UI without copying
+   them into Zustand.
 
 ### Load statistics
 
