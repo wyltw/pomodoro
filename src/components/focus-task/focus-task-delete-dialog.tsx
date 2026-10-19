@@ -58,7 +58,7 @@ export function FocusTaskDeleteDialog({
   }
 
   function handleDelete() {
-    if (isAuthPending) return;
+    if (disabled || isAuthPending) return;
 
     if (isSignedIn) {
       mutation.mutate({ taskId: task.id });
@@ -104,7 +104,7 @@ export function FocusTaskDeleteDialog({
             </Button>
           </DialogClose>
           <Button
-            disabled={mutation.isPending}
+            disabled={disabled || mutation.isPending}
             onClick={handleDelete}
             type="button"
             variant="destructive"
