@@ -15,31 +15,29 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { useFocusTasks } from "@/lib/hooks/focus-task-hooks";
+import { useCurrentFocusTasks } from "@/lib/hooks/current-focus-tasks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export function FocusTaskSidebar() {
   const { isMobile, setOpenMobile } = useSidebar();
   const { isPending: isAuthPending, isSignedIn } = useAuthSession();
-  const tasks = useDailyFocusTasksStore((state) => state.tasks);
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
-  const replaceTasks = useDailyFocusTasksStore((state) => state.replaceTasks);
   const setActiveTask = useDailyFocusTasksStore((state) => state.setActiveTask);
-  const {
-    tasks: queriedTasks,
-    error,
-    isLoading,
-  } = useFocusTasks({
-    enabled: isSignedIn,
-  });
+  const clearActiveTask = useDailyFocusTasksStore(
+    (state) => state.clearActiveTask,
+  );
+  const { tasks, serverTasks, error, isLoading } =
+    useCurrentFocusTasks(isSignedIn);
 
   useEffect(() => {
-    if (!queriedTasks) return;
-    replaceTasks(queriedTasks);
-  }, [queriedTasks, replaceTasks]);
+    if (!isSignedIn || !serverTasks || !activeTaskId) return;
+    if (serverTasks.some((task) => task.id === activeTaskId)) return;
+
+    clearActiveTask();
+  }, [activeTaskId, clearActiveTask, isSignedIn, serverTasks]);
 
   function handleItemClick(taskId: string) {
-    setActiveTask(taskId);
+    setActiveTask(taskId, tasks);
 
     if (isMobile) setOpenMobile(false);
   }

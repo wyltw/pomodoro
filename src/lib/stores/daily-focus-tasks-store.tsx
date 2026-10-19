@@ -25,9 +25,8 @@ export type DailyFocusTasksActions = {
   updateTask: (taskId: string, payload: EditableFocusTask) => void;
   completeActivePomodoro: () => void;
   removeTask: (taskId: string) => void;
-  setActiveTask: (taskId: string) => void;
+  setActiveTask: (taskId: string, tasks: FocusTask[]) => void;
   clearActiveTask: () => void;
-  replaceTasks: (tasks: FocusTask[]) => void;
 };
 
 export type DailyFocusTasksStore = DailyFocusTasksState &
@@ -115,26 +114,19 @@ export function createDailyFocusTasksStore({
           activeTaskId: isRemovingActiveTask ? undefined : state.activeTaskId,
         };
       }),
-    setActiveTask: (taskId) =>
+    setActiveTask: (taskId, tasks) =>
       set((state) => {
         if (state.activeTaskId === taskId) {
           return { activeTaskId: undefined };
         }
 
-        if (!hasTaskId(state.tasks, taskId)) {
+        if (!hasTaskId(tasks, taskId)) {
           return state;
         }
 
         return { activeTaskId: taskId };
       }),
     clearActiveTask: () => set({ activeTaskId: undefined }),
-    replaceTasks: (tasks) =>
-      set((state) => ({
-        tasks,
-        activeTaskId: hasTaskId(tasks, state.activeTaskId)
-          ? state.activeTaskId
-          : undefined,
-      })),
   });
 
   if (!shouldPersist) {

@@ -95,7 +95,7 @@ describe("setActiveTask", () => {
       },
     });
 
-    store.getState().setActiveTask(completedTask.id);
+    store.getState().setActiveTask(completedTask.id, [completedTask]);
 
     expect(store.getState().activeTaskId).toBe(completedTask.id);
   });
@@ -110,26 +110,41 @@ describe("setActiveTask", () => {
       },
     });
 
-    store.getState().setActiveTask(activeTask.id);
+    store.getState().setActiveTask(activeTask.id, [activeTask]);
 
     expect(store.getState().activeTaskId).toBeUndefined();
   });
 });
 
-describe("replaceTasks", () => {
-  test("replaces tasks and clears an active task that no longer exists", () => {
+describe("setActiveTask with server tasks", () => {
+  test("selects a task supplied by the current list even when the store has no tasks", () => {
     const store = createDailyFocusTasksStore({
       shouldPersist: false,
       initialValues: {
         localDate: "2026-07-12",
-        tasks: [activeTask],
-        activeTaskId: activeTask.id,
+        tasks: [],
+        activeTaskId: undefined,
       },
     });
 
-    store.getState().replaceTasks([inactiveTask]);
+    store.getState().setActiveTask(activeTask.id, [activeTask]);
 
-    expect(store.getState().tasks).toEqual([inactiveTask]);
+    expect(store.getState().tasks).toEqual([]);
+    expect(store.getState().activeTaskId).toBe(activeTask.id);
+  });
+
+  test("ignores a task that is not in the current list", () => {
+    const store = createDailyFocusTasksStore({
+      shouldPersist: false,
+      initialValues: {
+        localDate: "2026-07-12",
+        tasks: [],
+        activeTaskId: undefined,
+      },
+    });
+
+    store.getState().setActiveTask(activeTask.id, [inactiveTask]);
+
     expect(store.getState().activeTaskId).toBeUndefined();
   });
 });

@@ -8,6 +8,7 @@ import Timer from "./timer";
 import type { TimerType } from "@/lib/types/types";
 import { Armchair, Clock5, Coffee } from "lucide-react";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
+import { useCurrentFocusTasks } from "@/lib/hooks/current-focus-tasks";
 import {
   focusTasksQueryKey,
   useCompletePomodoro,
@@ -37,9 +38,9 @@ export default function TimerTabs() {
   const clearActiveTask = useDailyFocusTasksStore(
     (state) => state.clearActiveTask,
   );
-  const activeTask = useDailyFocusTasksStore((state) =>
-    state.tasks.find((task) => task.id === state.activeTaskId),
-  );
+  const { tasks } = useCurrentFocusTasks(isSignedIn);
+  const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
+  const activeTask = tasks.find((task) => task.id === activeTaskId);
   const mutation = useCompletePomodoro({
     async onSuccess({ completedTaskId }) {
       if (completedTaskId) clearActiveTask();
