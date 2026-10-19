@@ -6,68 +6,112 @@ import {
 } from "@/lib/contexts/timer-status-context";
 
 type TimerState = {
-  endSeconds: number;
-  seconds: number;
+  deadlineMs: number | null;
+  durationMs: number;
+  remainingMs: number;
   status: TimerStatus;
 };
 
 type TimerAction =
-  | { type: "start" }
-  | { type: "pause" }
-  | { type: "stop"; initialSeconds: number }
-  | { type: "setEndSeconds"; endSeconds: number }
-  | { type: "tick"; initialSeconds: number };
+  | { type: "start"; nowMs: number }
+  | { type: "pause"; nowMs: number }
+  | { type: "stop" }
+  | { type: "setDuration"; durationMs: number }
+  | { type: "tick"; nowMs: number };
+
+const COMPLETION_DISPLAY_MS = 1000;
+
+function getDurationMs(initialSeconds: number, endSeconds: number) {
+  return Math.max(0, endSeconds - initialSeconds) * 1000;
+}
 
 function timerReducer(state: TimerState, action: TimerAction): TimerState {
   switch (action.type) {
     case "start":
-      return { ...state, status: "running" };
-    case "pause":
-      return { ...state, status: "paused" };
+      if (state.status === "running") return state;
+
+      return {
+        ...state,
+        deadlineMs: action.nowMs + state.remainingMs,
+        status: "running",
+      };
+    case "pause": {
+      if (state.status !== "running" || state.deadlineMs === null) return state;
+
+      const remainingMs = Math.max(0, state.deadlineMs - action.nowMs);
+
+      return {
+        ...state,
+        deadlineMs: null,
+        remainingMs,
+        status: "paused",
+      };
+    }
     case "stop":
-      return { ...state, seconds: action.initialSeconds, status: "idle" };
-    case "setEndSeconds":
-      if (state.endSeconds === action.endSeconds) return state;
+      return {
+        ...state,
+        deadlineMs: null,
+        remainingMs: state.durationMs,
+        status: "idle",
+      };
+    case "setDuration":
+      if (state.durationMs === action.durationMs) return state;
 
-      return { ...state, endSeconds: action.endSeconds };
+      return {
+        ...state,
+        durationMs: action.durationMs,
+        remainingMs: action.durationMs,
+      };
     case "tick": {
-      if (state.status !== "running") return state;
+      if (state.status !== "running" || state.deadlineMs === null) return state;
 
-      if (state.seconds >= state.endSeconds) {
+      if (action.nowMs >= state.deadlineMs + COMPLETION_DISPLAY_MS) {
         return {
           ...state,
-          seconds: action.initialSeconds,
+          deadlineMs: null,
+          remainingMs: state.durationMs,
           status: "completed",
         };
       }
 
       return {
         ...state,
-        seconds: Math.min(state.seconds + 1, state.endSeconds),
+        remainingMs: Math.max(0, state.deadlineMs - action.nowMs),
       };
     }
   }
 }
 
-export const useTimer = (initialSeconds: number, endSeconds: number) => {
+export const useTimer = (
+  initialSeconds: number,
+  configuredEndSeconds: number,
+) => {
+  const configuredDurationMs = getDurationMs(
+    initialSeconds,
+    configuredEndSeconds,
+  );
   const [state, dispatch] = useReducer(timerReducer, {
-    endSeconds,
-    seconds: initialSeconds,
+    deadlineMs: null,
+    durationMs: configuredDurationMs,
+    remainingMs: configuredDurationMs,
     status: "idle",
   });
-  const { status } = state;
+  const { durationMs, remainingMs, status } = state;
+  const elapsedSeconds = Math.floor((durationMs - remainingMs) / 1000);
+  const endSeconds = initialSeconds + durationMs / 1000;
+  const seconds = initialSeconds + elapsedSeconds;
   const { setStatus } = useTimerStatus();
 
   const stopTimer = useCallback(() => {
-    dispatch({ type: "stop", initialSeconds });
-  }, [initialSeconds]);
+    dispatch({ type: "stop" });
+  }, []);
 
   const pauseTimer = useCallback(() => {
-    dispatch({ type: "pause" });
+    dispatch({ type: "pause", nowMs: Date.now() });
   }, []);
 
   const startTimer = useCallback(() => {
-    dispatch({ type: "start" });
+    dispatch({ type: "start", nowMs: Date.now() });
   }, []);
 
   useEffect(() => {
@@ -78,8 +122,8 @@ export const useTimer = (initialSeconds: number, endSeconds: number) => {
     if (status !== "idle") return;
 
     // Apply duration changes only while idle so an active session keeps its original end.
-    dispatch({ type: "setEndSeconds", endSeconds });
-  }, [endSeconds, status]);
+    dispatch({ type: "setDuration", durationMs: configuredDurationMs });
+  }, [configuredDurationMs, status]);
 
   useEffect(() => {
     // Reset the shared context status; local reducer state is discarded on unmount.
@@ -91,14 +135,22 @@ export const useTimer = (initialSeconds: number, endSeconds: number) => {
   useEffect(() => {
     if (status !== "running") return;
 
-    // status changes trigger cleaner function, so countdown will stop automatically
+    // The interval refreshes the display; the deadline remains the time source.
     const intervalId = setInterval(() => {
-      dispatch({ type: "tick", initialSeconds });
+      dispatch({ type: "tick", nowMs: Date.now() });
     }, 1000);
 
     return () => {
       clearInterval(intervalId);
     };
-  }, [status, initialSeconds]);
-  return { ...state, startTimer, pauseTimer, stopTimer };
+  }, [status]);
+
+  return {
+    endSeconds,
+    seconds,
+    status,
+    startTimer,
+    pauseTimer,
+    stopTimer,
+  };
 };
