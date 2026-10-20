@@ -14,7 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { useCurrentFocusTasks } from "@/lib/hooks/current-focus-tasks";
+import { useCurrentFocusTasks } from "@/lib/hooks/useCurrentFocusTasks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export function FocusTaskSidebar() {

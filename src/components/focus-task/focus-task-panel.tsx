@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { useTimerStatus } from "@/lib/contexts/timer-status-context";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { useCurrentFocusTasks } from "@/lib/hooks/current-focus-tasks";
+import { useCurrentFocusTasks } from "@/lib/hooks/useCurrentFocusTasks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 import { FocusTaskDeleteDialog } from "./focus-task-delete-dialog";
 import { FocusTaskDetails } from "./focus-task-details";
