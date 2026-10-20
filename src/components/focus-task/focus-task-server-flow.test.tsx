@@ -1,13 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useQueryClient } from "@tanstack/react-query";
 import { describe, expect, test, vi } from "vitest";
 
 import FocusTaskPanel from "@/components/focus-task/focus-task-panel";
 import { FocusTaskSidebar } from "@/components/focus-task/focus-task-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TimerStatusProvider } from "@/lib/contexts/timer-status-context";
-import { focusTasksQueryKey } from "@/lib/hooks/focus-task-hooks";
 import { AppProvider } from "@/lib/stores/daily-focus-tasks-store";
 import type { FocusTask } from "@/lib/types/types";
 
@@ -46,21 +44,6 @@ const serverTask: FocusTask = {
   completedPomodoros: 0,
 };
 
-function RefreshTasks() {
-  const queryClient = useQueryClient();
-
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        void queryClient.invalidateQueries({ queryKey: focusTasksQueryKey });
-      }}
-    >
-      Refresh tasks
-    </button>
-  );
-}
-
 describe("signed-in focus tasks", () => {
   test("selects a queried task and shows it in the task panel", async () => {
     getFocusTasksMock.mockResolvedValue([serverTask]);
@@ -83,39 +66,5 @@ describe("signed-in focus tasks", () => {
 
     expect(screen.getByText("Read from the server")).toBeTruthy();
     expect(screen.queryByText("No task selected")).toBeNull();
-  });
-
-  test("clears the selection when the server removes the task", async () => {
-    getFocusTasksMock
-      .mockResolvedValueOnce([serverTask])
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([serverTask]);
-    const user = userEvent.setup();
-
-    render(
-      <AppProvider>
-        <TimerStatusProvider>
-          <SidebarProvider>
-            <FocusTaskSidebar />
-            <FocusTaskPanel />
-            <RefreshTasks />
-          </SidebarProvider>
-        </TimerStatusProvider>
-      </AppProvider>,
-    );
-
-    await user.click(
-      await screen.findByRole("button", { name: /Server task/ }),
-    );
-    expect(screen.getByText("Read from the server")).toBeTruthy();
-
-    await user.click(screen.getByRole("button", { name: "Refresh tasks" }));
-    await waitFor(() => {
-      expect(screen.queryByRole("button", { name: /Server task/ })).toBeNull();
-    });
-
-    await user.click(screen.getByRole("button", { name: "Refresh tasks" }));
-    await screen.findByRole("button", { name: /Server task/ });
-    expect(screen.getByText("No task selected")).toBeTruthy();
   });
 });

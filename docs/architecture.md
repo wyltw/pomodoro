@@ -117,9 +117,7 @@ signed-in mode, persistence middleware is disabled and `FocusTaskSidebar` loads
 the current tasks through TanStack Query. `useCurrentFocusTasks` returns Query
 tasks for signed-in users and Zustand tasks for anonymous users. Signed-in tasks
 are not copied into Zustand; its `activeTaskId` remains the shared client-side
-selection. `setActiveTask` validates the selected ID against the current list,
-and the sidebar clears the selection if a refreshed server list no longer
-contains it.
+selection. `setActiveTask` validates the selected ID against the current list.
 
 Mutations use server actions and invalidate the relevant query keys after
 success. This keeps the database authoritative while allowing both data sources

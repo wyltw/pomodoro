@@ -15,8 +15,7 @@ Query on the client.
 **Decision.** `useCurrentFocusTasks` returns persisted Zustand tasks for
 anonymous users and Query tasks for signed-in users. Do not copy Query tasks
 into Zustand. Keep `activeTaskId` in the shared Zustand store; validate a new
-selection against the current list and clear it when a refreshed server list no
-longer contains the selected task. Writes remain separate: anonymous actions
+selection against the current list. Writes remain separate: anonymous actions
 update the local store, while signed-in actions write through Server Actions
 and invalidate Query. Enable persist only for anonymous users. Key the outer
 Query provider by `userId` so both its cache and the nested task store are
