@@ -22,8 +22,11 @@ describe("Timer", () => {
     );
 
     const { rerender } = render(renderTimer());
+    const startTimerButton = screen.getByRole("button", {
+      name: "start timer",
+    });
 
-    fireEvent.click(screen.getByRole("button", { name: "start timer" }));
+    fireEvent.click(startTimerButton);
 
     act(() => {
       vi.advanceTimersByTime(2000);
@@ -45,8 +48,11 @@ describe("Timer", () => {
       </TimerStatusProvider>
     );
     const { rerender } = render(renderTimer(1));
+    const startTimerButton = screen.getByRole("button", {
+      name: "start timer",
+    });
 
-    fireEvent.click(screen.getByRole("button", { name: "start timer" }));
+    fireEvent.click(startTimerButton);
     rerender(renderTimer(10));
 
     act(() => {

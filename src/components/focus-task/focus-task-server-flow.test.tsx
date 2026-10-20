@@ -60,9 +60,10 @@ describe("signed-in focus tasks", () => {
       </AppProvider>,
     );
 
-    await user.click(
-      await screen.findByRole("button", { name: /Server task/ }),
-    );
+    const taskButton = await screen.findByRole("button", {
+      name: /Server task/,
+    });
+    await user.click(taskButton);
 
     expect(screen.getByText("Read from the server")).toBeTruthy();
     expect(screen.queryByText("No task selected")).toBeNull();

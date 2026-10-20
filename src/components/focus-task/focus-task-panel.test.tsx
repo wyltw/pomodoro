@@ -65,9 +65,12 @@ describe("FocusTaskPanel", () => {
     const deleteButton = screen.getByRole("button", {
       name: "Delete task",
     }) as HTMLButtonElement;
+    const setTimerRunningButton = screen.getByRole("button", {
+      name: "Set timer running",
+    });
     expect(deleteButton.disabled).toBe(false);
 
-    await user.click(screen.getByRole("button", { name: "Set timer running" }));
+    await user.click(setTimerRunningButton);
 
     expect(deleteButton.disabled).toBe(true);
   });

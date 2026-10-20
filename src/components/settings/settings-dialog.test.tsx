@@ -38,18 +38,22 @@ describe("SettingsDialog", () => {
       </>,
     );
 
-    await user.click(screen.getByRole("button", { name: "Settings" }));
+    const settingsButton = screen.getByRole("button", { name: "Settings" });
+    await user.click(settingsButton);
 
     const pomodoroMinutesInput = screen.getByRole("spinbutton");
     const notificationVolumeSlider = screen.getByRole("slider", {
       name: "Notification volume",
+    });
+    const saveChangesButton = screen.getByRole("button", {
+      name: "Save changes",
     });
 
     await user.clear(pomodoroMinutesInput);
     await user.type(pomodoroMinutesInput, "30");
     notificationVolumeSlider.focus();
     await user.keyboard("{ArrowRight}");
-    await user.click(screen.getByRole("button", { name: "Save changes" }));
+    await user.click(saveChangesButton);
 
     expect(screen.getByText("30 minutes at 36% volume")).toBeDefined();
   });
@@ -64,9 +68,15 @@ describe("SettingsDialog", () => {
       </>,
     );
 
-    await user.click(screen.getByRole("button", { name: "Settings" }));
-    await user.clear(screen.getByRole("spinbutton"));
-    await user.click(screen.getByRole("button", { name: "Save changes" }));
+    const settingsButton = screen.getByRole("button", { name: "Settings" });
+    await user.click(settingsButton);
+
+    const pomodoroMinutesInput = screen.getByRole("spinbutton");
+    const saveChangesButton = screen.getByRole("button", {
+      name: "Save changes",
+    });
+    await user.clear(pomodoroMinutesInput);
+    await user.click(saveChangesButton);
 
     expect(
       screen.getByText("Pomodoro length must be at least 1 minute."),
@@ -79,13 +89,15 @@ describe("SettingsDialog", () => {
 
     render(<SettingsDialog />);
 
-    await user.click(screen.getByRole("button", { name: "Settings" }));
+    const settingsButton = screen.getByRole("button", { name: "Settings" });
+    await user.click(settingsButton);
 
     const pomodoroMinutesInput =
       screen.getByRole<HTMLInputElement>("spinbutton");
     const notificationVolumeSlider = screen.getByRole("slider", {
       name: "Notification volume",
     });
+    const cancelButton = screen.getByRole("button", { name: "Cancel" });
 
     await user.clear(pomodoroMinutesInput);
     await user.type(pomodoroMinutesInput, "30");
@@ -95,14 +107,17 @@ describe("SettingsDialog", () => {
     expect(pomodoroMinutesInput.value).toBe("30");
     expect(notificationVolumeSlider.getAttribute("aria-valuenow")).toBe("36");
 
-    await user.click(screen.getByRole("button", { name: "Cancel" }));
-    await user.click(screen.getByRole("button", { name: "Settings" }));
+    await user.click(cancelButton);
+    await user.click(settingsButton);
 
-    expect(screen.getByRole<HTMLInputElement>("spinbutton").value).toBe("25");
-    expect(
-      screen
-        .getByRole("slider", { name: "Notification volume" })
-        .getAttribute("aria-valuenow"),
-    ).toBe("35");
+    const reopenedPomodoroMinutesInput =
+      screen.getByRole<HTMLInputElement>("spinbutton");
+    const reopenedNotificationVolumeSlider = screen.getByRole("slider", {
+      name: "Notification volume",
+    });
+    expect(reopenedPomodoroMinutesInput.value).toBe("25");
+    expect(reopenedNotificationVolumeSlider.getAttribute("aria-valuenow")).toBe(
+      "35",
+    );
   });
 });
