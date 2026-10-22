@@ -70,10 +70,13 @@ describe("FocusTaskList", () => {
     const taskButton = screen.getByRole("button", {
       name: /Write integration test/,
     }) as HTMLButtonElement;
+    const setTimerRunningButton = screen.getByRole("button", {
+      name: "Set timer running",
+    });
 
     expect(taskButton.disabled).toBe(false);
 
-    await user.click(screen.getByRole("button", { name: "Set timer running" }));
+    await user.click(setTimerRunningButton);
 
     expect(taskButton.disabled).toBe(true);
   });

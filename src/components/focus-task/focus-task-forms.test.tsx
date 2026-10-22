@@ -127,9 +127,10 @@ describe("FocusTaskCreateForm", () => {
     createFocusTaskMock.mockReturnValueOnce(deferred.promise);
     renderForm(<FocusTaskCreateForm isAuthPending={false} isSignedIn={true} />);
     const fields = getFormFields();
+    const saveTaskButton = screen.getByRole("button", { name: "Save task" });
     const user = await enterTaskValues(fields);
 
-    await user.click(screen.getByRole("button", { name: "Save task" }));
+    await user.click(saveTaskButton);
 
     expect(createFocusTaskMock).toHaveBeenCalledWith({
       description: "Keep input when requests fail",
@@ -156,9 +157,10 @@ describe("FocusTaskCreateForm", () => {
     createFocusTaskMock.mockReturnValueOnce(deferred.promise);
     renderForm(<FocusTaskCreateForm isAuthPending={false} isSignedIn={true} />);
     const fields = getFormFields();
+    const saveTaskButton = screen.getByRole("button", { name: "Save task" });
     const user = await enterTaskValues(fields);
 
-    await user.click(screen.getByRole("button", { name: "Save task" }));
+    await user.click(saveTaskButton);
     await act(async () => deferred.reject(new Error("Creation failed")));
 
     await waitFor(() => expect(fields.fieldset.disabled).toBe(false));
@@ -185,9 +187,12 @@ describe("FocusTaskUpdateForm", () => {
       [task],
     );
     const fields = getFormFields();
+    const updateTaskButton = screen.getByRole("button", {
+      name: "Update task",
+    });
     const user = await enterTaskValues(fields);
 
-    await user.click(screen.getByRole("button", { name: "Update task" }));
+    await user.click(updateTaskButton);
 
     expect(updateFocusTaskMock).toHaveBeenCalledWith(task.id, {
       description: "Keep input when requests fail",
@@ -220,9 +225,12 @@ describe("FocusTaskUpdateForm", () => {
       [task],
     );
     const fields = getFormFields();
+    const updateTaskButton = screen.getByRole("button", {
+      name: "Update task",
+    });
     const user = await enterTaskValues(fields);
 
-    await user.click(screen.getByRole("button", { name: "Update task" }));
+    await user.click(updateTaskButton);
     await act(async () => deferred.reject(new Error("Update failed")));
 
     await waitFor(() => expect(fields.fieldset.disabled).toBe(false));

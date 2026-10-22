@@ -13,7 +13,6 @@ export function useCurrentFocusTasks(isSignedIn: boolean) {
 
   return {
     tasks: isSignedIn ? (serverTasks ?? []) : localTasks,
-    serverTasks,
     error: isSignedIn ? error : null,
     isLoading: isSignedIn && isLoading,
   };

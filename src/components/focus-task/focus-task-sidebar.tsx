@@ -1,7 +1,6 @@
 "use client";
 
 import { ListChecksIcon } from "lucide-react";
-import { useEffect } from "react";
 
 import { FocusTaskCreateForm } from "@/components/focus-task/focus-task-create-form";
 import { FocusTaskList } from "@/components/focus-task/focus-task-list";
@@ -15,7 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { useCurrentFocusTasks } from "@/lib/hooks/current-focus-tasks";
+import { useCurrentFocusTasks } from "@/lib/hooks/useCurrentFocusTasks";
 import { useDailyFocusTasksStore } from "@/lib/stores/daily-focus-tasks-store";
 
 export function FocusTaskSidebar() {
@@ -23,18 +22,7 @@ export function FocusTaskSidebar() {
   const { isPending: isAuthPending, isSignedIn } = useAuthSession();
   const activeTaskId = useDailyFocusTasksStore((state) => state.activeTaskId);
   const setActiveTask = useDailyFocusTasksStore((state) => state.setActiveTask);
-  const clearActiveTask = useDailyFocusTasksStore(
-    (state) => state.clearActiveTask,
-  );
-  const { tasks, serverTasks, error, isLoading } =
-    useCurrentFocusTasks(isSignedIn);
-
-  useEffect(() => {
-    if (!isSignedIn || !serverTasks || !activeTaskId) return;
-    if (serverTasks.some((task) => task.id === activeTaskId)) return;
-
-    clearActiveTask();
-  }, [activeTaskId, clearActiveTask, isSignedIn, serverTasks]);
+  const { tasks, error, isLoading } = useCurrentFocusTasks(isSignedIn);
 
   function handleItemClick(taskId: string) {
     setActiveTask(taskId, tasks);

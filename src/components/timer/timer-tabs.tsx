@@ -8,7 +8,7 @@ import Timer from "./timer";
 import type { TimerType } from "@/lib/types/types";
 import { Armchair, Clock5, Coffee } from "lucide-react";
 import { useAuthSession } from "@/lib/hooks/auth-hooks";
-import { useCurrentFocusTasks } from "@/lib/hooks/current-focus-tasks";
+import { useCurrentFocusTasks } from "@/lib/hooks/useCurrentFocusTasks";
 import {
   focusTasksQueryKey,
   useCompletePomodoro,
